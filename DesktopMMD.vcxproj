@@ -88,12 +88,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,9 +144,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="CalculateBPM.h" />
     <ClInclude Include="CaptureSound.h" />
     <ClInclude Include="CheckNoSound.h" />
@@ -154,6 +151,8 @@
     <ClInclude Include="EstimateBPM.h" />
     <ClInclude Include="fft.h" />
     <ClInclude Include="ManageMMD.h" />
+    <ClInclude Include="PlayAnim.h" />
+    <ClInclude Include="TranrateAnim.h" />
     <ClInclude Include="UtilTimer.h" />
     <ClInclude Include="WaveFile.h" />
     <ClInclude Include="window.h" />
@@ -170,6 +169,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ManageMMD.cpp" />
+    <ClCompile Include="PlayAnim.cpp" />
+    <ClCompile Include="TranrateAnim.cpp" />
+    <ClCompile Include="TransrateAnim.cpp" />
     <ClCompile Include="UtilTimer.cpp" />
     <ClCompile Include="WaveFile.cpp" />
     <ClCompile Include="window.cpp" />
