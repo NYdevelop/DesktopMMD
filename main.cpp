@@ -11,16 +11,14 @@ using namespace std;
 // プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
 int main()
 {
-    //thread t([]()
-    //{
-
-    //});
-    ManageMMD manager;
-    manager.Process();
-    manager.Exit();
+    {
+        ManageMMD manager;
+        manager.Initialize();
+        manager.Process();
+        manager.Exit();
+    }
 
     _CrtDumpMemoryLeaks();
-    //t.join();
 
     return 0;
 }

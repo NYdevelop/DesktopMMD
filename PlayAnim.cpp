@@ -8,7 +8,7 @@ void PlayAnim::AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle, int
     animeIndex = MV1AttachAnim(modelHandle, animIndex, AnimSrcMHandle, NameCheck);//ƒ‚[ƒVƒ‡ƒ“‚Ì‘I‘ğ
     if (animeIndex == -1)
     {
-        throw "MV1AttachAnim error";
+        MessageBox(NULL, TEXT("MV1AttachAnim error"), NULL, MB_ICONERROR);
     }
     SetMaximumTime(MV1GetAttachAnimTotalTime(modelHandle, animeIndex));
 }

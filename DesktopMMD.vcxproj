@@ -147,13 +147,18 @@
     <ClInclude Include="CalculateBPM.h" />
     <ClInclude Include="CaptureSound.h" />
     <ClInclude Include="CheckNoSound.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="DrawMMD.h" />
     <ClInclude Include="EstimateBPM.h" />
     <ClInclude Include="fft.h" />
     <ClInclude Include="ManageMMD.h" />
     <ClInclude Include="PlayAnim.h" />
+    <ClInclude Include="rhythmState.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="StateManager.h" />
     <ClInclude Include="TranrateAnim.h" />
     <ClInclude Include="UtilTimer.h" />
+    <ClInclude Include="WaitState.h" />
     <ClInclude Include="WaveFile.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="WinUtil.h" />
@@ -170,6 +175,7 @@
     </ClCompile>
     <ClCompile Include="ManageMMD.cpp" />
     <ClCompile Include="PlayAnim.cpp" />
+    <ClCompile Include="rhythmState.cpp" />
     <ClCompile Include="TranrateAnim.cpp" />
     <ClCompile Include="TransrateAnim.cpp" />
     <ClCompile Include="UtilTimer.cpp" />

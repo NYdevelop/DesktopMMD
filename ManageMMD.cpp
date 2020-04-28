@@ -1,28 +1,48 @@
 #include "ManageMMD.h"
 
-#include "WaveFile.h"
-#include "fft.h"
-#include "EstimateBPM.h"
-#include "CalculateBPM.h"
-#include "CheckNoSound.h"
+#include "WaitState.h"
+#include "rhythmState.h"
 
+#include "fft.h"
 
 using namespace std;
 
-HRESULT ManageMMD::Process()
+HRESULT ManageMMD::Initialize()
 {
     m_Window.Init();
 
     SetUserWindow(m_Window.GetHWnd());
-    m_mmd.preInitialize();
+    m_mmd = shared_ptr<DrawMMD>(new DrawMMD());
+    m_mmd->preInitialize();
     if (DxLib::DxLib_Init() == -1) return E_FAIL;
-    m_mmd.afterInitialize();
+    m_mmd->afterInitialize();
+
+    stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
+    m_mmd->SetStateManager(stateManager);
 
     m_Window.SetDrawFunc([&](HDC hdc)
     {
-        m_mmd.mainProcess();
+        m_mmd->mainProcess();
     });
 
+    m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
+    {
+        switch ((EContextMenu)LOWORD(wParam)) {
+        case CONTEXT_EXIT: /* Exitメニュー */
+            SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
+            break;
+
+        case CONTEXT_MODE_WAIT:
+            stateManager->Transrate(STATE_WAIT);
+            break;
+
+        case CONTEXT_MODE_RHYTHM:
+            stateManager->Transrate(STATE_RHYTHM);
+            break;
+        }
+    });
+
+    /// 録音デバイス初期化
     WAVEFORMATEX wf;
     wf.wFormatTag = WAVE_FORMAT_PCM;       // PCM形式
     wf.nChannels = 1;                      // ステレオかモノラルか
@@ -33,51 +53,36 @@ HRESULT ManageMMD::Process()
                                                                 // モノラル*サンプル22050*量子化16bit=1byteなので 一秒間に44100byteのデータが発生する
                                                                 // サンプル * nBlockAlign = 一秒間のデータ量なので nBlockAlignは2
 
-    CalculateBPM calcBPM;
-    CheckNoSound checker;
-    calcBPM.SetCalcVolume([&checker, &calcBPM, this](double volume)
-    {
-        /// 動きの大きさ調整
-        auto rate = (float)volume / 1000.f;
-        if (rate > 1)
-        {
-            rate = 1;
-        }
-        m_mmd.SetMoveAttitude(rate);
+    m_Capture = shared_ptr<CaptureSound>(new CaptureSound());
+    m_Capture->OpenDevice(0, wf, 4410 * 4);
 
-        /// 鳴っているかどうか
-        bool isNoSound = checker.CheckSound(volume);
-        m_mmd.SetNoSound(isNoSound);
-        if (isNoSound == true)
-        {
-            calcBPM.Clear();
-            cout << "clear" << endl;
-            return;
-        }
-    });
+    /// State初期化
+    shared_ptr<State> wait(new WaitState());
+    stateManager->AddState(STATE_WAIT, move(wait));
 
-    EstimateBPM estimate;
-    m_Capture.SetCaptureCallback([this, wf, &estimate, &calcBPM, &checker](WAVEHDR wh)
-    {
-        auto currentVolume = calcBPM.CalcVolume(wh, wf);
-        auto bpms = calcBPM.CalcBPM(currentVolume, wf);
-        if (bpms.size() == 0) return;
-        auto ret = estimate.Estimate(bpms);
-        m_mmd.SetBPM(ret);
-    });
+    shared_ptr<State> rhythm(new RhythmState());
+    auto rhythmPtr = (RhythmState*)rhythm.get();
+    rhythmPtr->SetCapture(m_Capture);
+    rhythmPtr->SetMMD(m_mmd);
+    rhythmPtr->OnceInital();
+    stateManager->AddState(STATE_RHYTHM, move(rhythm));
 
-    m_Capture.OpenDevice(0, wf, 4410*4);
+    stateManager->Transrate(STATE_WAIT);
 
-    m_Capture.Start();
+    return S_OK;
+}
 
+HRESULT ManageMMD::Process()
+{
     m_Window.Process(60);
-    m_Capture.Stop();
 
     return S_OK;
 }
 
 void ManageMMD::Exit()
 {
+    stateManager->End();
+    m_Capture->CloseDevice();
     DxLib::DxLib_End(); // ＤＸライブラリ使用の終了処理
 }
 
@@ -116,7 +121,7 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
         }
     });
 
-    m_Capture.SetCaptureCallback([&](WAVEHDR wh)
+    m_Capture->SetCaptureCallback([&](WAVEHDR wh)
     {
         vector< complex<double> > signal;
         // setup "signal" as your FFT input.
@@ -129,7 +134,6 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
         vector< complex<double> > proj;
         lc_fft(signal, ids, n_level, &proj);// FFT変換
 
-                                            //auto result = new float[devideNum];
         for (int k = 0; k < devideNum; k++)
         {
             // 特徴的な周波数成分は低周波数に集まりやすいので、低周波数の音を中心に解像度を上げる
@@ -139,11 +143,10 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
             //複素数の大きさを計算
             double diagonal = sqrt(proj[indexFq].real() * proj[indexFq].real() + proj[indexFq].imag() * proj[indexFq].imag());
 
-            //result[k] = (float)diagonal;
             prev[k] = max((float)diagonal / 800.f, prev[k] - 8);
         }
     });
 
 
-    m_Capture.OpenDevice(0, wf, FFT_LENGTH * 2);
+    m_Capture->OpenDevice(0, wf, FFT_LENGTH * 2);
 }

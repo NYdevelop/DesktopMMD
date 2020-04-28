@@ -13,93 +13,135 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ヘッダー ファイル\State">
+      <UniqueIdentifier>{7e7de1a9-9819-45d5-9365-b1f9bb062192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\State">
+      <UniqueIdentifier>{d39ce697-239b-441b-b23b-5dfcceb68731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Soud">
+      <UniqueIdentifier>{514e50f5-6574-441a-b2de-8194476d6d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Sound">
+      <UniqueIdentifier>{d3e7046b-921a-4804-b349-c40b5199cd0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util">
+      <UniqueIdentifier>{90f79bac-00f3-4eae-878d-61bbc3c5a0c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\MMD">
+      <UniqueIdentifier>{7522c9df-4fae-41e3-956e-fc19b0bdca12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Util">
+      <UniqueIdentifier>{bac96a27-4be5-4b57-94e6-d5541662ea29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\MMD">
+      <UniqueIdentifier>{566fde51-ed06-457f-8f2f-4f71a0a4669f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UtilTimer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawMMD.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="window.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="CaptureSound.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="State.h">
+      <Filter>ヘッダー ファイル\State</Filter>
     </ClInclude>
-    <ClInclude Include="ManageMMD.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="StateManager.h">
+      <Filter>ヘッダー ファイル\State</Filter>
     </ClInclude>
-    <ClInclude Include="WaveFile.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="fft.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="EstimateBPM.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="WinUtil.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="CheckNoSound.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="rhythmState.h">
+      <Filter>ヘッダー ファイル\State</Filter>
     </ClInclude>
     <ClInclude Include="CalculateBPM.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="CaptureSound.h">
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckNoSound.h">
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveFile.h">
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="EstimateBPM.h">
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="fft.h">
+      <Filter>ヘッダー ファイル\Soud</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawMMD.h">
+      <Filter>ヘッダー ファイル\MMD</Filter>
+    </ClInclude>
+    <ClInclude Include="ManageMMD.h">
+      <Filter>ヘッダー ファイル\MMD</Filter>
     </ClInclude>
     <ClInclude Include="PlayAnim.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\MMD</Filter>
     </ClInclude>
     <ClInclude Include="TranrateAnim.h">
+      <Filter>ヘッダー ファイル\MMD</Filter>
+    </ClInclude>
+    <ClInclude Include="UtilTimer.h">
+      <Filter>ヘッダー ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="WinUtil.h">
+      <Filter>ヘッダー ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="WaitState.h">
+      <Filter>ヘッダー ファイル\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UtilTimer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawMMD.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="window.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="CalculateBPM.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
     <ClCompile Include="CaptureSound.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ManageMMD.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="WaveFile.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="fft.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="EstimateBPM.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="WinUtil.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
     <ClCompile Include="CheckNoSound.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
-    <ClCompile Include="CalculateBPM.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="fft.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="EstimateBPM.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveFile.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="UtilTimer.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="WinUtil.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawMMD.cpp">
+      <Filter>ソース ファイル\MMD</Filter>
+    </ClCompile>
+    <ClCompile Include="ManageMMD.cpp">
+      <Filter>ソース ファイル\MMD</Filter>
     </ClCompile>
     <ClCompile Include="PlayAnim.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="TransrateAnim.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\MMD</Filter>
     </ClCompile>
     <ClCompile Include="TranrateAnim.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\MMD</Filter>
+    </ClCompile>
+    <ClCompile Include="TransrateAnim.cpp">
+      <Filter>ソース ファイル\MMD</Filter>
+    </ClCompile>
+    <ClCompile Include="rhythmState.cpp">
+      <Filter>ソース ファイル\State</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

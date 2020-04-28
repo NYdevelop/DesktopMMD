@@ -15,6 +15,7 @@ public:
     bool IsClose();
 
     void SetDrawFunc(const std::function<void(HDC)>& func);
+    void SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func);
 
 private:
     HRESULT InitWindow(HWND* hWnd);
@@ -37,6 +38,8 @@ private:
     int                   m_nHeight;
 
     HMENU m_ContextMenu;
+    HMENU m_ModeMenu;
 
     std::function<void(HDC)> m_DrawFunc;
+    std::function<void(WPARAM, LPARAM)> m_CommandCallback;
 };

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "Define.h"
 
 //#define _CRTDBG_MAP_ALLOC
 //#include <stdlib.h>
@@ -73,8 +74,14 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
 
     /// コンテキストメニュー作成
     m_ContextMenu = CreatePopupMenu();
+    m_ModeMenu = CreatePopupMenu();
+
     /* メニュー項目追加 */
-    AppendMenu(m_ContextMenu, MF_STRING, 1, L"Exit");
+    AppendMenu(m_ContextMenu, MF_POPUP, (UINT)m_ModeMenu, L"Mode");
+    AppendMenu(m_ContextMenu, MF_STRING, CONTEXT_EXIT,    L"Exit");
+
+    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_WAIT,   L"Wait");
+    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_RHYTHM, L"Rhythm");
 
     return S_OK;
 }
@@ -91,11 +98,17 @@ LRESULT CALLBACK CWindow::WindProc(
 
     case WM_COMMAND:
     {
-        switch (LOWORD(wParam)) {
-        case 1: /* Exitメニュー */
-            SendMessageA(hwnd, WM_CLOSE, 0, 0);
-            break;
+        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+        if (win->m_CommandCallback != nullptr)
+        {
+            win->m_CommandCallback(wParam, lParam);
         }
+
+        //switch (LOWORD(wParam)) {
+        //case 2: /* Exitメニュー */
+        //    SendMessageA(hwnd, WM_CLOSE, 0, 0);
+        //    break;
+        //}
     }
     break;
 
@@ -177,21 +190,24 @@ HRESULT CWindow::Init()
 HRESULT CWindow::Process(int fps)
 {
     HRESULT hResult = E_FAIL;
-    if (m_bInitDone)
+    if (!m_bInitDone)
     {
-        m_Timer.Start([=]()
-        {
-            //InvalidateRect(m_hWnd, NULL, FALSE);
-            m_DrawFunc(nullptr);
-            return true;
-        },
-            1000 * 1000 / fps);
+        MessageBox(NULL, TEXT("window not initalize"), NULL, MB_ICONERROR);
+        return hResult;
+    }
 
-        MSG msg;
-        while (GetMessage(&msg, NULL, 0, 0)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
+    m_Timer.Start([=]()
+    {
+        //InvalidateRect(m_hWnd, NULL, FALSE);
+        m_DrawFunc(nullptr);
+        return true;
+    },
+        1000 * 1000 / fps);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 
     return hResult;
@@ -210,6 +226,11 @@ bool CWindow::IsClose()
 void CWindow::SetDrawFunc(const function<void(HDC)>& func)
 {
     m_DrawFunc = func;
+}
+
+void CWindow::SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func)
+{
+    m_CommandCallback = func;
 }
 
 void CWindow::Draw(HDC hDc)

@@ -7,11 +7,11 @@
 
 using namespace std;
 
-std::chrono::system_clock::time_point start;
 HRESULT CaptureSound::OpenDevice(UINT deviceIndex, WAVEFORMATEX format, int bufferSize)
 {
+    m_WaveFormat = format;
     if (waveInOpen(&hwi, deviceIndex, &format, (DWORD)Callback, (DWORD_PTR)this, CALLBACK_FUNCTION) != MMSYSERR_NOERROR) {
-        MessageBox(NULL, TEXT("WAVEデバイスのオープンに失敗しました。"), NULL, MB_ICONWARNING);
+        MessageBox(NULL, TEXT("WAVEデバイスのオープンに失敗しました。"), NULL, MB_ICONERROR);
         return -1;
     }
 
@@ -44,7 +44,6 @@ HRESULT CaptureSound::OpenDevice(UINT deviceIndex, WAVEFORMATEX format, int buff
 
 void CaptureSound::Start()
 {
-    start = chrono::system_clock::now();
     // 録音開始
     waveInStart(hwi);
 }
@@ -53,14 +52,19 @@ void CaptureSound::Stop()
 {
     if (hwi == nullptr) return;
 
-    //! 1.録音終了
+    // 録音終了
     waveInStop(hwi);
+}
 
-    //! 2.入力デバイスに登録したデータブロックを解放する.
+HRESULT CaptureSound::CloseDevice()
+{
+    if (hwi == nullptr) return S_OK;
+
+    // 入力デバイスに登録したデータブロックを解放する.
     for (int i = 0; i < BUFFER_NUM; i++) {
         waveInUnprepareHeader(hwi, &InHdr[i], sizeof(WAVEHDR));
 
-        //! 3.データバッファを解放する.
+        // データバッファを解放する.
         if (InHdr[i].lpData) {
             delete[] InHdr[i].lpData;
             InHdr[i].lpData = NULL;
@@ -73,14 +77,21 @@ void CaptureSound::Stop()
         latestBuffer.lpData = NULL;
     }
 
-    //! -4.入力デバイスをクローズする.
+    // 入力デバイスをクローズする.
     waveInClose(hwi);
     hwi = NULL;
+
+    return S_OK;
 }
 
 void CaptureSound::SetCaptureCallback(const std::function<void(WAVEHDR)>& callback)
 {
     m_CaptureCallback = callback;
+}
+
+WAVEFORMATEX CaptureSound::GetWaveFormatEx()
+{
+    return m_WaveFormat;
 }
 
 void CaptureSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
@@ -96,8 +107,6 @@ void CaptureSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwPa
         break;
 
     case WIM_DATA:
-        //long long elapsedMicroSec = (chrono::system_clock::now() - start).count() / 10; //処理に要した時間をミリ秒に変換
-        //cout << "DATA " << elapsedMicroSec << endl;
         auto instance = (CaptureSound*)dwInstance;
         instance->SoundInputDone(hwi, (WAVEHDR*)dwParam1);
         break;

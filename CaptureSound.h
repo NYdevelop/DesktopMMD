@@ -11,7 +11,11 @@ public:
     void Start();
     void Stop();
 
+    HRESULT CloseDevice();
+
     void SetCaptureCallback(const std::function<void(WAVEHDR)>& callback);
+
+    WAVEFORMATEX GetWaveFormatEx();
 
 private:
     static void CALLBACK Callback(HWAVEIN hwi,
@@ -28,4 +32,6 @@ private:
     HWAVEIN hwi = nullptr;
     WAVEHDR InHdr[BUFFER_NUM];               //!< サウンド入力のデータブロック構造体
     WAVEHDR latestBuffer;
+
+    WAVEFORMATEX m_WaveFormat;
 };
