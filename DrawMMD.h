@@ -14,6 +14,8 @@ public:
     void afterInitialize();
     int mainProcess();
 
+    void LoadModel();
+
     inline void SetStateManager(std::shared_ptr<StateManager<EState>> stateManager)
     {
         m_StateManager = stateManager;
@@ -27,6 +29,7 @@ public:
 private:
     int model;//モデルハンドル
     DxLib::VECTOR charaPos;//キャラクタの座標
+    float rotateY;
 
     LONG dispWidth;
     LONG dispHeight;
@@ -34,4 +37,6 @@ private:
     PlayAnim blink;
 
     std::shared_ptr<StateManager<EState>> m_StateManager;
+
+    bool isDraw = true;
 };

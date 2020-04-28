@@ -1,8 +1,7 @@
 #pragma once
 
-#include "State.h"
+#include "StateMMD.h"
 #include "CaptureSound.h"
-#include "DrawMMD.h"
 
 #include "PlayAnim.h"
 #include "TranrateAnim.h"
@@ -13,7 +12,7 @@
 
 #include <memory>
 
-class RhythmState : public State
+class RhythmState : public StateMMD
 {
 public:
     void Initialize();
@@ -22,14 +21,11 @@ public:
 
     void OnceInital();
 
+    void ModelInitial();
+
     inline void SetCapture(std::shared_ptr<CaptureSound> capture)
     {
         m_Capture = move(capture);
-    }
-
-    inline void SetMMD(std::shared_ptr<DrawMMD> mmd)
-    {
-        m_mmd = move(mmd);
     }
 
     void SetBPM(float bpm);
@@ -39,9 +35,6 @@ public:
 
 private:
     std::shared_ptr<CaptureSound> m_Capture;
-    std::shared_ptr<DrawMMD> m_mmd;
-
-    int model;
 
     PlayAnim unazuki;
     int stableAnimIndex = -1;

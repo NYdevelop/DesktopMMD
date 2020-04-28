@@ -1,5 +1,6 @@
 #include "rhythmState.h"
 
+#include "DxLib.h"
 
 #include <iostream>
 
@@ -51,27 +52,6 @@ void RhythmState::End()
 
 void RhythmState::OnceInital()
 {
-    model = m_mmd->GetModelHandle();
-
-    unazuki.AttachAnime(model, 3);
-    unazuki.SetPlaySpeed(BASE_PLAY_SPEED);
-
-    noSoundAnimIndex = 1;
-    noSoundAnimIndex = MV1AttachAnim(model, noSoundAnimIndex, -1, FALSE);//モーションの選択
-
-    stableAnimIndex = 4;
-    stableAnimIndex = MV1AttachAnim(model, stableAnimIndex, -1, FALSE);//モーションの選択
-
-    unazuki2NoSound.SetAnim(unazuki.GetAnimIndex(), noSoundAnimIndex, model);
-    noSound2Unazuki.SetAnim(noSoundAnimIndex, unazuki.GetAnimIndex(), model);
-    noSound2Stable.SetAnim(noSoundAnimIndex, stableAnimIndex, model);
-
-    MV1SetAttachAnimTime(model, noSoundAnimIndex, 0);//モーションの再生位置を設定
-    MV1SetAttachAnimBlendRate(model, noSoundAnimIndex, 0);
-
-    MV1SetAttachAnimTime(model, stableAnimIndex, 0);//モーションの再生位置を設定
-    MV1SetAttachAnimBlendRate(model, stableAnimIndex, 0);
-
     calcBPM.SetCalcVolume([this](double volume)
     {
         /// 動きの大きさ調整
@@ -92,7 +72,28 @@ void RhythmState::OnceInital()
             return;
         }
     });
+}
 
+void RhythmState::ModelInitial()
+{
+    unazuki.AttachAnime(model, 3);
+    unazuki.SetPlaySpeed(BASE_PLAY_SPEED);
+
+    noSoundAnimIndex = 1;
+    noSoundAnimIndex = MV1AttachAnim(model, noSoundAnimIndex, -1, FALSE);//モーションの選択
+
+    stableAnimIndex = 4;
+    stableAnimIndex = MV1AttachAnim(model, stableAnimIndex, -1, FALSE);//モーションの選択
+
+    unazuki2NoSound.SetAnim(unazuki.GetAnimIndex(), noSoundAnimIndex, model);
+    noSound2Unazuki.SetAnim(noSoundAnimIndex, unazuki.GetAnimIndex(), model);
+    noSound2Stable.SetAnim(noSoundAnimIndex, stableAnimIndex, model);
+
+    MV1SetAttachAnimTime(model, noSoundAnimIndex, 0);//モーションの再生位置を設定
+    MV1SetAttachAnimBlendRate(model, noSoundAnimIndex, 0);
+
+    MV1SetAttachAnimTime(model, stableAnimIndex, 0);//モーションの再生位置を設定
+    MV1SetAttachAnimBlendRate(model, stableAnimIndex, 0);
 }
 
 void RhythmState::SetBPM(float bpm)

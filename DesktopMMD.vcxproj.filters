@@ -19,9 +19,6 @@
     <Filter Include="ソース ファイル\State">
       <UniqueIdentifier>{d39ce697-239b-441b-b23b-5dfcceb68731}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Soud">
-      <UniqueIdentifier>{514e50f5-6574-441a-b2de-8194476d6d1c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Sound">
       <UniqueIdentifier>{d3e7046b-921a-4804-b349-c40b5199cd0a}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,9 @@
     </Filter>
     <Filter Include="ヘッダー ファイル\MMD">
       <UniqueIdentifier>{566fde51-ed06-457f-8f2f-4f71a0a4669f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Sound">
+      <UniqueIdentifier>{514e50f5-6574-441a-b2de-8194476d6d1c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -52,22 +52,22 @@
       <Filter>ヘッダー ファイル\State</Filter>
     </ClInclude>
     <ClInclude Include="CalculateBPM.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="CaptureSound.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="CheckNoSound.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="WaveFile.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="EstimateBPM.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="fft.h">
-      <Filter>ヘッダー ファイル\Soud</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="DrawMMD.h">
       <Filter>ヘッダー ファイル\MMD</Filter>
@@ -93,6 +93,18 @@
     <ClInclude Include="Define.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="ReadState.h">
+      <Filter>ヘッダー ファイル\State</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputSound.h">
+      <Filter>ヘッダー ファイル\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadWavFile.h">
+      <Filter>ヘッダー ファイル\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMMD.h">
+      <Filter>ヘッダー ファイル\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -114,9 +126,6 @@
       <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
     <ClCompile Include="EstimateBPM.cpp">
-      <Filter>ソース ファイル\Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="WaveFile.cpp">
       <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
     <ClCompile Include="UtilTimer.cpp">
@@ -142,6 +151,15 @@
     </ClCompile>
     <ClCompile Include="rhythmState.cpp">
       <Filter>ソース ファイル\State</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadState.cpp">
+      <Filter>ソース ファイル\State</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputSound.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadWavFile.cpp">
+      <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

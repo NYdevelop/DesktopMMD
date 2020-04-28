@@ -82,6 +82,7 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
 
     AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_WAIT,   L"Wait");
     AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_RHYTHM, L"Rhythm");
+    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_READ,   L"Read");
 
     return S_OK;
 }
@@ -103,12 +104,6 @@ LRESULT CALLBACK CWindow::WindProc(
         {
             win->m_CommandCallback(wParam, lParam);
         }
-
-        //switch (LOWORD(wParam)) {
-        //case 2: /* Exitƒƒjƒ…[ */
-        //    SendMessageA(hwnd, WM_CLOSE, 0, 0);
-        //    break;
-        //}
     }
     break;
 
@@ -138,16 +133,6 @@ LRESULT CALLBACK CWindow::WindProc(
         TrackPopupMenu(win->m_ContextMenu, 0, pt.x, pt.y, 0, hwnd, NULL);
     }
     break;
-
-    //case WM_PAINT:
-    //{
-    //    PAINTSTRUCT paint;
-    //    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
-    //    auto hdc = BeginPaint(win->m_hWnd, &paint);
-    //    win->Draw(hdc);
-    //    EndPaint(win->m_hWnd, &paint);
-    //}
-    //break;
 
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);

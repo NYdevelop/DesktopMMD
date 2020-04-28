@@ -15,7 +15,17 @@ public:
         playSpeed = value;
     }
 
+    inline void IsLoop(bool flag)
+    {
+        isLoop = flag;
+    }
+
     void PlayAnimation();
+
+    inline void ResetAnimTime()
+    {
+        playTime = 0;
+    }
 
     inline int GetAnimIndex()
     {
@@ -28,4 +38,5 @@ private:
     float playSpeed = 1.0f;
     float maximumTime = 0;
     int modelHandle;
+    bool isLoop = true;
 };

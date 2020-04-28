@@ -15,8 +15,16 @@ void PlayAnim::AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle, int
 
 void PlayAnim::PlayAnimation()
 {
-    playTime += playSpeed;
-    if (playTime >= maximumTime)
+    if (playTime < maximumTime)
+    {
+        playTime += playSpeed;
+        if (playTime > maximumTime)
+        {
+            playTime = maximumTime;
+        }
+    }
+
+    if (playTime >= maximumTime && isLoop)
     {
         playTime = 0.f;
     }

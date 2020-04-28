@@ -152,10 +152,14 @@
     <ClInclude Include="EstimateBPM.h" />
     <ClInclude Include="fft.h" />
     <ClInclude Include="ManageMMD.h" />
+    <ClInclude Include="OutputSound.h" />
     <ClInclude Include="PlayAnim.h" />
-    <ClInclude Include="rhythmState.h" />
+    <ClInclude Include="ReadState.h" />
+    <ClInclude Include="ReadWavFile.h" />
+    <ClInclude Include="RhythmState.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateManager.h" />
+    <ClInclude Include="StateMMD.h" />
     <ClInclude Include="TranrateAnim.h" />
     <ClInclude Include="UtilTimer.h" />
     <ClInclude Include="WaitState.h" />
@@ -174,12 +178,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ManageMMD.cpp" />
+    <ClCompile Include="OutputSound.cpp" />
     <ClCompile Include="PlayAnim.cpp" />
-    <ClCompile Include="rhythmState.cpp" />
+    <ClCompile Include="ReadState.cpp" />
+    <ClCompile Include="ReadWavFile.cpp" />
+    <ClCompile Include="RhythmState.cpp" />
     <ClCompile Include="TranrateAnim.cpp" />
     <ClCompile Include="TransrateAnim.cpp" />
     <ClCompile Include="UtilTimer.cpp" />
-    <ClCompile Include="WaveFile.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="WinUtil.cpp" />
   </ItemGroup>

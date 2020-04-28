@@ -49,6 +49,11 @@ public:
         currentState->End();
     }
 
+    std::map<T, std::shared_ptr<State>> GetStateMap()
+    {
+        return m_StateMap;
+    }
+
 private:
     std::map<T, std::shared_ptr<State>> m_StateMap;
     std::shared_ptr<State> currentState;
