@@ -11,9 +11,6 @@ using namespace std;
 // プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
 int main()
 {
-    system("python ../../python/yahooAPI/yahooAPI.py");
-    system("move text.txt data");
-    system("move sep_text.txt data");
     {
         ManageMMD manager;
         manager.Initialize();
