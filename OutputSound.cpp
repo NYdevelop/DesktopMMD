@@ -2,6 +2,8 @@
 
 #include "ReadWavFile.h"
 
+#pragma comment(lib, "winmm")
+
 HRESULT OutputSound::OpenDevice(WAVEFORMATEX* format, UINT deviceIndex)
 {
     //! 出力デバイスをオープンする.
@@ -17,17 +19,32 @@ HRESULT OutputSound::OpenDevice(WAVEFORMATEX* format, UINT deviceIndex)
 
 void OutputSound::Start(unsigned long bufSize)
 {
+    OutHdr = { 0 };
     //! データブロックを出力デバイスに登録する.
-//    const int BUFSIZE = 4096;
-    //memset(&OutHdr, 0, bufSize);
-    //for (int i = 0; i < BUFFER_NUM; i++) {
-        OutHdr.lpData = new char[bufSize];
-        if (waveOutPrepareHeader(hwo, &OutHdr, sizeof(WAVEHDR)) != MMSYSERR_NOERROR)
-        {
-            MessageBox(NULL, TEXT("output sound error"), NULL, MB_ICONERROR);
-            return;
-        }
-    //}
+    TCHAR str[MAXERRORLENGTH];
+    OutHdr.lpData = new char[bufSize];
+    //OutHdr.dwBufferLength = bufSize;
+    //OutHdr.dwFlags = 0;
+    //OutHdr.dwBytesRecorded = 0;
+    //OutHdr.dwLoops = 1;
+    //OutHdr.lpNext = NULL;
+    //OutHdr.dwUser = 0;
+    //OutHdr.reserved = 0;
+    OutHdr.dwBufferLength = 0;
+    OutHdr.dwFlags = 0;
+    OutHdr.dwBytesRecorded = 0;
+    OutHdr.dwLoops = 0;
+    OutHdr.lpNext = NULL;
+    OutHdr.dwUser = 0;
+    OutHdr.reserved = 0;
+
+    auto mmRes = waveOutPrepareHeader(hwo, &OutHdr, sizeof(WAVEHDR));
+    if (mmRes != MMSYSERR_NOERROR)
+    {
+        waveOutGetErrorText(mmRes, str, MAXERRORLENGTH);
+        MessageBox(NULL, str, TEXT("output sound error"), MB_ICONERROR);
+        return;
+    }
 }
 
 void OutputSound::Stop()
@@ -40,16 +57,14 @@ HRESULT OutputSound::CloseDevice()
 {
     if (hwo == nullptr) S_OK;
 
-    //for (int i = 0; i < BUFFER_NUM; i++) {
-        //! 出力デバイスに登録したデータブロックを解放する.
-        waveOutUnprepareHeader(hwo, &OutHdr, sizeof(WAVEHDR));
+    //! 出力デバイスに登録したデータブロックを解放する.
+    waveOutUnprepareHeader(hwo, &OutHdr, sizeof(WAVEHDR));
 
-        //! データバッファを解放する.
-        if (OutHdr.lpData) {
-            delete[] OutHdr.lpData;
-            OutHdr.lpData = NULL;
-        }
-    //}
+    //! データバッファを解放する.
+    if (OutHdr.lpData) {
+        delete[] OutHdr.lpData;
+        OutHdr.lpData = NULL;
+    }
 
     //! 出力デバイスをクローズする.
     waveOutClose(hwo);
@@ -60,16 +75,12 @@ HRESULT OutputSound::CloseDevice()
 
 void OutputSound::InputData(WAVEHDR wh)
 {
-    //! 空いている出力データバッファを探して、入力音声データをコピーする.
-    //for (DWORD i = 0; i < BUFFER_NUM; i++) {
-        if (OutHdr.dwBufferLength == 0 && OutHdr.lpData)
-        {
-            memcpy(OutHdr.lpData, wh.lpData, wh.dwBytesRecorded);
-            OutHdr.dwBufferLength = wh.dwBytesRecorded;
-            waveOutWrite(hwo, &OutHdr, sizeof(WAVEHDR));
-            //break;
-        }
-    //}
+    if (OutHdr.dwBufferLength == 0 && OutHdr.lpData)
+    {
+        memcpy(OutHdr.lpData, wh.lpData, wh.dwBytesRecorded);
+        OutHdr.dwBufferLength = wh.dwBytesRecorded;
+        waveOutWrite(hwo, &OutHdr, sizeof(WAVEHDR));
+    }
 }
 
 void OutputSound::Output(const std::wstring & wavFileName, UINT deviceIndex)
