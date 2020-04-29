@@ -9,12 +9,21 @@ void ReadState::Initialize()
 {
     cout << "state: read" << endl;
 
-    // TODO: ニュース原稿ダウンロード
-    // TODO: ひらがな化
-    // TODO: wav, vmd生成
-    // TODO: 読み込み
-    manager->LoadModel();
+    // ニュース原稿ダウンロード、ひらがな化
+    system("python YahooAPI/yahooAPI.py");
+    system("move text.txt data");
+    system("move sep_text.txt data");
 
+    // wav生成
+    system("softalk_rec data/text.txt");
+
+    // vmd生成
+    system("TextLip.exe data/text.txt");
+    system("move text.vmd data/text.vmd");
+    system("motion_update.bat");
+
+    // 各種読み込み
+    manager->LoadModel();
     m_Output->Output(L"data/text.wav");
     MV1SetAttachAnimBlendRate(model, lipAnim.GetAnimIndex(), 1);
     lipAnim.ResetAnimTime();

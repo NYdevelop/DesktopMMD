@@ -91,14 +91,14 @@ void OutputSound::Output(const std::wstring & wavFileName, UINT deviceIndex)
     wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 
     OpenDevice(&wf, deviceIndex);
-    Start(header.FileSize + 1);
+    int size = header.FileSize - wf.nAvgBytesPerSec * 0.5;
+    Start(size);
 
     WAVEHDR wh;
-    wh.lpData = new char[header.FileSize + 1];
-    wh.lpData[header.FileSize] = 0;
-    wh.dwBytesRecorded = header.FileSize + 1;
+    wh.lpData = new char[size];
+    wh.dwBytesRecorded = size;
 
-    reader.ReadWaveFile(wh.lpData, header.FileSize);
+    reader.ReadWaveFile(wh.lpData, size);
     InputData(wh);
 }
 

@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{233755C0-6F26-447A-8BC7-C0533658CBE1}</ProjectGuid>
+    <ProjectGuid>{14F8CEB6-05D5-4027-A47A-A31B80AAB0A3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DesktopMMD</RootNamespace>
+    <RootNamespace>TextLip</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,6 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -88,12 +89,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,50 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CalculateBPM.h" />
-    <ClInclude Include="CaptureSound.h" />
-    <ClInclude Include="CheckNoSound.h" />
-    <ClInclude Include="Define.h" />
-    <ClInclude Include="DrawMMD.h" />
-    <ClInclude Include="EstimateBPM.h" />
-    <ClInclude Include="fft.h" />
-    <ClInclude Include="ManageMMD.h" />
-    <ClInclude Include="OutputSound.h" />
-    <ClInclude Include="PlayAnim.h" />
-    <ClInclude Include="ReadState.h" />
-    <ClInclude Include="ReadWavFile.h" />
-    <ClInclude Include="RhythmState.h" />
-    <ClInclude Include="State.h" />
-    <ClInclude Include="StateManager.h" />
-    <ClInclude Include="StateMMD.h" />
-    <ClInclude Include="TranrateAnim.h" />
-    <ClInclude Include="UtilTimer.h" />
-    <ClInclude Include="WaitState.h" />
-    <ClInclude Include="WaveFile.h" />
-    <ClInclude Include="window.h" />
-    <ClInclude Include="WinUtil.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="CalculateBPM.cpp" />
-    <ClCompile Include="CaptureSound.cpp" />
-    <ClCompile Include="CheckNoSound.cpp" />
-    <ClCompile Include="EstimateBPM.cpp" />
-    <ClCompile Include="fft.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="DrawMMD.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ManageMMD.cpp" />
-    <ClCompile Include="OutputSound.cpp" />
-    <ClCompile Include="PlayAnim.cpp" />
-    <ClCompile Include="ReadState.cpp" />
-    <ClCompile Include="ReadWavFile.cpp" />
-    <ClCompile Include="RhythmState.cpp" />
-    <ClCompile Include="TranrateAnim.cpp" />
-    <ClCompile Include="TransrateAnim.cpp" />
-    <ClCompile Include="UtilTimer.cpp" />
-    <ClCompile Include="window.cpp" />
-    <ClCompile Include="WinUtil.cpp" />
+    <ClCompile Include="TextLip.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
