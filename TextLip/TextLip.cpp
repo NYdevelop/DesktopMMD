@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <map>
 
+#include "BinaryWriter.h"
+#include "ConvertJapaneseChar.h"
+
 using namespace std;
 
 #pragma region Define
@@ -23,46 +26,42 @@ map<string, int> exclude =
     { "っ", 3 },
 };
 
+// TODO: 口の形をそのままに
 vector<string> wait = { "ー", "っ" };
 
 vector<string> baseStr =
 {
-    "かさたなはまやらわがざだばぱゃぁ",
-    "きしちにひみりぎじぢびぴぃ",
+    "かさたなはまやらわがざだばぱゃぁゎ",
+    "きしちにひみりぎじぢびぴぃゐ",
     "くすつぬふむゆるぐずづぶぷゅぅ",
-    "けせてねへめれげぜでべぺぇ",
+    "けせてねへめれげぜでべぺぇゑ",
     "こそとのほもよをろをごぞどぼぽょぉ"
 };
+
+const unsigned int MORF_NAME_SIZE = 15;
+const unsigned int MODEL_NAME_SIZE = 20;
 #pragma endregion
 
+BinaryWriter writer;
+
 #pragma region Func
-void outputBinary(ofstream& ofs, int data)
+void oneFrame(char* morfName, int keyframe, float weight)
 {
-    ofs.write(reinterpret_cast<char *>(&data), sizeof(int));
-}
-
-void outputBinary(ofstream& ofs, float data)
-{
-    ofs.write(reinterpret_cast<char *>(&data), sizeof(float));
-}
-
-void oneFrame(ofstream& ofs, char* morfName, int keyframe, float weight)
-{
-    ofs.write(morfName, 15);
+    writer.Write(morfName, MORF_NAME_SIZE);
 
     // keyframe
-    outputBinary(ofs, keyframe);
+    writer.Write(keyframe);
 
     // weight
-    outputBinary(ofs, weight);
+    writer.Write(weight);
 }
 
-void oneMove(ofstream& ofs, char* morfName, int& keyFrame, const string& next)
+void oneMove(char* morfName, int& keyFrame, const string& next)
 {
     if (morfName[1] == char(0xa6)) // 「え」の場合
     {
         morfName[1] = char(0xa2);
-        oneMove(ofs, morfName, keyFrame, next);
+        oneMove(morfName, keyFrame, next);
         return;
     }
 
@@ -71,24 +70,23 @@ void oneMove(ofstream& ofs, char* morfName, int& keyFrame, const string& next)
     {
         keyFrame -= 4;
     }
-    oneFrame(ofs, morfName, keyFrame, 0);
+    oneFrame(morfName, keyFrame, 0);
 
     keyFrame += 4;
     float weight = 1.f;
     if (morfName[1] == char(0xa0)) // 「あ」の場合
         weight = 0.5f;
-    oneFrame(ofs, morfName, keyFrame, weight);
+    oneFrame(morfName, keyFrame, weight);
 
     keyFrame += 6;
-    oneFrame(ofs, morfName, keyFrame, 0);
+    oneFrame(morfName, keyFrame, 0);
 }
-#pragma endregion
 
 int countnn(const string& str)
 {
     int ret = 0;
     char nn = char(0xf1);
-    for (unsigned int i = 0; i<str.size(); i += 2)
+    for (unsigned int i = 0; i<str.size()-2; i += 2)
     {
         string search(str.begin()+i, str.begin() + i+2);
         if (exclude.find(search) != exclude.end())
@@ -99,74 +97,78 @@ int countnn(const string& str)
     return ret;
 }
 
-bool Coitain(char* c, const string& v)
+bool Coitain(const string& src, const string& find)
 {
-    return find_if(
-        v.begin(),
-        v.end(),
-        [c](char x) 
-    {
-        return x == c[1];
-    }) != v.end();
+    return find.find(src) != string::npos;
 }
+
+string oneWord(const string& word)
+{
+    string ret;
+    /// 英字
+    bool hit = false;
+    for (auto c : word)
+    {
+        if (c >= 0x3A && c <= 0x7A)
+        {
+            hit = true;
+            ret += ConvertAlphabetAndSymbol(c);
+        }
+    }
+    if (hit == true)
+    {
+        return ret;
+    }
+
+    /// 数値
+    try
+    {
+        auto i = stof(word);
+        ret = Convert(i);
+        return ret;
+    }
+    catch (const std::invalid_argument&)
+    {
+    }
+
+    return word;
+}
+#pragma endregion
 
 int main(int argc, char** argv)
 {
+    char tmp[] = { char(0x95), char(0x96) };
+    string tmp2(tmp);
     if (argc != 2)
     {
         return 0;
     }
     ifstream ifs(argv[1]);
 
+    /// 各単語処理
     string buf;
     string text("");
     while (!ifs.eof())
     {
         getline(ifs, buf);
         if (buf == "") break;
-        if (string(buf.end() - 3, buf.end() - 1) != "。")
-        {
-            buf += "。";
-        }
-        text += buf;
+
+        /// 一文に連結
+        buf = oneWord(buf);
+        text.append(buf);
     }
 
-    ofstream ofs("text.vmd", ios::binary);
-
-    std::copy(header.begin(), header.end(), std::ostream_iterator<char>(ofs));
+    writer.Open("text.vmd");
+    writer.Write(header);
     char modelName[20] = "初音ミク";
-    ofs.write(modelName, 20);
+    writer.Write(modelName, MODEL_NAME_SIZE);
 
     int boneNum = 0;
-    outputBinary(ofs, boneNum);
-
-    //for (auto v : exclude)
-    //{
-    //    size_t pos = text.find(v);
-    //    while (pos != string::npos)
-    //    {
-    //        text.erase(pos, 2);
-    //        pos = text.find(v);
-    //    }
-    //}
+    writer.Write(boneNum);
 
     // キー数： 文字数 * 3
     int charNum = text.size() / 2;
-    outputBinary(ofs, (charNum - countnn(text)) * 3);
-
-    // 各行の基準データ生成
-    //vector< vector<unsigned char> > aa(5);
-    //aa[0] = a;
-    //for (int i = 0; i<4; i++)
-    //{
-    //    auto& row0 = aa[i];
-    //    auto& row1 = aa[i+1];
-    //    for (int j = 0; j<8; j++)
-    //    {
-    //        row1.emplace_back(row0[j] + 2);
-    //    }
-    //}
-    //aa[4].emplace_back(0xf0); // 「を」
+    writer.Write((charNum - countnn(text)) * 3);
 
     int keyFrame = 2+4;
     for (int i = 0; i < charNum; i++)
@@ -178,10 +180,10 @@ int main(int argc, char** argv)
             continue;
         }
 
-        char morfName[15] = { text[i*2], text[i*2+1] };
+        char morfName[MORF_NAME_SIZE] = { text[i*2], text[i*2+1] };
         for (int j = 0; j < 5; j++)
         {
-            if (Coitain(morfName, baseStr[j]) == true)
+            if (Coitain(string(morfName), baseStr[j]) == true)
             {
                 morfName[1] = char(0xa0 + j*2);
                 break;
@@ -193,14 +195,14 @@ int main(int argc, char** argv)
         {
             next = string(text.begin() + (i + 1) * 2, text.begin() + (i + 1) * 2 + 2);
         }
-        oneMove(ofs, morfName, keyFrame, next);
+        oneMove(morfName, keyFrame, next);
     }
 
 
     // footer カメラ等
-    outputBinary(ofs, 0);
-    outputBinary(ofs, 0);
-    outputBinary(ofs, 0);
+    writer.Write(0);
+    writer.Write(0);
+    writer.Write(0);
 
     return 0;
 }

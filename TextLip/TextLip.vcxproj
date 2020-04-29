@@ -143,7 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConvertJapaneseChar.cpp" />
     <ClCompile Include="TextLip.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BinaryWriter.h" />
+    <ClInclude Include="ConvertJapaneseChar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
