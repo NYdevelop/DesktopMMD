@@ -22,12 +22,14 @@ map<string, int> exclude =
     { "ん", 6 },
     { "、", 23 },
     { "。", 38 },
-    { "ー", 3 },
-    { "っ", 3 },
 };
 
-// TODO: 口の形をそのままに
-vector<string> wait = { "ー", "っ" };
+// 口の形をそのままに
+map<string, float> wait = 
+{
+    {"ー", 0.55f},
+    {"っ", 0.5f},
+};
 
 vector<string> baseStr =
 {
@@ -45,8 +47,15 @@ const unsigned int MODEL_NAME_SIZE = 20;
 BinaryWriter writer;
 
 #pragma region Func
+bool Coitain(const string& src, const string& find)
+{
+    return find.find(src) != string::npos;
+}
+
 void oneFrame(char* morfName, int keyframe, float weight)
 {
+    //cout << string(morfName) << ", frame: " << keyframe << ", weight: " << weight << endl;
+
     writer.Write(morfName, MORF_NAME_SIZE);
 
     // keyframe
@@ -78,15 +87,50 @@ void oneMove(char* morfName, int& keyFrame, const string& next)
         weight = 0.5f;
     oneFrame(morfName, keyFrame, weight);
 
+    if (wait.find(next) != wait.end())
+    {
+        keyFrame += 6;
+        weight = 1.f;
+        if (morfName[1] == char(0xa0)) // 「あ」の場合
+            weight = wait[next];
+        oneFrame(morfName, keyFrame, weight);
+    }
+
     keyFrame += 6;
     oneFrame(morfName, keyFrame, 0);
+}
+
+void oneChar(const string& chara, int& keyFrame, const string& nextChara)
+{
+    if (wait.find(chara) != wait.end())
+    {
+        return;
+    }
+
+    if (exclude.find(chara) != exclude.end())
+    {
+        keyFrame += exclude[chara];
+        return;
+    }
+
+
+    char morfName[MORF_NAME_SIZE] = { chara[0], chara[1] };
+    for (int j = 0; j < 5; j++)
+    {
+        if (Coitain(string(morfName), baseStr[j]) == true)
+        {
+            morfName[1] = char(0xa0 + j * 2);
+            break;
+        }
+    }
+
+    oneMove(morfName, keyFrame, nextChara);
 }
 
 int countnn(const string& str)
 {
     int ret = 0;
-    char nn = char(0xf1);
-    for (unsigned int i = 0; i<str.size()-2; i += 2)
+    for (unsigned int i = 0; i<str.size(); i += 2)
     {
         string search(str.begin()+i, str.begin() + i+2);
         if (exclude.find(search) != exclude.end())
@@ -97,22 +141,44 @@ int countnn(const string& str)
     return ret;
 }
 
-bool Coitain(const string& src, const string& find)
+int countWait(const string& str)
 {
-    return find.find(src) != string::npos;
+    int ret = 0;
+    for (unsigned int i = 0; i < str.size() - 2; i += 2)
+    {
+        string search(str.begin() + i, str.begin() + i + 2);
+        if (wait.find(search) != wait.end())
+        {
+            ret++;
+        }
+    }
+    return ret;
 }
 
-string oneWord(const string& word)
+/// trueならば2バイト文字
+bool SJISMultiCheck(unsigned char c) {
+    if (((c >= 0x81) && (c <= 0x9f)) || ((c >= 0xe0) && (c <= 0xfc)))
+        return true;
+    return false;
+}
+
+string ConvertOneWord(const string& word)
 {
     string ret;
     /// 英字
     bool hit = false;
-    for (auto c : word)
+    for (unsigned int i = 0; i<word.size();)
     {
-        if (c >= 0x3A && c <= 0x7A)
+        if (!SJISMultiCheck(word[0]) && word[i] >= 0x3A && word[i] <= 0x7A)
         {
+            // 半角文字
             hit = true;
-            ret += ConvertAlphabetAndSymbol(c);
+            ret += ConvertAlphabetAndSymbol(word[i]);
+            i++;
+        }
+        else
+        {
+            i += 2;
         }
     }
     if (hit == true)
@@ -154,13 +220,13 @@ int main(int argc, char** argv)
         if (buf == "") break;
 
         /// 一文に連結
-        buf = oneWord(buf);
+        buf = ConvertOneWord(buf);
         text.append(buf);
     }
 
     writer.Open("text.vmd");
     writer.Write(header);
-    char modelName[20] = "初音ミク";
+    char modelName[MODEL_NAME_SIZE] = "初音ミク";
     writer.Write(modelName, MODEL_NAME_SIZE);
 
     int boneNum = 0;
@@ -168,34 +234,20 @@ int main(int argc, char** argv)
 
     // キー数： 文字数 * 3
     int charNum = text.size() / 2;
-    writer.Write((charNum - countnn(text)) * 3);
+    int waitNum = countWait(text);
+    writer.Write((charNum - countnn(text) - waitNum) * 3 + waitNum);
 
-    int keyFrame = 2+4;
+    int keyFrame = 0;// 2 + 4;
     for (int i = 0; i < charNum; i++)
     {
-        string search(text.begin() + i*2, text.begin() + i*2 + 2);
-        if (exclude.find(search) != exclude.end())
+        string currentChar(text.begin() + i * 2, text.begin() + i * 2 + 2);
+        if (i == charNum - 1)
         {
-            keyFrame += exclude[search];
+            oneChar(currentChar, keyFrame, string());
             continue;
         }
-
-        char morfName[MORF_NAME_SIZE] = { text[i*2], text[i*2+1] };
-        for (int j = 0; j < 5; j++)
-        {
-            if (Coitain(string(morfName), baseStr[j]) == true)
-            {
-                morfName[1] = char(0xa0 + j*2);
-                break;
-            }
-        }
-
-        string next;
-        if (i != charNum - 1)
-        {
-            next = string(text.begin() + (i + 1) * 2, text.begin() + (i + 1) * 2 + 2);
-        }
-        oneMove(morfName, keyFrame, next);
+        string next(text.begin() + (i + 1) * 2, text.begin() + (i + 1) * 2 + 2);
+        oneChar(currentChar, keyFrame, next);
     }
 
 
@@ -203,6 +255,8 @@ int main(int argc, char** argv)
     writer.Write(0);
     writer.Write(0);
     writer.Write(0);
+
+    //system("pause");
 
     return 0;
 }
