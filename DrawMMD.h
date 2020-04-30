@@ -26,10 +26,22 @@ public:
         return model;
     }
 
+    inline void SetCharactorPos(const DxLib::VECTOR& pos)
+    {
+        charaPos = pos;
+    }
+
+    inline DxLib::VECTOR GetCharactorPos()
+    {
+        return charaPos;
+    }
+
+    float Zoom;
+    float RotateY;
+
 private:
     int model;//モデルハンドル
     DxLib::VECTOR charaPos;//キャラクタの座標
-    float rotateY;
 
     LONG dispWidth;
     LONG dispHeight;

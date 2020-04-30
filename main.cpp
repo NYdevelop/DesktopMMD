@@ -6,7 +6,6 @@ using namespace std;
 // プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
 int main()
 {
-    // TODO: キー入力判定
     {
         ManageMMD manager;
         manager.Initialize();

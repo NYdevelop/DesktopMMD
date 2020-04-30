@@ -78,9 +78,6 @@
     <ClInclude Include="PlayAnim.h">
       <Filter>ヘッダー ファイル\MMD</Filter>
     </ClInclude>
-    <ClInclude Include="TranrateAnim.h">
-      <Filter>ヘッダー ファイル\MMD</Filter>
-    </ClInclude>
     <ClInclude Include="UtilTimer.h">
       <Filter>ヘッダー ファイル\Util</Filter>
     </ClInclude>
@@ -104,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="StateMMD.h">
       <Filter>ヘッダー ファイル\State</Filter>
+    </ClInclude>
+    <ClInclude Include="TransrateAnim.h">
+      <Filter>ヘッダー ファイル\MMD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -141,9 +141,6 @@
       <Filter>ソース ファイル\MMD</Filter>
     </ClCompile>
     <ClCompile Include="PlayAnim.cpp">
-      <Filter>ソース ファイル\MMD</Filter>
-    </ClCompile>
-    <ClCompile Include="TranrateAnim.cpp">
       <Filter>ソース ファイル\MMD</Filter>
     </ClCompile>
     <ClCompile Include="TransrateAnim.cpp">

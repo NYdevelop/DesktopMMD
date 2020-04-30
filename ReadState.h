@@ -28,5 +28,5 @@ private:
 
     PlayAnim lipAnim;
 
-    ManageMMD* manager;
+    ManageMMD* manager = nullptr;
 };

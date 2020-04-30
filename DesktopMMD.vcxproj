@@ -160,7 +160,7 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="StateMMD.h" />
-    <ClInclude Include="TranrateAnim.h" />
+    <ClInclude Include="TransrateAnim.h" />
     <ClInclude Include="UtilTimer.h" />
     <ClInclude Include="WaitState.h" />
     <ClInclude Include="WaveFile.h" />
@@ -183,7 +183,6 @@
     <ClCompile Include="ReadState.cpp" />
     <ClCompile Include="ReadWavFile.cpp" />
     <ClCompile Include="RhythmState.cpp" />
-    <ClCompile Include="TranrateAnim.cpp" />
     <ClCompile Include="TransrateAnim.cpp" />
     <ClCompile Include="UtilTimer.cpp" />
     <ClCompile Include="window.cpp" />

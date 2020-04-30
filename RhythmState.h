@@ -4,7 +4,7 @@
 #include "CaptureSound.h"
 
 #include "PlayAnim.h"
-#include "TranrateAnim.h"
+#include "TransrateAnim.h"
 
 #include "EstimateBPM.h"
 #include "CalculateBPM.h"

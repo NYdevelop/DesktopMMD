@@ -1,17 +1,11 @@
 #include "window.h"
 
-//#include <wingdi.h>
-
 #include <iostream>
 
 #include <string>
 #include <vector>
 
 #include "Define.h"
-
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
 
 using namespace std;
 
@@ -107,6 +101,25 @@ LRESULT CALLBACK CWindow::WindProc(
     }
     break;
 
+    //case WM_KEYDOWN:
+    //{
+    //    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+    //    if (win->m_KeyDownCallback != nullptr)
+    //    {
+    //        win->m_KeyDownCallback(wParam, lParam);
+    //    }
+    //}
+    //break;
+
+    //case WM_KEYUP:
+    //{
+    //    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+    //    if (win->m_KeyUpCallback != nullptr)
+    //    {
+    //        win->m_KeyUpCallback(wParam, lParam);
+    //    }
+    //}
+    //break;
 
     case WM_DESTROY:
     {
@@ -144,7 +157,9 @@ LRESULT CALLBACK CWindow::WindProc(
 
 
 CWindow::CWindow() :
-    m_BackGround(CreateSolidBrush(BACKGROUND))
+    m_BackGround(CreateSolidBrush(BACKGROUND)),
+    m_ContextMenu(0),
+    m_ModeMenu(0)
 {
     m_hWnd = NULL;
 
@@ -182,15 +197,16 @@ HRESULT CWindow::Process(int fps)
     }
 
     m_Timer.Start([=]()
-    {
-        //InvalidateRect(m_hWnd, NULL, FALSE);
-        m_DrawFunc(nullptr);
-        return true;
-    },
+        {
+            if (m_DrawFunc != nullptr)
+                m_DrawFunc(nullptr);
+            return true;
+        },
         1000 * 1000 / fps);
 
     MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
@@ -217,6 +233,16 @@ void CWindow::SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func
 {
     m_CommandCallback = func;
 }
+
+//void CWindow::SetCallbackKeyDown(const std::function<void(WPARAM, LPARAM)>& func)
+//{
+//    m_KeyDownCallback = func;
+//}
+//
+//void CWindow::SetCallbackKeyUp(const std::function<void(WPARAM, LPARAM)>& func)
+//{
+//    m_KeyUpCallback = func;
+//}
 
 void CWindow::Draw(HDC hDc)
 {

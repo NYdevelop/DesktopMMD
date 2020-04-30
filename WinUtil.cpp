@@ -47,3 +47,9 @@ std::string WStringToString(std::wstring const& src)
     // •ÏŠ·Œ‹‰Ê‚ð•Ô‚·
     return string(dest.begin(), dest.end());
 }
+
+
+bool IsPress(int key)
+{
+    return GetKeyState(key) & 0x8000;
+}

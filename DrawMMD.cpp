@@ -22,18 +22,17 @@ void DrawMMD::afterInitialize()
         0, 0, dispWidth, dispHeight,
         GetColor(1, 1, 1), TRUE);//背景を設定(透過させる)
 
-    //文字サイズの設定
-    //SetFontSize(32);
-
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面にする
 
-    rotateY = -5.8f;
+    RotateY = -5.8f;
     float posX = 3.7f;////6.5f;//15f;
-    float posY = -18.7f;//-20.3f;//-25f;
-    float zoom = 6.8f;//10f;//20f;
+    //float posY = -18.7f;//-20.3f;//-25f;
+    float posY = -17.8f;
+    Zoom = 6.8f;//10f;//20f;
 
     charaPos = VGet(posX, posY, 1.0f);
-    SetupCamera_Ortho(6.8f);
+
+    SetupCamera_Ortho(Zoom);
     SetCameraNearFar(0.1f, 50.0f);
     SetCameraPositionAndTarget_UpVecY(VGet(0, 0, -10), VGet(0, 0, 0));
 }
@@ -49,12 +48,17 @@ int DrawMMD::mainProcess()
         0, 0, dispWidth, dispHeight,
         GetColor(1, 1, 1), TRUE);//背景を設定(透過させる)
 
+    SetupCamera_Ortho(Zoom);
+
     //モデルの座標指定
     DxLib::MV1SetPosition(model, charaPos);
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY, 0.0f));
 
     blink.PlayAnimation();
 
     m_StateManager->Doing();
+
+    MV1PhysicsCalculation(model, 1000.0f / 60.0f);
 
     //モデルの描画
     DxLib::MV1DrawModel(model);
@@ -69,11 +73,15 @@ void DrawMMD::LoadModel()
 {
     isDraw = false;
 
+    MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_REALTIME);
+    MV1SetLoadModelPhysicsWorldGravity(-10.f);
     MV1InitModel();
 
     // TODO: 設定ファイル化
     MV1SetLoadModelAnimFilePath(L"../../C#/RealtimeListenMMD/Model/motion/motion");
-    model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/結月ゆかり_純_ver1.0/結月ゆかり_純.pmd");
+    //model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/ぽんぷ長式大和_水着/ぽんぷ長式大和＿水着mode.pmx");
+    //model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/Menace メナス(カノン改造)/メナス_edit.pmx");
+    model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/アールビット式WF改変唯依姫(ｼｮｰﾄﾍｱ)/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx");
 
     if (model == -1)
     {
@@ -90,7 +98,9 @@ void DrawMMD::LoadModel()
     blink.SetMaximumTime(250.f);
 
     MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, rotateY, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY, 0.0f));
+
+    MV1PhysicsResetState(model);
 
     isDraw = true;
 }

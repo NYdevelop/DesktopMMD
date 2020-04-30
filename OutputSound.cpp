@@ -23,13 +23,6 @@ void OutputSound::Start(unsigned long bufSize)
     //! データブロックを出力デバイスに登録する.
     TCHAR str[MAXERRORLENGTH];
     OutHdr.lpData = new char[bufSize];
-    //OutHdr.dwBufferLength = bufSize;
-    //OutHdr.dwFlags = 0;
-    //OutHdr.dwBytesRecorded = 0;
-    //OutHdr.dwLoops = 1;
-    //OutHdr.lpNext = NULL;
-    //OutHdr.dwUser = 0;
-    //OutHdr.reserved = 0;
     OutHdr.dwBufferLength = 0;
     OutHdr.dwFlags = 0;
     OutHdr.dwBytesRecorded = 0;
@@ -92,6 +85,7 @@ void OutputSound::Output(const std::wstring & wavFileName, UINT deviceIndex)
         return;
     }
 
+    // TODO: ファイルサイズが大きすぎる場合の処理
     auto header = reader.GetHeader();
     WAVEFORMATEX wf;
     wf.wFormatTag = WAVE_FORMAT_PCM;

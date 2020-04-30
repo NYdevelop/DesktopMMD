@@ -1,5 +1,7 @@
 #include "ManageMMD.h"
 
+#include "WinUtil.h"
+
 #include "WaitState.h"
 #include "rhythmState.h"
 #include "ReadState.h"
@@ -7,6 +9,7 @@
 #include "fft.h"
 
 using namespace std;
+
 
 HRESULT ManageMMD::Initialize()
 {
@@ -24,6 +27,54 @@ HRESULT ManageMMD::Initialize()
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         m_mmd->mainProcess();
+
+
+        /// キー入力判定
+        if (IsPress(VK_SHIFT) != 0)
+        {
+            if (IsPress(VK_RIGHT))
+            {
+                m_mmd->RotateY -= .1f;
+            }
+
+            if (IsPress(VK_LEFT))
+            {
+                m_mmd->RotateY += .1f;
+            }
+
+            if (IsPress(VK_UP))
+            {
+                m_mmd->Zoom -= .1f;
+            }
+
+            if (IsPress(VK_DOWN))
+            {
+                m_mmd->Zoom += .1f;
+            }
+            return;
+        }
+
+        auto pos = m_mmd->GetCharactorPos();
+        if (IsPress(VK_RIGHT))
+        {
+            pos.x += .1f;
+        }
+
+        if (IsPress(VK_LEFT))
+        {
+            pos.x -= .1f;
+        }
+
+        if (IsPress(VK_UP))
+        {
+            pos.y += .1f;
+        }
+
+        if (IsPress(VK_DOWN))
+        {
+            pos.y -= .1f;
+        }
+        m_mmd->SetCharactorPos(pos);
     });
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
@@ -66,14 +117,6 @@ HRESULT ManageMMD::Initialize()
     /// 音声出力初期化
     m_Output = shared_ptr<OutputSound>(new OutputSound());
 
-    //auto max = waveOutGetNumDevs();
-    //WAVEOUTCAPS dev;
-    //for (UINT n = 0; n < max; n++) {
-    //    waveOutGetDevCaps(n, &dev, sizeof(dev));
-    //    cout << dev.szPname << endl;
-    //}
-
-
     /// State初期化
     shared_ptr<State> wait(new WaitState());
     stateManager->AddState(STATE_WAIT, move(wait));
@@ -106,6 +149,8 @@ HRESULT ManageMMD::Process()
 
 void ManageMMD::Exit()
 {
+    // TODO: キャラクタ位置保存
+    m_Window.SetDrawFunc(nullptr);
     stateManager->End();
 
     m_Output->Stop();
