@@ -141,6 +141,7 @@ HRESULT ManageMMD::Initialize()
     shared_ptr<State> dance(new DanceState());
     auto dancePtr = (DanceState*)dance.get();
     dancePtr->SetOutputSound(m_Output);
+    dancePtr->SetDrawMMD(m_mmd);
     stateManager->AddState(EState::STATE_DANCE, dance);
 
     LoadModel();

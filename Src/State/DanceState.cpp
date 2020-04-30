@@ -10,7 +10,14 @@ void DanceState::Initialize()
 {
     cout << "state: dance" << endl;
 
-    // TODO: モデル位置リセット
+    // モデル位置リセット
+    auto pos = m_mmd->GetCharactorPos();
+    pos.x = 0.f;
+    pos.y = -10.f;
+    m_mmd->SetCharactorPos(pos);
+    m_mmd->RotateY = 0;
+    m_mmd->Zoom = 20.f;
+
     MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 1);
     danceAnim.ResetAnimTime();
     MV1PhysicsResetState(model);
@@ -44,4 +51,9 @@ void DanceState::ModelInitial()
 void DanceState::SetOutputSound(std::shared_ptr<OutputSound> output)
 {
     m_Output = output;
+}
+
+void DanceState::SetDrawMMD(std::shared_ptr<DrawMMD> mmd)
+{
+    m_mmd = mmd;
 }
