@@ -4,10 +4,10 @@ float EstimateBPM::Estimate(std::vector<int> val)
 {
     if (previousValue == 0)
     {
-        previousValue = val[0];
+        previousValue = static_cast<float>(val[0]);
 
-        if (val[1] != -1)
-            previousValue = val[0] < val[1] ? val[0] : val[1];
+        if (val[1] != -1 && val[0] > val[1])
+            previousValue = static_cast<float>(val[1]);
 
         return previousValue;
     }

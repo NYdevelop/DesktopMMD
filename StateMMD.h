@@ -13,8 +13,5 @@ public:
     virtual void ModelInitial() = 0;
 
 protected:
-    int model;
-
-private:
-
+    int model = 0;
 };

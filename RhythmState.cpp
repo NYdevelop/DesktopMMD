@@ -121,7 +121,7 @@ void RhythmState::SetNoSound(bool isNoSound)
     m_IsNoSound = isNoSound;
 }
 
-void RhythmState::SetMoveAttitude(double rate)
+void RhythmState::SetMoveAttitude(float rate)
 {
     MV1SetAttachAnimBlendRate(model, unazuki.GetAnimIndex(), rate);
     MV1SetAttachAnimBlendRate(model, stableAnimIndex, 1 - rate);

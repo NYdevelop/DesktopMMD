@@ -1,13 +1,13 @@
 #pragma once
 
-enum EState : int
+enum class EState
 {
     STATE_WAIT = 0,
     STATE_RHYTHM,
     STATE_READ,
 };
 
-enum EContextMenu : int
+enum class EContextMenu : int
 {
     CONTEXT_MODE = 1,
     CONTEXT_MODE_WAIT = 11,

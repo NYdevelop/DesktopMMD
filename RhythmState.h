@@ -31,7 +31,7 @@ public:
     void SetBPM(float bpm);
     void SetNoSound(bool isNoSound);
 
-    void SetMoveAttitude(double rate);
+    void SetMoveAttitude(float rate);
 
 private:
     std::shared_ptr<CaptureSound> m_Capture;
@@ -46,7 +46,7 @@ private:
 
     bool m_IsNoSound = false;
 
-    float m_Bpm;
+    float m_Bpm = 0;
 
     const float BASE_BPM = 46.8f;
     const float BASE_PLAY_SPEED = 0.5f;

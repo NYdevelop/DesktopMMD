@@ -29,6 +29,6 @@ public:
     WAVFILEHEADER GetHeader();
 
 private:
-    HANDLE			hFile = NULL;		//!< ファイル・ハンドル.
-    WAVFILEHEADER	Header;				//!< WAVEファイルのヘッダ構造体.
+    HANDLE hFile = NULL;          //!< ファイル・ハンドル.
+    WAVFILEHEADER Header = { 0 }; //!< WAVEファイルのヘッダ構造体.
 };

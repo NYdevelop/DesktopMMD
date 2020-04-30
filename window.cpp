@@ -72,11 +72,11 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
 
     /* ÉÅÉjÉÖÅ[çÄñ⁄í«â¡ */
     AppendMenu(m_ContextMenu, MF_POPUP, (UINT)m_ModeMenu, L"Mode");
-    AppendMenu(m_ContextMenu, MF_STRING, CONTEXT_EXIT,    L"Exit");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_EXIT,    L"Exit");
 
-    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_WAIT,   L"Wait");
-    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_RHYTHM, L"Rhythm");
-    AppendMenu(m_ModeMenu, MF_STRING, CONTEXT_MODE_READ,   L"Read");
+    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_WAIT,   L"Wait");
+    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_RHYTHM, L"Rhythm");
+    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_READ,   L"Read");
 
     return S_OK;
 }

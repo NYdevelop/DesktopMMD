@@ -30,7 +30,7 @@ private:
 
     static const int BUFFER_NUM = 5;
     HWAVEIN hwi = nullptr;
-    WAVEHDR InHdr[BUFFER_NUM];               //!< サウンド入力のデータブロック構造体
+    WAVEHDR InHdr[BUFFER_NUM] = { 0 };               //!< サウンド入力のデータブロック構造体
     WAVEHDR latestBuffer;
 
     WAVEFORMATEX m_WaveFormat;

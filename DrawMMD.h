@@ -36,15 +36,15 @@ public:
         return charaPos;
     }
 
-    float Zoom;
-    float RotateY;
+    float Zoom = 0;
+    float RotateY = 0;
 
 private:
-    int model;//モデルハンドル
-    DxLib::VECTOR charaPos;//キャラクタの座標
+    int model = 0;//モデルハンドル
+    DxLib::VECTOR charaPos = VGet(0, 0, 0);//キャラクタの座標
 
-    LONG dispWidth;
-    LONG dispHeight;
+    LONG dispWidth = 0;
+    LONG dispHeight = 0;
 
     PlayAnim blink;
 

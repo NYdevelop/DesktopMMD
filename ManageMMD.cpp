@@ -80,20 +80,20 @@ HRESULT ManageMMD::Initialize()
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
         switch ((EContextMenu)LOWORD(wParam)) {
-        case CONTEXT_EXIT: /* Exitメニュー */
+        case EContextMenu::CONTEXT_EXIT: /* Exitメニュー */
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
             break;
 
-        case CONTEXT_MODE_WAIT:
-            stateManager->Transrate(STATE_WAIT);
+        case EContextMenu::CONTEXT_MODE_WAIT:
+            stateManager->Transrate(EState::STATE_WAIT);
             break;
 
-        case CONTEXT_MODE_RHYTHM:
-            stateManager->Transrate(STATE_RHYTHM);
+        case EContextMenu::CONTEXT_MODE_RHYTHM:
+            stateManager->Transrate(EState::STATE_RHYTHM);
             break;
 
-        case CONTEXT_MODE_READ:
-            stateManager->Transrate(STATE_READ);
+        case EContextMenu::CONTEXT_MODE_READ:
+            stateManager->Transrate(EState::STATE_READ);
             break;
         }
     });
@@ -119,23 +119,23 @@ HRESULT ManageMMD::Initialize()
 
     /// State初期化
     shared_ptr<State> wait(new WaitState());
-    stateManager->AddState(STATE_WAIT, move(wait));
+    stateManager->AddState(EState::STATE_WAIT, move(wait));
 
     shared_ptr<State> rhythm(new RhythmState());
     auto rhythmPtr = (RhythmState*)rhythm.get();
     rhythmPtr->SetModel(m_mmd->GetModelHandle());
     rhythmPtr->OnceInital();
-    stateManager->AddState(STATE_RHYTHM, move(rhythm));
+    stateManager->AddState(EState::STATE_RHYTHM, move(rhythm));
 
     shared_ptr<State> read(new ReadState());
     auto readPtr = (ReadState*)read.get();
     readPtr->SetOutputSound(m_Output);
     readPtr->SetManager(this);
-    stateManager->AddState(STATE_READ, move(read));
+    stateManager->AddState(EState::STATE_READ, move(read));
 
     LoadModel();
 
-    stateManager->Transrate(STATE_WAIT);
+    stateManager->Transrate(EState::STATE_WAIT);
 
     return S_OK;
 }

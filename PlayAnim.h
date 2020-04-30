@@ -37,6 +37,6 @@ private:
     float playTime = 0;
     float playSpeed = 1.0f;
     float maximumTime = 0;
-    int modelHandle;
+    int modelHandle = 0;
     bool isLoop = true;
 };
