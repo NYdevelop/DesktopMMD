@@ -5,6 +5,7 @@
 #include "WaitState.h"
 #include "rhythmState.h"
 #include "ReadState.h"
+#include "DanceState.h"
 
 #include "fft.h"
 
@@ -95,6 +96,10 @@ HRESULT ManageMMD::Initialize()
         case EContextMenu::CONTEXT_MODE_READ:
             stateManager->Transrate(EState::STATE_READ);
             break;
+
+        case EContextMenu::CONTEXT_MODE_DANCE:
+            stateManager->Transrate(EState::STATE_DANCE);
+            break;
         }
     });
 
@@ -132,6 +137,11 @@ HRESULT ManageMMD::Initialize()
     readPtr->SetOutputSound(m_Output);
     readPtr->SetManager(this);
     stateManager->AddState(EState::STATE_READ, move(read));
+
+    shared_ptr<State> dance(new DanceState());
+    auto dancePtr = (DanceState*)dance.get();
+    dancePtr->SetOutputSound(m_Output);
+    stateManager->AddState(EState::STATE_DANCE, dance);
 
     LoadModel();
 

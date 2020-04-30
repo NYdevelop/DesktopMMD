@@ -105,6 +105,9 @@
     <ClInclude Include="TransrateAnim.h">
       <Filter>ヘッダー ファイル\MMD</Filter>
     </ClInclude>
+    <ClInclude Include="DanceState.h">
+      <Filter>ヘッダー ファイル\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="ReadWavFile.cpp">
       <Filter>ソース ファイル\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="DanceState.cpp">
+      <Filter>ソース ファイル\State</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

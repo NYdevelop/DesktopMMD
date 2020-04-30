@@ -19,8 +19,7 @@ void UtilTimer::Start(std::function<bool(void)> func, unsigned long microsecond)
                 break;
             }
 
-            auto end = std::chrono::system_clock::now();
-            auto elapsed = end - start;
+            auto elapsed = std::chrono::system_clock::now() - start;
             // std::cout << "elapsed.count()=[" << elapsed.count() << "]" << std::endl;
 
             // 毎回、インターバル時間のスリープを保障

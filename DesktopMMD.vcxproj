@@ -147,6 +147,7 @@
     <ClInclude Include="CalculateBPM.h" />
     <ClInclude Include="CaptureSound.h" />
     <ClInclude Include="CheckNoSound.h" />
+    <ClInclude Include="DanceState.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="DrawMMD.h" />
     <ClInclude Include="EstimateBPM.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="CalculateBPM.cpp" />
     <ClCompile Include="CaptureSound.cpp" />
     <ClCompile Include="CheckNoSound.cpp" />
+    <ClCompile Include="DanceState.cpp" />
     <ClCompile Include="EstimateBPM.cpp" />
     <ClCompile Include="fft.cpp" />
     <ClCompile Include="main.cpp" />

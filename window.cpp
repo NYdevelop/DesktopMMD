@@ -77,6 +77,7 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
     AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_WAIT,   L"Wait");
     AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_RHYTHM, L"Rhythm");
     AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_READ,   L"Read");
+    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_DANCE,  L"Dance");
 
     return S_OK;
 }
