@@ -86,17 +86,18 @@ void OutputSound::Output(const std::wstring & wavFileName, UINT deviceIndex)
     }
 
     // TODO: ファイルサイズが大きすぎる場合の処理
-    auto header = reader.GetHeader();
+    auto format = reader.GetFormat();
     WAVEFORMATEX wf;
     wf.wFormatTag = WAVE_FORMAT_PCM;
-    wf.nChannels = header.Channels;
-    wf.nSamplesPerSec = header.SamplesPerSec;
-    wf.wBitsPerSample = header.BitsPerSample;
+    wf.nChannels = format.Channels;
+    wf.nSamplesPerSec = format.SamplesPerSec;
+    wf.wBitsPerSample = format.BitsPerSample;
     wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;
     wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 
     OpenDevice(&wf, deviceIndex);
-    int size = header.FileSize - wf.nAvgBytesPerSec * 0.5;
+    auto header = reader.GetHeader();
+    unsigned long size = static_cast<unsigned long>(header.Size - wf.nAvgBytesPerSec * 0.5);
     Start(size);
 
     WAVEHDR wh;

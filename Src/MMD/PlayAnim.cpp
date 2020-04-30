@@ -4,6 +4,7 @@
 
 void PlayAnim::AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle, int NameCheck)
 {
+    // TODO: モーションの動的ロード
     modelHandle = modHandle;
     animeIndex = MV1AttachAnim(modelHandle, animIndex, AnimSrcMHandle, NameCheck);//モーションの選択
     if (animeIndex == -1)

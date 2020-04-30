@@ -1,13 +1,13 @@
-#include "ManageMMD.h"
+#include "MMD/ManageMMD.h"
 
-#include "WinUtil.h"
+#include "Util/WinUtil.h"
 
-#include "WaitState.h"
-#include "rhythmState.h"
-#include "ReadState.h"
-#include "DanceState.h"
+#include "State/WaitState.h"
+#include "State/RhythmState.h"
+#include "State/ReadState.h"
+#include "State/DanceState.h"
 
-#include "fft.h"
+#include "Sound/fft.h"
 
 using namespace std;
 

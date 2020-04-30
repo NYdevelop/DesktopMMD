@@ -88,7 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用;Src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,12 +118,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用;Src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,51 +146,51 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CalculateBPM.h" />
-    <ClInclude Include="CaptureSound.h" />
-    <ClInclude Include="CheckNoSound.h" />
-    <ClInclude Include="DanceState.h" />
-    <ClInclude Include="Define.h" />
-    <ClInclude Include="DrawMMD.h" />
-    <ClInclude Include="EstimateBPM.h" />
-    <ClInclude Include="fft.h" />
-    <ClInclude Include="ManageMMD.h" />
-    <ClInclude Include="OutputSound.h" />
-    <ClInclude Include="PlayAnim.h" />
-    <ClInclude Include="ReadState.h" />
-    <ClInclude Include="ReadWavFile.h" />
-    <ClInclude Include="RhythmState.h" />
-    <ClInclude Include="State.h" />
-    <ClInclude Include="StateManager.h" />
-    <ClInclude Include="StateMMD.h" />
-    <ClInclude Include="TransrateAnim.h" />
-    <ClInclude Include="UtilTimer.h" />
-    <ClInclude Include="WaitState.h" />
-    <ClInclude Include="WaveFile.h" />
-    <ClInclude Include="window.h" />
-    <ClInclude Include="WinUtil.h" />
+    <ClInclude Include="Src/Sound/CalculateBPM.h" />
+    <ClInclude Include="Src/Sound/CaptureSound.h" />
+    <ClInclude Include="Src/Sound/CheckNoSound.h" />
+    <ClInclude Include="Src/Sound/EstimateBPM.h" />
+    <ClInclude Include="Src/Sound/OutputSound.h" />
+    <ClInclude Include="Src/Sound/ReadWavFile.h" />
+    <ClInclude Include="Src/Sound/WaveFile.h" />
+    <ClInclude Include="Src/Sound/fft.h" />
+    <ClInclude Include="Src/State/DanceState.h" />
+    <ClInclude Include="Src/State/WaitState.h" />
+    <ClInclude Include="Src/State/StateManager.h" />
+    <ClInclude Include="Src/State/ReadState.h" />
+    <ClInclude Include="Src/State/State.h" />
+    <ClInclude Include="Src/State/StateMMD.h" />
+    <ClInclude Include="Src/State/RhythmState.h" />
+    <ClInclude Include="Src/MMD/ManageMMD.h" />
+    <ClInclude Include="Src/MMD/PlayAnim.h" />
+    <ClInclude Include="Src/MMD/DrawMMD.h" />
+    <ClInclude Include="Src/MMD/TransrateAnim.h" />
+    <ClInclude Include="Src/Util/UtilTimer.h" />
+    <ClInclude Include="Src/Util/WinUtil.h" />
+    <ClInclude Include="Src/Define.h" />
+    <ClInclude Include="Src/window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CalculateBPM.cpp" />
-    <ClCompile Include="CaptureSound.cpp" />
-    <ClCompile Include="CheckNoSound.cpp" />
-    <ClCompile Include="DanceState.cpp" />
-    <ClCompile Include="EstimateBPM.cpp" />
-    <ClCompile Include="fft.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="DrawMMD.cpp">
+    <ClCompile Include="Src/Sound/CalculateBPM.cpp" />
+    <ClCompile Include="Src/Sound/CaptureSound.cpp" />
+    <ClCompile Include="Src/Sound/CheckNoSound.cpp" />
+    <ClCompile Include="Src/Sound/OutputSound.cpp" />
+    <ClCompile Include="Src/Sound/EstimateBPM.cpp" />
+    <ClCompile Include="Src/Sound/ReadWavFile.cpp" />
+    <ClCompile Include="Src/Sound/fft.cpp" />
+    <ClCompile Include="Src/State/DanceState.cpp" />
+    <ClCompile Include="Src/main.cpp" />
+    <ClCompile Include="Src/MMD/DrawMMD.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ManageMMD.cpp" />
-    <ClCompile Include="OutputSound.cpp" />
-    <ClCompile Include="PlayAnim.cpp" />
-    <ClCompile Include="ReadState.cpp" />
-    <ClCompile Include="ReadWavFile.cpp" />
-    <ClCompile Include="RhythmState.cpp" />
-    <ClCompile Include="TransrateAnim.cpp" />
-    <ClCompile Include="UtilTimer.cpp" />
-    <ClCompile Include="window.cpp" />
-    <ClCompile Include="WinUtil.cpp" />
+    <ClCompile Include="Src/MMD/ManageMMD.cpp" />
+    <ClCompile Include="Src/MMD/PlayAnim.cpp" />
+    <ClCompile Include="Src/State/ReadState.cpp" />
+    <ClCompile Include="Src/State/RhythmState.cpp" />
+    <ClCompile Include="Src/MMD/TransrateAnim.cpp" />
+    <ClCompile Include="Src/Util/UtilTimer.cpp" />
+    <ClCompile Include="Src/Util/WinUtil.cpp" />
+    <ClCompile Include="Src/window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

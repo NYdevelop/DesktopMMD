@@ -1,0 +1,95 @@
+// 'fmt 'チャンクと'data'チャンクに対応
+
+
+#include "typedef.h"			//#includeが使えます
+
+// プロトタイプ
+void main(void);
+int SelectID(char c1,char c2,char c3,char c4);
+void ID_fmt(int size);
+void ID_data(int size);
+
+
+struct RIFFHEADER {				// RIFF のヘッダー
+	char	ID[4];
+	DWORD	Size;
+	char	FileType[4];
+};
+
+struct RIFFCHUNCK {				// RIFF のチャンク
+	char	ID[4];
+	DWORD	Size;
+};
+
+WORD BPS = 0;		// Bytes Per Second の略。転送バイト数のこと。
+					// 現在未使用。
+
+main();		// メイン関数呼び出し(DOS風に)
+return;
+
+//////////////////////////////////////////////////////////////
+//  メインルーチン
+void main(void) {
+	int		Sel;
+
+	$RIFFHEADER		RIFF;		// ヘッダー読み込み
+
+	while(GetCurrentOffset() <= GetFileSize() ) {
+		$RIFFCHUNCK		Chunck;
+
+		Sel=SelectID(Chunck.ID[0],Chunck.ID[1],Chunck.ID[2],Chunck.ID[3]);
+		switch(Sel) {
+		case 1:		ID_fmt(Chunck.Size);	break;
+		case 2:		ID_data(Chunck.Size);	break;
+		default:	$BYTE データ[Chunck.Size];	break;
+		}
+	}
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// チャンクＩＤ選択
+// （IDを１文字づつ比較）
+int SelectID(char c1,char c2,char c3,char c4) {
+	int		ID = 0;
+
+//	MessageBox(tostr(c1)+" "+tostr(c2)+" "+tostr(c3)+" "+tostr(c4));	// デバグ用
+
+	if( (c1=='f')&&(c2=='m')&&(c3=='t')&&(c4==32 ) ) ID = 1;		// fmt
+	if( (c1=='d')&&(c2=='a')&&(c3=='t')&&(c4=='a') ) ID = 2;		// data
+
+	return(ID);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// フォーマット・チャンク
+void ID_fmt(int size) {
+	switch(GetCurrentByte()) {
+	case 01:	$WORD	ＰＣＭ;		break;
+	default:	$WORD	UnKnow;		break;
+	}
+	switch(GetCurrentByte()) {
+	case 01:	$WORD	モノラル;	break;
+	case 02:	$WORD	ステレオ;	break;
+	default:	$WORD	チャンネル数;	break;
+	}
+	$DWORD	標本化周波数;
+	$DWORD	転送バイト数;
+	$WORD	サンプルサイズ;
+	$WORD	量子化ビット数;
+
+  if (size > 16)
+  {
+    $BYTE ExtendData[size-16];
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// WAVEデータ・チャンク
+void ID_data(int size) {
+
+	$BYTE	WAVEデータ[size];
+}

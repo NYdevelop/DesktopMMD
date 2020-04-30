@@ -9,33 +9,37 @@
 //BOOL			IsOpenWaveFile( void );
 //WAVEFORMATEX*	GetAudioFormat( WAVEFORMATEX* wf );
 
+//! RIFF のヘッダー
+struct RIFFHEADER
+{
+    DWORD	ID;
+    DWORD	Size;
+    DWORD	FileType;
+};
 
-//! WAVEファイルヘッダ構造体.
-typedef struct {
-    DWORD		RiffId;						//!< RIFFファイル識別子 (RIFF).
-    DWORD		FileSize;					//!< ファイルサイズ - 8.
-    DWORD		FileType;					//!< ファイルタイプ ("WAVE").
-    DWORD		FormatId;					//!< フォーマット識別子 ("fmt ").
-    DWORD		FormatSize;					//!< フォーマット・サイズ - 8.
+//! RIFF のチャンク
+struct RIFFCHUNCK
+{
+    DWORD	ID;
+    DWORD	Size;
+};
+
+//! フォーマットチャンク
+struct RIFFFORMATCHUNK {
     WORD		FormatType;					//!< フォーマットタイプ.
     WORD		Channels;					//!< チャンネル数.
     DWORD		SamplesPerSec;				//!< サンプリング周期.
     DWORD		AvgBytesPerSec;				//!< 1秒あたりのバイト数.
     WORD		BlockAlign;					//!< 1チャンネルのバイト数.
     WORD		BitsPerSample;				//!< 1データあたりのビット数.
-} WAVFILEHEADER;
+} ;
 
-//! ファクトリチャンク・ヘッダ構造体.
-typedef struct {
+//! ファクトリチャンク・ヘッダ
+struct WAVEFACTCHUNK
+{
     DWORD		Id;							//!< データ識別子("fact").
     DWORD		Size;						//!< チャンクサイズ - 8.
     DWORD		Samples;					//!< 全サンプル数.
-} WAVEFACTCHUNK;
-
-//! データチャンク・ヘッダ構造体.
-typedef struct {
-    DWORD		Id;							//!< データ識別子("data").
-    DWORD		Size;						//!< データ・サイズ.
-} WAVEDATACHUNK;
+};
 
 #endif	// __WAVEFILE_H__

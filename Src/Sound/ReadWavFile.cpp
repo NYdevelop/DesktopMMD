@@ -27,53 +27,61 @@ BOOL ReadWavFile::ReadOpenWaveFile(LPCTSTR file_name)
 
     //! ファイルヘッダを解析する.
     do {
+        const int CHECK_LENGTH = 256;
         //! ファイルの先頭からストリームを読み込む.
-        BYTE	buf[256];
-        auto len = ReadWaveFile(buf, 256);
+        BYTE	buf[CHECK_LENGTH];
+        auto len = ReadWaveFile(buf, CHECK_LENGTH);
         if (len == 0) break;
 
         //! ファイルヘッダを取り出す.
-        Header = *((WAVFILEHEADER*)&buf[offset]);
+        Header = *((RIFFHEADER*)&buf[offset]);
         offset += sizeof(Header);
 
         //! RIFFヘッダを調べる.
-        if ((Header.RiffId != RIFFCC('RIFF'))
+        if ((Header.ID != RIFFCC('RIFF'))
             || (Header.FileType != RIFFCC('WAVE'))
-            || (Header.FileSize <= (sizeof(Header) - 8))) {
+            || (Header.Size <= (sizeof(Header) - 8))) {
             break;
         }
-        //! フォーマットヘッダを調べる.
-        if ((Header.FormatId != RIFFCC('fmt '))
-            || (Header.Channels == 0)
-            || (Header.SamplesPerSec == 0)
-            || (Header.AvgBytesPerSec == 0)
-            || (Header.BlockAlign == 0)
-            || (Header.BitsPerSample == 0)
-            || (Header.FormatSize     <  16)) {
-            break;
-        }
-        for (; offset < 256 && buf[offset] == 0; offset++);
 
-        //! ファクトリチャンクを取り出す.
-        WAVEFACTCHUNK fact;
-        fact = *((WAVEFACTCHUNK*)&buf[offset]);
-        if (fact.Id == RIFFCC('fact')) {
-            offset += sizeof(WAVEFACTCHUNK);
-        }
-        else {
-            fact.Samples = 0;
-        }
-        for (; offset < 256 && buf[offset] == 0; offset++);
+        while (offset < len)
+        {
+            RIFFCHUNCK chunk = *((RIFFCHUNCK*)&buf[offset]);
+            offset += sizeof(chunk);
 
-        //! データヘッダを取り出す.
-        WAVEDATACHUNK data;
-        data = *((WAVEDATACHUNK*)&buf[offset]);
-        offset += sizeof(WAVEDATACHUNK);
-
-        //! データヘッダを調べる.
-        if (data.Id != RIFFCC('data') || data.Size == 0) {
-            break;
+            if (chunk.ID == RIFFCC('fmt '))
+            {
+                Format = *((RIFFFORMATCHUNK*)&buf[offset]);
+                //! フォーマットヘッダを調べる.
+                if ((Format.Channels == 0)
+                    || (Format.SamplesPerSec == 0)
+                    || (Format.AvgBytesPerSec == 0)
+                    || (Format.BlockAlign == 0)
+                    || (Format.BitsPerSample == 0))
+                {
+                    throw "wave format error";
+                }
+            }
+            else if (chunk.ID == RIFFCC('fact'))
+            {
+                //! ファクトリチャンクを取り出す.
+                WAVEFACTCHUNK fact;
+                fact = *((WAVEFACTCHUNK*)&buf[offset]);
+                if (fact.Id != RIFFCC('fact')) {
+                    fact.Samples = 0;
+                }
+            }
+            else if (chunk.ID == RIFFCC('data'))
+            {
+                //! データヘッダを調べる.
+                if (chunk.Size == 0) {
+                    throw "wav data size error";
+                }
+                break;
+            }
+            offset += chunk.Size;
         }
+
         //! ファイルから読み込んだデータが少ない場合、エラーにする.
         if (len <= offset) {
             break;
@@ -114,8 +122,13 @@ DWORD ReadWavFile::ReadWaveFile(void * data, DWORD size)
     return 0;
 }
 
-WAVFILEHEADER ReadWavFile::GetHeader()
+RIFFHEADER ReadWavFile::GetHeader()
 {
     return Header;
+}
+
+RIFFFORMATCHUNK ReadWavFile::GetFormat()
+{
+    return Format;
 }
 

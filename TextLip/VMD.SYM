@@ -1,0 +1,44 @@
+#include "typedef.h"			//#include‚ªŽg‚¦‚Ü‚·
+#maxloop -1
+#littleendian
+
+struct Bone
+{
+  char BoneName[15];
+  UINT FrameNo;
+  float PosX;
+  float PosY;
+  float PosZ;
+  float RotX;
+  float RotY;
+  float RotZ;
+  float RotW;
+  BYTE Interpolation[64];
+};
+
+struct Morf
+{
+  char MorfNum[15];
+  UINT FrameNo;
+  float Weight;
+};
+
+
+
+// load start
+$char Header[30];
+$char ModelName[20];
+
+$UINT BoneNum;
+$Bone bone[BoneNum];
+
+$UINT MorfNum;
+$Morf morf[MorfNum];
+
+$UINT CameraNum;
+
+$UINT LightNum;
+
+$UINT ShadowNum;
+
+return;

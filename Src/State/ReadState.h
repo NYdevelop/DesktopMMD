@@ -1,11 +1,11 @@
 #pragma once
-#include "StateMMD.h"
+#include "State/StateMMD.h"
 
 #include <memory>
-#include "OutputSound.h"
-#include "PlayAnim.h"
+#include "Sound/OutputSound.h"
+#include "MMD/PlayAnim.h"
 
-#include "ManageMMD.h"
+#include "MMD/ManageMMD.h"
 
 class ReadState : public StateMMD
 {

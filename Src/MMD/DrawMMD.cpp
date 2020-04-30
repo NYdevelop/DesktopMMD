@@ -1,6 +1,6 @@
-#include "DrawMMD.h"
+#include "MMD/DrawMMD.h"
 
-#include "WinUtil.h"
+#include "Util/WinUtil.h"
 #include <iostream>
 
 using namespace std;

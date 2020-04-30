@@ -1,14 +1,14 @@
 #pragma once
 
-#include "StateMMD.h"
-#include "CaptureSound.h"
+#include "State/StateMMD.h"
+#include "Sound/CaptureSound.h"
 
-#include "PlayAnim.h"
-#include "TransrateAnim.h"
+#include "MMD/PlayAnim.h"
+#include "MMD/TransrateAnim.h"
 
-#include "EstimateBPM.h"
-#include "CalculateBPM.h"
-#include "CheckNoSound.h"
+#include "Sound/EstimateBPM.h"
+#include "Sound/CalculateBPM.h"
+#include "Sound/CheckNoSound.h"
 
 #include <memory>
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <vector>
 #include "WaveFile.h"
 
 class ReadWavFile
@@ -26,9 +27,11 @@ public:
     *	@retval	ファイルから読み込んだバイト数.
     */
     DWORD	ReadWaveFile(void* data, DWORD size);
-    WAVFILEHEADER GetHeader();
+    RIFFHEADER GetHeader();
+    RIFFFORMATCHUNK GetFormat();
 
 private:
     HANDLE hFile = NULL;          //!< ファイル・ハンドル.
-    WAVFILEHEADER Header = { 0 }; //!< WAVEファイルのヘッダ構造体.
+    RIFFHEADER Header = { 0 }; //!< WAVEファイルのヘッダ
+    RIFFFORMATCHUNK Format = { 0 };
 };

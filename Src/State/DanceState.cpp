@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "DxLib.h"
+#include <chrono>
 
 using namespace std;
 
@@ -9,11 +10,14 @@ void DanceState::Initialize()
 {
     cout << "state: dance" << endl;
 
-    m_Output->Output(L"data/music.wav");
+    // TODO: モデル位置リセット
     MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 1);
     danceAnim.ResetAnimTime();
     MV1PhysicsResetState(model);
+
+    m_Output->Output(L"data/music.wav");
 }
+
 
 void DanceState::Doing()
 {
@@ -33,7 +37,7 @@ void DanceState::ModelInitial()
 {
     danceAnim.AttachAnime(model, 7);
     danceAnim.IsLoop(false);
-    danceAnim.SetPlaySpeed(.5f);
+    danceAnim.SetPlaySpeed(.575f);
     MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 0);
 }
 

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "window.h"
-#include "CaptureSound.h"
-#include "OutputSound.h"
-#include "DrawMMD.h"
-#include "StateManager.h"
+#include "Sound/CaptureSound.h"
+#include "Sound/OutputSound.h"
+#include "MMD/DrawMMD.h"
+#include "State/StateManager.h"
 
 #include "Define.h"
 
