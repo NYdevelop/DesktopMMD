@@ -176,6 +176,9 @@
     <ClCompile Include="Src\State\WalkStateManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Src\State\WaitState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Sound\WAV.SYM" />

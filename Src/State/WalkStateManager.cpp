@@ -21,6 +21,7 @@ void WalkStateManager::Start(DxLib::VECTOR distination)
     UpdateDirection();
 
     m_StateManager->Transrate(EState::STATE_WALK);
+    m_IsMove = true;
 }
 
 void WalkStateManager::Update()
@@ -36,7 +37,9 @@ void WalkStateManager::Update()
 
     if (distance < m_Threshold)
     {
+        m_IsMove = false;
         m_StateManager->Transrate(nextState);
+        return;
     }
 
     // is•ûŒüC³

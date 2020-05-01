@@ -193,6 +193,7 @@
     <ClCompile Include="Src/Util/UtilTimer.cpp" />
     <ClCompile Include="Src/Util/WinUtil.cpp" />
     <ClCompile Include="Src/window.cpp" />
+    <ClCompile Include="Src\State\WaitState.cpp" />
     <ClCompile Include="Src\State\WalkState.cpp" />
     <ClCompile Include="Src\State\WalkStateManager.cpp" />
   </ItemGroup>

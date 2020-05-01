@@ -10,8 +10,6 @@ using namespace std;
 //DxLib_Init以前で呼び出すべき処理
 void DrawMMD::preInitialize()
 {
-    //ディスプレイ解像度の取得
-    // http://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10129265945
     RECT rc;
     GetWindowRect(GetDesktopWindow(), &rc);
     dispWidth = rc.right - rc.left;
@@ -28,15 +26,14 @@ void DrawMMD::afterInitialize()
 
     RotateY = -2.7f;
     float posX = 0.f;
-    float posY = -11.f;
-    Zoom = 22.f;
-    // Zoom = 1.7f;
+    float posY = -7.f;
+    m_Zoom = 35.f;
 
     charaPos = VGet(posX, posY, 1.0f);
+    cameraPos = VGet(0.f, 0.f, m_Zoom * -1.f);
 
-    SetupCamera_Ortho(Zoom);
-    //SetupCamera_Perspective(Zoom);
-    SetCameraNearFar(0.1f, 50.0f);
+    SetupCamera_Perspective(30.f * M_PI / 180.f);
+    SetCameraNearFar(1.f, 1000.0f);
     SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
 }
 
@@ -51,9 +48,7 @@ int DrawMMD::mainProcess()
         0, 0, dispWidth, dispHeight,
         GetColor(1, 1, 1), TRUE);//背景を設定(透過させる)
 
-    SetupCamera_Ortho(Zoom);
     SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
-    //SetupCamera_Perspective(Zoom);
 
     //モデルの座標指定
     DxLib::MV1SetPosition(model, charaPos);

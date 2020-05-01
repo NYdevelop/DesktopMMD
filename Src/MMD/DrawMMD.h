@@ -21,33 +21,35 @@ public:
         m_StateManager = stateManager;
     }
 
-    inline int GetModelHandle()
-    {
-        return model;
-    }
+    inline int GetModelHandle() { return model; }
 
     inline void SetCharactorPos(const DxLib::VECTOR& pos)
     {
         charaPos = pos;
     }
 
-    inline DxLib::VECTOR GetCharactorPos()
-    {
-        return charaPos;
-    }
+    inline DxLib::VECTOR GetCharactorPos() { return charaPos; }
 
     void UpdatePosRot();
 
-    float Zoom = 0;
+    inline void SetZoom(float zoom)
+    {
+        m_Zoom = zoom;
+        cameraPos = VScale(VNorm(cameraPos), zoom);
+    }
+
+    float GetZoom() { return m_Zoom; };
+
     float RotateY = 0;
-    DxLib::VECTOR cameraPos = VGet(0.f, 0.f, -10.f);
+    DxLib::VECTOR cameraPos = VGet(0.f, 0.f, 0.f);
 
 private:
     int model = 0;//モデルハンドル
     DxLib::VECTOR charaPos = VGet(0.f, 0.f, 1.f);//キャラクタの座標
+    float m_Zoom = 10.f;
 
-    LONG dispWidth = 0;
-    LONG dispHeight = 0;
+    LONG dispWidth = 640;
+    LONG dispHeight = 480;
 
     PlayAnim blink;
 

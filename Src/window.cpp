@@ -72,10 +72,11 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
 
     /* メニュー項目追加 */
     AppendMenu(m_ContextMenu, MF_POPUP, (UINT)m_ModeMenu, L"Mode");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_LEFT,  L"左端へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RIGHT, L"右端へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_OVER,  L"奥へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_EXIT,    L"Exit");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_LEFT,   L"左端へ移動");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RIGHT,  L"右端へ移動");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_OVER,   L"奥へ移動");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RANDOM, L"ランダム移動");
+    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_EXIT,        L"Exit");
 
     AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_WAIT,   L"Wait");
     AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_RHYTHM, L"Rhythm");
@@ -209,6 +210,11 @@ HRESULT CWindow::Process(int fps)
 HWND CWindow::GetHWnd()
 {
     return m_hWnd;
+}
+
+HMENU CWindow::GetContextMenu()
+{
+    return m_ContextMenu;
 }
 
 bool CWindow::IsClose()

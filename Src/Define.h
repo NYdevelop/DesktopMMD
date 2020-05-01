@@ -19,5 +19,6 @@ enum class EContextMenu : int
     CONTEXT_MOVE_LEFT = 2,
     CONTEXT_MOVE_RIGHT = 3,
     CONTEXT_MOVE_OVER = 99,
-    CONTEXT_EXIT = 4,
+    CONTEXT_MOVE_RANDOM = 4,
+    CONTEXT_EXIT = 0,
 };

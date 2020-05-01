@@ -47,12 +47,12 @@ HRESULT ManageMMD::Initialize()
 
             if (IsPress(VK_UP))
             {
-                m_mmd->Zoom += .1f;
+                m_mmd->SetZoom(m_mmd->GetZoom() + .1f);
             }
 
             if (IsPress(VK_DOWN))
             {
-                m_mmd->Zoom -= .1f;
+                m_mmd->SetZoom(m_mmd->GetZoom() - .1f);
             }
             return;
         }
@@ -93,7 +93,7 @@ HRESULT ManageMMD::Initialize()
 
         if (IsPress(VK_MBUTTON))
         {
-            static const float CAMERA_MOVE_SPEED = 44.f;
+            static const float CAMERA_MOVE_SPEED_A = .001f;
             int mouseX, mouseY;
             GetMousePoint(&mouseX, &mouseY);
 
@@ -105,7 +105,10 @@ HRESULT ManageMMD::Initialize()
                 float s = 1.f;
                 if (mouseX - beginMousePosX < 0)
                     s = -1.f;
-                newPos = VAdd(m_mmd->cameraPos, VScale(xVec, CAMERA_MOVE_SPEED / m_mmd->Zoom * s));
+                newPos =
+                    VAdd(
+                        m_mmd->cameraPos,
+                        VScale(xVec, CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 2) * s));
 
                 beginMousePosX = mouseX;
             }
@@ -119,12 +122,15 @@ HRESULT ManageMMD::Initialize()
                 float s = 1.f;
                 if (mouseY - beginMousePosY < 0)
                     s = -1.f;
-                newPos = VAdd(newPos, VScale(yVec, CAMERA_MOVE_SPEED / m_mmd->Zoom * s));
+                newPos =
+                    VAdd(
+                        newPos,
+                        VScale(yVec, CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 2) * s));
 
                 beginMousePosY = mouseY;
             }
 
-            newPos = VScale(VNorm(newPos), 10.f);
+            newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
             m_mmd->cameraPos = newPos;
             return;
         }
@@ -132,30 +138,20 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackWheel([&](WPARAM wParam, LPARAM lParam)
         {
-            DWORD fwKeys = GET_KEYSTATE_WPARAM(wParam);	// 同時に押されているキー情報
             int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
-
-            //int x = GET_X_LPARAM(lParam);	// 回転時のマウスカーソルのクライアント座標Ｘ
-            //int y = GET_Y_LPARAM(lParam);	// 回転時のマウスカーソルのクライアント座標Ｙ
-
-            // 前回の端数を追加
-            //zDelta += nWheelFraction;
 
             // ノッチ数を求める
             int nNotch = zDelta / WHEEL_DELTA;
 
-            // 端数を保存する
-            //nWheelFraction = zDelta % WHEEL_DELTA;
-
             if (nNotch > 0)
             {
                 // ↑に回転（チルト）した
-                m_mmd->Zoom -= .5f;
+                m_mmd->SetZoom(m_mmd->GetZoom() - 5.f);
             }
             else if (nNotch < 0)
             {
                 // ↓に回転（チルト）した
-                m_mmd->Zoom += .5f;
+                m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
             }
         });
 
@@ -209,6 +205,27 @@ HRESULT ManageMMD::Initialize()
         }
         break;
 
+        case EContextMenu::CONTEXT_MOVE_RANDOM:
+        {
+            UINT id = (UINT)EContextMenu::CONTEXT_MOVE_RANDOM;
+            auto waitState = (WaitState*)stateManager->GetStateMap()[EState::STATE_WAIT].get();
+
+            //チェック状態取得
+            auto uState = GetMenuState(m_Window.GetContextMenu(), id, MF_BYCOMMAND);
+
+            if (uState & MFS_CHECKED)
+            {
+                //チェックはずす
+                waitState->SetRandomMove(false);
+                CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_UNCHECKED);
+                return;
+            }
+
+            //チェックする
+            waitState->SetRandomMove(true);
+            CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_CHECKED);
+        }
+        break;
         }
     });
 
@@ -233,6 +250,10 @@ HRESULT ManageMMD::Initialize()
 
     /// State初期化
     shared_ptr<State> wait(new WaitState());
+    auto waitPtr = (WaitState*)wait.get();
+    waitPtr->SetDrawMMD(m_mmd);
+    waitPtr->SetWalkStateManager(&walkManager);
+    waitPtr->OnceInitial();
     stateManager->AddState(EState::STATE_WAIT, move(wait));
 
     shared_ptr<State> rhythm(new RhythmState());

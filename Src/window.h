@@ -12,6 +12,7 @@ public:
     HRESULT Process(int fps = 30);
 
     HWND GetHWnd();
+    HMENU GetContextMenu();
     bool IsClose();
 
     void SetDrawFunc(const std::function<void(HDC)>& func);

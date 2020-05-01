@@ -16,6 +16,8 @@ public:
     void Start(DxLib::VECTOR distination);
     void Update();
 
+    bool IsMove() { return m_IsMove; };
+
 private:
     void UpdateDirection();
 
@@ -27,5 +29,5 @@ private:
     WalkState* m_Walk = nullptr;
 
     float m_Threshold = 0.1f;
-
+    bool m_IsMove = false;
 };
