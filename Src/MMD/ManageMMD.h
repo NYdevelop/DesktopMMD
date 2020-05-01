@@ -6,7 +6,7 @@
 #include "MMD/DrawMMD.h"
 #include "State/StateManager.h"
 
-#include "Define.h"
+#include "State/WalkStateManager.h"
 
 #include <vector>
 
@@ -31,4 +31,6 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
 
     std::shared_ptr<StateManager<EState>> stateManager;
+
+    WalkStateManager walkManager;
 };

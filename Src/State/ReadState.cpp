@@ -22,10 +22,13 @@ void ReadState::Initialize()
 {
     cout << "state: read" << endl;
 
-    // ニュース原稿ダウンロード、ひらがな化
-    //system("python YahooAPI/yahooAPI.py");
-    //system("move text.txt data");
-    //system("move sep_text.txt data");
+    if (IsSame("data/text.txt", "data/before_text.txt") == true)
+    {
+        // ニュース原稿ダウンロード、ひらがな化
+        system("python YahooAPI/yahooAPI.py");
+        system("move text.txt data");
+        system("move sep_text.txt data");
+    }
 
     if (IsSame("data/text.txt", "data/before_text.txt") == false)
     {
@@ -41,9 +44,9 @@ void ReadState::Initialize()
             });
 
         // wav生成
-        system("softalk_rec data/text.txt");
+        system("softalk_rec data\\text.txt");
 
-        system("copy data/text.txt data/before_text.txt");
+        system("copy /Y data\\text.txt data\\before_text.txt");
         t.join();
     }
 
@@ -70,7 +73,7 @@ void ReadState::ModelInitial()
 {
     lipAnim.AttachAnime(model, 6);
     lipAnim.IsLoop(false);
-    lipAnim.SetPlaySpeed(0.9f);
+    lipAnim.SetPlaySpeed(1.0f);
 }
 
 

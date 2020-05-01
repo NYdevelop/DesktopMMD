@@ -41,7 +41,7 @@ public:
 
 private:
     int model = 0;//モデルハンドル
-    DxLib::VECTOR charaPos = VGet(0, 0, 0);//キャラクタの座標
+    DxLib::VECTOR charaPos = VGet(0, 0, 1.f);//キャラクタの座標
 
     LONG dispWidth = 0;
     LONG dispHeight = 0;

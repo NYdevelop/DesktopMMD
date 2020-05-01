@@ -6,6 +6,8 @@ using namespace std;
 // プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
 int main()
 {
+    // TODO: カメラの方を向く
+    // TODO: 指定座標に向かって自動で移動(画面座標)
     {
         ManageMMD manager;
         manager.Initialize();

@@ -169,6 +169,8 @@
     <ClInclude Include="Src/Util/WinUtil.h" />
     <ClInclude Include="Src/Define.h" />
     <ClInclude Include="Src/window.h" />
+    <ClInclude Include="Src\State\WalkState.h" />
+    <ClInclude Include="Src\State\WalkStateManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src/Sound/CalculateBPM.cpp" />
@@ -191,6 +193,11 @@
     <ClCompile Include="Src/Util/UtilTimer.cpp" />
     <ClCompile Include="Src/Util/WinUtil.cpp" />
     <ClCompile Include="Src/window.cpp" />
+    <ClCompile Include="Src\State\WalkState.cpp" />
+    <ClCompile Include="Src\State\WalkStateManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Src\Sound\WAV.SYM" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

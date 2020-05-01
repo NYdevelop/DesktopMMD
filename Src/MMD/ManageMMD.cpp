@@ -6,6 +6,8 @@
 #include "State/RhythmState.h"
 #include "State/ReadState.h"
 #include "State/DanceState.h"
+#include "State/WalkState.h"
+#define M_PI       3.14159265358979323846
 
 #include "Sound/fft.h"
 
@@ -28,7 +30,7 @@ HRESULT ManageMMD::Initialize()
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         m_mmd->mainProcess();
-
+        walkManager.Update();
 
         /// ƒL[“ü—Í”»’è
         if (IsPress(VK_SHIFT) != 0)
@@ -56,16 +58,6 @@ HRESULT ManageMMD::Initialize()
         }
 
         auto pos = m_mmd->GetCharactorPos();
-        if (IsPress(VK_RIGHT))
-        {
-            pos.x += .1f;
-        }
-
-        if (IsPress(VK_LEFT))
-        {
-            pos.x -= .1f;
-        }
-
         if (IsPress(VK_UP))
         {
             pos.y += .1f;
@@ -76,6 +68,31 @@ HRESULT ManageMMD::Initialize()
             pos.y -= .1f;
         }
         m_mmd->SetCharactorPos(pos);
+
+        /// walkó‘Ô‘JˆÚ
+        //if (stateManager->GetCurrentStateIndex() == EState::STATE_WALK)
+        //{
+        //    if (!IsPress(VK_RIGHT) && !IsPress(VK_LEFT))
+        //    {
+        //        stateManager->Transrate(EState::STATE_WAIT);
+        //    }
+        //}
+        //if (IsPress(VK_RIGHT) || IsPress(VK_LEFT))
+        //{
+        //    float direction = 0;
+        //    if (IsPress(VK_RIGHT))
+        //    {
+        //        direction = -M_PI / 2;
+        //    }
+        //    if (IsPress(VK_LEFT))
+        //    {
+        //        direction = M_PI / 2;
+        //    }
+        //    auto walk = (WalkState*)(stateManager->GetStateMap()[EState::STATE_WALK].get());
+        //    walk->SetDirection(direction);
+        //    stateManager->Transrate(EState::STATE_WALK);
+        //}
+
     });
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
@@ -100,6 +117,28 @@ HRESULT ManageMMD::Initialize()
         case EContextMenu::CONTEXT_MODE_DANCE:
             stateManager->Transrate(EState::STATE_DANCE);
             break;
+
+        case EContextMenu::CONTEXT_MOVE_LEFT:
+        {
+            auto pos = m_mmd->GetCharactorPos();
+            walkManager.Start(VGet(-11.f, pos.y, 1.f));
+        }
+            break;
+
+        case EContextMenu::CONTEXT_MOVE_RIGHT:
+        {
+            auto pos = m_mmd->GetCharactorPos();
+            walkManager.Start(VGet(11.f, pos.y, 1.f));
+        }
+            break;
+
+        case EContextMenu::CONTEXT_MOVE_OVER:
+        {
+            auto pos = m_mmd->GetCharactorPos();
+            walkManager.Start(VGet(11.f, pos.y, 11.f));
+        }
+        break;
+
         }
     });
 
@@ -144,9 +183,16 @@ HRESULT ManageMMD::Initialize()
     dancePtr->SetDrawMMD(m_mmd);
     stateManager->AddState(EState::STATE_DANCE, dance);
 
+    shared_ptr<State> walk(new WalkState());
+    auto walkPtr = (WalkState*)walk.get();
+    walkPtr->SetDrawMMD(m_mmd);
+    stateManager->AddState(EState::STATE_WALK, walk);
+    walkManager.Initialize(walkPtr, m_mmd, stateManager);
+    walkManager.SetNextState(EState::STATE_WAIT);
+
     LoadModel();
 
-    stateManager->Transrate(EState::STATE_WAIT);
+    stateManager->SetState(EState::STATE_WAIT);
 
     return S_OK;
 }

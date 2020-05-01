@@ -3,6 +3,8 @@
 #include "Util/WinUtil.h"
 #include <iostream>
 
+#define M_PI       3.14159265358979323846f
+
 using namespace std;
 
 //DxLib_Init以前で呼び出すべき処理
@@ -24,15 +26,16 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面にする
 
-    RotateY = -5.8f;
-    float posX = 3.7f;////6.5f;//15f;
-    //float posY = -18.7f;//-20.3f;//-25f;
-    float posY = -17.8f;
-    Zoom = 6.8f;//10f;//20f;
+    RotateY = -2.7f;
+    float posX = 0.f;
+    float posY = -11.f;
+    Zoom = 22.f;
+    // Zoom = 1.7f;
 
     charaPos = VGet(posX, posY, 1.0f);
 
     SetupCamera_Ortho(Zoom);
+    //SetupCamera_Perspective(Zoom);
     SetCameraNearFar(0.1f, 50.0f);
     SetCameraPositionAndTarget_UpVecY(VGet(0, 0, -10), VGet(0, 0, 0));
 }
@@ -49,10 +52,11 @@ int DrawMMD::mainProcess()
         GetColor(1, 1, 1), TRUE);//背景を設定(透過させる)
 
     SetupCamera_Ortho(Zoom);
+    //SetupCamera_Perspective(Zoom);
 
     //モデルの座標指定
     DxLib::MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, RotateY, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + M_PI, 0.0f));
 
     blink.PlayAnimation();
 
@@ -98,7 +102,7 @@ void DrawMMD::LoadModel()
     blink.SetMaximumTime(250.f);
 
     MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, RotateY, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + M_PI, 0.0f));
 
     MV1PhysicsResetState(model);
 
