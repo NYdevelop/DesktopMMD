@@ -7,7 +7,7 @@ using namespace std;
 int main()
 {
     // TODO: カメラの方を向く
-    // TODO: 指定座標に向かって自動で移動(画面座標)
+    // TODO: 画面上のランダム移動
     {
         ManageMMD manager;
         manager.Initialize();

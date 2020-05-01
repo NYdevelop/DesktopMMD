@@ -7,7 +7,6 @@
 #include "State/ReadState.h"
 #include "State/DanceState.h"
 #include "State/WalkState.h"
-#define M_PI       3.14159265358979323846
 
 #include "Sound/fft.h"
 
@@ -27,6 +26,7 @@ HRESULT ManageMMD::Initialize()
     stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
     m_mmd->SetStateManager(stateManager);
 
+    int beginMousePosX = 0, beginMousePosY = 0;
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         m_mmd->mainProcess();
@@ -47,12 +47,12 @@ HRESULT ManageMMD::Initialize()
 
             if (IsPress(VK_UP))
             {
-                m_mmd->Zoom -= .1f;
+                m_mmd->Zoom += .1f;
             }
 
             if (IsPress(VK_DOWN))
             {
-                m_mmd->Zoom += .1f;
+                m_mmd->Zoom -= .1f;
             }
             return;
         }
@@ -69,31 +69,95 @@ HRESULT ManageMMD::Initialize()
         }
         m_mmd->SetCharactorPos(pos);
 
-        /// walk状態遷移
-        //if (stateManager->GetCurrentStateIndex() == EState::STATE_WALK)
-        //{
-        //    if (!IsPress(VK_RIGHT) && !IsPress(VK_LEFT))
-        //    {
-        //        stateManager->Transrate(EState::STATE_WAIT);
-        //    }
-        //}
-        //if (IsPress(VK_RIGHT) || IsPress(VK_LEFT))
-        //{
-        //    float direction = 0;
-        //    if (IsPress(VK_RIGHT))
-        //    {
-        //        direction = -M_PI / 2;
-        //    }
-        //    if (IsPress(VK_LEFT))
-        //    {
-        //        direction = M_PI / 2;
-        //    }
-        //    auto walk = (WalkState*)(stateManager->GetStateMap()[EState::STATE_WALK].get());
-        //    walk->SetDirection(direction);
-        //    stateManager->Transrate(EState::STATE_WALK);
-        //}
+        if (IsPress('M'))
+        {
+            // ConvScreenPosToWorldPos に渡す座標の z を 0.0f にした場合は画面の指定の座標のワールド座標での
+            // 一番手前(画面に近い側)の座標(カメラから SetCameraNearFar の Near で指定した分だけ離れた距離の位置)を取得することができ、
+            // z を 1.0f にした場合は画面の指定の座標のワールド座標での画面奥側の座標(カメラから SetCameraNearFar の Far で
+            // 指定した分だけ離れた距離の位置)を取得することができます
 
+            // https://dxlib.xsrv.jp/function/dxfunc_3d_camera.html#R12N11
+
+            int MouseX = 0, MouseY = 0;
+            GetMousePoint(&MouseX, &MouseY);
+            auto ScreenPos = VGet(0.f, 0.f, 0.f);
+            ScreenPos.x = (float)MouseX;
+            ScreenPos.y = (float)MouseY;
+
+            ScreenPos.z = 0.0f;
+            auto Start3DPos = ConvScreenPosToWorldPos(ScreenPos);
+
+            auto pos = m_mmd->GetCharactorPos();
+            walkManager.Start(VGet(Start3DPos.x, pos.y, 1.f));
+        }
+
+        if (IsPress(VK_MBUTTON))
+        {
+            static const float CAMERA_MOVE_SPEED = 44.f;
+            int mouseX, mouseY;
+            GetMousePoint(&mouseX, &mouseY);
+
+            auto rayVec = m_mmd->cameraPos; //VSub(m_mmd->cameraPos, VGet(0,0,0));
+            auto xVec = VNorm(VCross(rayVec, VGet(0,1,0)));
+            VECTOR newPos = rayVec;
+            if (mouseX - beginMousePosX != 0)
+            {
+                float s = 1.f;
+                if (mouseX - beginMousePosX < 0)
+                    s = -1.f;
+                newPos = VAdd(m_mmd->cameraPos, VScale(xVec, CAMERA_MOVE_SPEED / m_mmd->Zoom * s));
+
+                beginMousePosX = mouseX;
+            }
+
+            if (mouseY - beginMousePosY != 0)
+            {
+                //rayVec = m_mmd->cameraPos; //VSub(m_mmd->cameraPos, VGet(0,0,0));
+                //xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+
+                auto yVec = VNorm(VCross(xVec, rayVec));
+                float s = 1.f;
+                if (mouseY - beginMousePosY < 0)
+                    s = -1.f;
+                newPos = VAdd(newPos, VScale(yVec, CAMERA_MOVE_SPEED / m_mmd->Zoom * s));
+
+                beginMousePosY = mouseY;
+            }
+
+            newPos = VScale(VNorm(newPos), 10.f);
+            m_mmd->cameraPos = newPos;
+            return;
+        }
     });
+
+    m_Window.SetCallbackWheel([&](WPARAM wParam, LPARAM lParam)
+        {
+            DWORD fwKeys = GET_KEYSTATE_WPARAM(wParam);	// 同時に押されているキー情報
+            int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
+
+            //int x = GET_X_LPARAM(lParam);	// 回転時のマウスカーソルのクライアント座標Ｘ
+            //int y = GET_Y_LPARAM(lParam);	// 回転時のマウスカーソルのクライアント座標Ｙ
+
+            // 前回の端数を追加
+            //zDelta += nWheelFraction;
+
+            // ノッチ数を求める
+            int nNotch = zDelta / WHEEL_DELTA;
+
+            // 端数を保存する
+            //nWheelFraction = zDelta % WHEEL_DELTA;
+
+            if (nNotch > 0)
+            {
+                // ↑に回転（チルト）した
+                m_mmd->Zoom -= .5f;
+            }
+            else if (nNotch < 0)
+            {
+                // ↓に回転（チルト）した
+                m_mmd->Zoom += .5f;
+            }
+        });
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
@@ -120,15 +184,21 @@ HRESULT ManageMMD::Initialize()
 
         case EContextMenu::CONTEXT_MOVE_LEFT:
         {
+            auto ScreenPos = VGet(100.f, 0.f, 0.f);
+            auto worldPos = ConvScreenPosToWorldPos(ScreenPos);
+
             auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(-11.f, pos.y, 1.f));
+            walkManager.Start(VGet(worldPos.x, pos.y, 1.f));
         }
             break;
 
         case EContextMenu::CONTEXT_MOVE_RIGHT:
         {
+            auto ScreenPos = VGet(1920.f - 100.f, 0.f, 0.f);
+            auto worldPos = ConvScreenPosToWorldPos(ScreenPos);
+
             auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(11.f, pos.y, 1.f));
+            walkManager.Start(VGet(worldPos.x, pos.y, 1.f));
         }
             break;
 

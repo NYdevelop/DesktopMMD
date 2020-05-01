@@ -15,8 +15,9 @@ void DanceState::Initialize()
     pos.x = 0.f;
     pos.y = -10.f;
     m_mmd->SetCharactorPos(pos);
-    m_mmd->RotateY = 0;
+    m_mmd->RotateY = 3.14f;
     m_mmd->Zoom = 20.f;
+    m_mmd->UpdatePosRot();
 
     MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 1);
     danceAnim.ResetAnimTime();

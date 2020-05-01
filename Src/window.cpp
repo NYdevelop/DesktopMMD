@@ -105,32 +105,10 @@ LRESULT CALLBACK CWindow::WindProc(
     }
     break;
 
-    //case WM_KEYDOWN:
-    //{
-    //    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
-    //    if (win->m_KeyDownCallback != nullptr)
-    //    {
-    //        win->m_KeyDownCallback(wParam, lParam);
-    //    }
-    //}
-    //break;
-
-    //case WM_KEYUP:
-    //{
-    //    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
-    //    if (win->m_KeyUpCallback != nullptr)
-    //    {
-    //        win->m_KeyUpCallback(wParam, lParam);
-    //    }
-    //}
-    //break;
-
     case WM_DESTROY:
     {
         CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         win->m_Timer.Break_Force();
-
-        //_CrtDumpMemoryLeaks();
         ::PostQuitMessage(0);
     }
     break;
@@ -150,6 +128,16 @@ LRESULT CALLBACK CWindow::WindProc(
         TrackPopupMenu(win->m_ContextMenu, 0, pt.x, pt.y, 0, hwnd, NULL);
     }
     break;
+
+    case WM_MOUSEWHEEL:
+    {
+        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+        if (win->m_WheelCallback != nullptr)
+        {
+            win->m_WheelCallback(wParam, lParam);
+        }
+    }
+        break;
 
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -238,15 +226,10 @@ void CWindow::SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func
     m_CommandCallback = func;
 }
 
-//void CWindow::SetCallbackKeyDown(const std::function<void(WPARAM, LPARAM)>& func)
-//{
-//    m_KeyDownCallback = func;
-//}
-//
-//void CWindow::SetCallbackKeyUp(const std::function<void(WPARAM, LPARAM)>& func)
-//{
-//    m_KeyUpCallback = func;
-//}
+void CWindow::SetCallbackWheel(const std::function<void(WPARAM, LPARAM)>& func)
+{
+    m_WheelCallback = func;
+}
 
 void CWindow::Draw(HDC hDc)
 {

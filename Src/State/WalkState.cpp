@@ -14,7 +14,7 @@ void WalkState::Initialize()
     cout << "state: walk" << endl;
 
     m_mmd->RotateY = m_Direction;
-    MV1SetRotationXYZ(model, VGet(0.0f, m_Direction + M_PI, 0.0f));
+    m_mmd->UpdatePosRot();
     MV1SetAttachAnimBlendRate(model, walkAnim.GetAnimIndex(), 1);
     walkAnim.ResetAnimTime();
     MV1PhysicsResetState(model);
@@ -43,7 +43,7 @@ void WalkState::End()
 
 void WalkState::ModelInitial()
 {
-    walkAnim.AttachAnime(model, 8);
+    walkAnim.AttachAnime(model, 9);
     walkAnim.SetPlaySpeed(1.0f);
     MV1SetAttachAnimBlendRate(model, walkAnim.GetAnimIndex(), 0);
 }
