@@ -7,7 +7,7 @@ using namespace std;
 int main()
 {
     // TODO: ƒJƒƒ‰‚Ì•û‚ğŒü‚­
-    // TODO: ‰æ–Êã‚Ìƒ‰ƒ“ƒ_ƒ€ˆÚ“®
+    // TODO: Q‚éAÀ‚é
     {
         ManageMMD manager;
         manager.Initialize();

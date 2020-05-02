@@ -1,6 +1,7 @@
 #include "MMD/ManageMMD.h"
 
 #include "Util/WinUtil.h"
+#include "Util/UtilMMD.h"
 
 #include "State/WaitState.h"
 #include "State/RhythmState.h"
@@ -71,24 +72,9 @@ HRESULT ManageMMD::Initialize()
 
         if (IsPress('M'))
         {
-            // ConvScreenPosToWorldPos に渡す座標の z を 0.0f にした場合は画面の指定の座標のワールド座標での
-            // 一番手前(画面に近い側)の座標(カメラから SetCameraNearFar の Near で指定した分だけ離れた距離の位置)を取得することができ、
-            // z を 1.0f にした場合は画面の指定の座標のワールド座標での画面奥側の座標(カメラから SetCameraNearFar の Far で
-            // 指定した分だけ離れた距離の位置)を取得することができます
-
-            // https://dxlib.xsrv.jp/function/dxfunc_3d_camera.html#R12N11
-
             int MouseX = 0, MouseY = 0;
             GetMousePoint(&MouseX, &MouseY);
-            auto ScreenPos = VGet(0.f, 0.f, 0.f);
-            ScreenPos.x = (float)MouseX;
-            ScreenPos.y = (float)MouseY;
-
-            ScreenPos.z = 0.0f;
-            auto Start3DPos = ConvScreenPosToWorldPos(ScreenPos);
-
-            auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(Start3DPos.x, pos.y, 1.f));
+            WalkStart((float)MouseX, (float)MouseY, m_mmd.get(), &walkManager);
         }
 
         if (IsPress(VK_MBUTTON))
@@ -180,30 +166,17 @@ HRESULT ManageMMD::Initialize()
 
         case EContextMenu::CONTEXT_MOVE_LEFT:
         {
-            auto ScreenPos = VGet(100.f, 0.f, 0.f);
-            auto worldPos = ConvScreenPosToWorldPos(ScreenPos);
-
-            auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(worldPos.x, pos.y, 1.f));
+            auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
+            WalkStart(100.f, CharaScreenPos.y, m_mmd.get(), &walkManager);
         }
             break;
 
         case EContextMenu::CONTEXT_MOVE_RIGHT:
         {
-            auto ScreenPos = VGet(1920.f - 100.f, 0.f, 0.f);
-            auto worldPos = ConvScreenPosToWorldPos(ScreenPos);
-
-            auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(worldPos.x, pos.y, 1.f));
+            auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
+            WalkStart(1920.f - 100.f, CharaScreenPos.y, m_mmd.get(), &walkManager);
         }
             break;
-
-        case EContextMenu::CONTEXT_MOVE_OVER:
-        {
-            auto pos = m_mmd->GetCharactorPos();
-            walkManager.Start(VGet(11.f, pos.y, 11.f));
-        }
-        break;
 
         case EContextMenu::CONTEXT_MOVE_RANDOM:
         {

@@ -171,6 +171,7 @@
     <ClInclude Include="Src/window.h" />
     <ClInclude Include="Src\State\WalkState.h" />
     <ClInclude Include="Src\State\WalkStateManager.h" />
+    <ClInclude Include="Src\Util\UtilMMD.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src/Sound/CalculateBPM.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="Src\State\WaitState.cpp" />
     <ClCompile Include="Src\State\WalkState.cpp" />
     <ClCompile Include="Src\State\WalkStateManager.cpp" />
+    <ClCompile Include="Src\Util\UtilMMD.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Sound\WAV.SYM" />

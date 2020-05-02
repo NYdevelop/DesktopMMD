@@ -1,6 +1,7 @@
 #include "WaitState.h"
 
 #include <random>
+#include "Util/UtilMMD.h"
 
 static std::mt19937 mt;
 void WaitState::Doing()
@@ -10,24 +11,8 @@ void WaitState::Doing()
 
     if (mt() % 500 != 0) return;
 
-    // ランダムワールド座標算出
-    auto ScreenPos = VGet(0.f, 0.f, 0.f);
-    ScreenPos.x = (float)(mt() % dispWidth);
-    ScreenPos.y = (float)(mt() % dispHeight);
-
-    ScreenPos.z = 0.0f;
-    auto Start3DPos = ConvScreenPosToWorldPos(ScreenPos);
-
-    ScreenPos.z = 1.0f;
-    auto End3DPos = ConvScreenPosToWorldPos(ScreenPos);
-
-    auto rayVec = VNorm(VSub(End3DPos, Start3DPos));
-    if (abs(rayVec.y) < 0.5) return;
-
-    auto pos = m_mmd->GetCharactorPos();
-    auto t = (pos.y - Start3DPos.y) / rayVec.y;
-    auto newPos = VGet(Start3DPos.x + t * rayVec.x, pos.y, Start3DPos.z + t * rayVec.z);
-    walkManager->Start(newPos);
+    // ランダムなスクリーン座標へ移動開始
+    WalkStart((float)(mt() % dispWidth), (float)(mt() % dispHeight), m_mmd.get(), walkManager);
 }
 
 void WaitState::OnceInitial()

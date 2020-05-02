@@ -74,7 +74,6 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
     AppendMenu(m_ContextMenu, MF_POPUP, (UINT)m_ModeMenu, L"Mode");
     AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_LEFT,   L"左端へ移動");
     AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RIGHT,  L"右端へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_OVER,   L"奥へ移動");
     AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RANDOM, L"ランダム移動");
     AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_EXIT,        L"Exit");
 

@@ -1,5 +1,7 @@
 #include "WalkStateManager.h"
 
+#include "Util/UtilMMD.h"
+
 void WalkStateManager::Initialize(WalkState* walk, std::shared_ptr<DrawMMD> mmd, std::shared_ptr<StateManager<EState>> stateManager)
 {
     m_Walk = walk;
@@ -30,11 +32,7 @@ void WalkStateManager::Update()
         return;
 
     // 位置のチェック
-    auto pos = m_mmd->GetCharactorPos();
-
-    auto sub = VSub(m_Distination, pos);
-    auto distance = sqrt(VDot(sub, sub));
-
+    auto distance = GetDistance(m_Distination, m_mmd->GetCharactorPos());
     if (distance < m_Threshold)
     {
         m_IsMove = false;

@@ -114,6 +114,9 @@
     <ClInclude Include="Src\State\WalkStateManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Util\UtilMMD.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src/Sound/CalculateBPM.cpp">
@@ -177,6 +180,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Src\State\WaitState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Util\UtilMMD.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
