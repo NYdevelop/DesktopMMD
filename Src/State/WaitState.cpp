@@ -12,7 +12,11 @@ void WaitState::Doing()
     if (mt() % 500 != 0) return;
 
     // ランダムなスクリーン座標へ移動開始
-    WalkStart((float)(mt() % dispWidth), (float)(mt() % dispHeight), m_mmd.get(), walkManager);
+    WalkStart(
+        (float)(mt() % dispWidth),
+        (float)(mt() % dispHeight),
+        m_mmd.get(),
+        walkManager);
 }
 
 void WaitState::OnceInitial()

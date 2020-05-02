@@ -20,7 +20,8 @@ public:
         isLoop = flag;
     }
 
-    void PlayAnimation();
+    /// ÅŒã‚Ü‚ÅÄ¶‚µ‚½‚çFalse‚ğ•Ô‚·
+    bool PlayAnimation();
 
     inline void ResetAnimTime()
     {

@@ -14,7 +14,7 @@ void PlayAnim::AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle, int
     SetMaximumTime(MV1GetAttachAnimTotalTime(modelHandle, animeIndex));
 }
 
-void PlayAnim::PlayAnimation()
+bool PlayAnim::PlayAnimation()
 {
     if (playTime < maximumTime)
     {
@@ -31,4 +31,10 @@ void PlayAnim::PlayAnimation()
     }
 
     MV1SetAttachAnimTime(modelHandle, animeIndex, playTime);//ƒ‚[ƒVƒ‡ƒ“‚ÌÄ¶ˆÊ’u‚ðÝ’è
+
+    if (playTime >= maximumTime)
+    {
+        return false;
+    }
+    return true;
 }

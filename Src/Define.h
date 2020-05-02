@@ -7,6 +7,7 @@ enum class EState
     STATE_READ,
     STATE_DANCE,
     STATE_WALK,
+    STATE_WAVE_HAND,
 };
 
 enum class EContextMenu : int
@@ -16,6 +17,7 @@ enum class EContextMenu : int
     CONTEXT_MODE_RHYTHM = 12,
     CONTEXT_MODE_READ = 13,
     CONTEXT_MODE_DANCE = 14,
+    CONTEXT_MODE_WAVE_HAND = 15,
     CONTEXT_MOVE_LEFT = 2,
     CONTEXT_MOVE_RIGHT = 3,
     CONTEXT_MOVE_RANDOM = 4,

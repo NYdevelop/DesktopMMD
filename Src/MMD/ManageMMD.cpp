@@ -8,6 +8,7 @@
 #include "State/ReadState.h"
 #include "State/DanceState.h"
 #include "State/WalkState.h"
+#include "State/WaveHandState.h"
 
 #include "Sound/fft.h"
 
@@ -143,7 +144,8 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
-        switch ((EContextMenu)LOWORD(wParam)) {
+        auto select = (EContextMenu)LOWORD(wParam);
+        switch (select) {
         case EContextMenu::CONTEXT_EXIT: /* ExitÉÅÉjÉÖÅ[ */
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
             break;
@@ -162,6 +164,10 @@ HRESULT ManageMMD::Initialize()
 
         case EContextMenu::CONTEXT_MODE_DANCE:
             stateManager->Transrate(EState::STATE_DANCE);
+            break;
+
+        case EContextMenu::CONTEXT_MODE_WAVE_HAND:
+            stateManager->Transrate(EState::STATE_WAVE_HAND);
             break;
 
         case EContextMenu::CONTEXT_MOVE_LEFT:
@@ -222,37 +228,7 @@ HRESULT ManageMMD::Initialize()
     m_Output = shared_ptr<OutputSound>(new OutputSound());
 
     /// Stateèâä˙âª
-    shared_ptr<State> wait(new WaitState());
-    auto waitPtr = (WaitState*)wait.get();
-    waitPtr->SetDrawMMD(m_mmd);
-    waitPtr->SetWalkStateManager(&walkManager);
-    waitPtr->OnceInitial();
-    stateManager->AddState(EState::STATE_WAIT, move(wait));
-
-    shared_ptr<State> rhythm(new RhythmState());
-    auto rhythmPtr = (RhythmState*)rhythm.get();
-    rhythmPtr->SetModel(m_mmd->GetModelHandle());
-    rhythmPtr->OnceInital();
-    stateManager->AddState(EState::STATE_RHYTHM, move(rhythm));
-
-    shared_ptr<State> read(new ReadState());
-    auto readPtr = (ReadState*)read.get();
-    readPtr->SetOutputSound(m_Output);
-    readPtr->SetManager(this);
-    stateManager->AddState(EState::STATE_READ, move(read));
-
-    shared_ptr<State> dance(new DanceState());
-    auto dancePtr = (DanceState*)dance.get();
-    dancePtr->SetOutputSound(m_Output);
-    dancePtr->SetDrawMMD(m_mmd);
-    stateManager->AddState(EState::STATE_DANCE, dance);
-
-    shared_ptr<State> walk(new WalkState());
-    auto walkPtr = (WalkState*)walk.get();
-    walkPtr->SetDrawMMD(m_mmd);
-    stateManager->AddState(EState::STATE_WALK, walk);
-    walkManager.Initialize(walkPtr, m_mmd, stateManager);
-    walkManager.SetNextState(EState::STATE_WAIT);
+    InitState();
 
     LoadModel();
 
@@ -358,4 +334,44 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
 
 
     m_Capture->OpenDevice(0, wf, FFT_LENGTH * 2);
+}
+
+void ManageMMD::InitState()
+{
+    shared_ptr<State> wait(new WaitState());
+    auto waitPtr = (WaitState*)wait.get();
+    waitPtr->SetDrawMMD(m_mmd);
+    waitPtr->SetWalkStateManager(&walkManager);
+    waitPtr->OnceInitial();
+    stateManager->AddState(EState::STATE_WAIT, move(wait));
+
+    shared_ptr<State> rhythm(new RhythmState());
+    auto rhythmPtr = (RhythmState*)rhythm.get();
+    rhythmPtr->SetModel(m_mmd->GetModelHandle());
+    rhythmPtr->OnceInital();
+    stateManager->AddState(EState::STATE_RHYTHM, move(rhythm));
+
+    shared_ptr<State> read(new ReadState());
+    auto readPtr = (ReadState*)read.get();
+    readPtr->SetOutputSound(m_Output);
+    readPtr->SetManager(this);
+    stateManager->AddState(EState::STATE_READ, move(read));
+
+    shared_ptr<State> dance(new DanceState());
+    auto dancePtr = (DanceState*)dance.get();
+    dancePtr->SetOutputSound(m_Output);
+    dancePtr->SetDrawMMD(m_mmd);
+    stateManager->AddState(EState::STATE_DANCE, dance);
+
+    shared_ptr<State> walk(new WalkState());
+    auto walkPtr = (WalkState*)walk.get();
+    walkPtr->SetDrawMMD(m_mmd);
+    stateManager->AddState(EState::STATE_WALK, walk);
+    walkManager.Initialize(walkPtr, m_mmd, stateManager);
+    walkManager.SetNextState(EState::STATE_WAIT);
+
+    shared_ptr<State> waveHand(new WaveHandState());
+    auto waveHandPtr = (WaveHandState*)waveHand.get();
+    waveHandPtr->SetDrawMMD(m_mmd);
+    stateManager->AddState(EState::STATE_WAVE_HAND, waveHand);
 }

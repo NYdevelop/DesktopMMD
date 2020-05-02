@@ -32,7 +32,7 @@ public:
 private:
     bool m_RandomMove = false;
     std::shared_ptr<DrawMMD> m_mmd;
-    WalkStateManager* walkManager;
+    WalkStateManager* walkManager = nullptr;
 
     int dispWidth = 640;
     int dispHeight = 480;

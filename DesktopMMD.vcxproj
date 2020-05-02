@@ -169,8 +169,12 @@
     <ClInclude Include="Src/Util/WinUtil.h" />
     <ClInclude Include="Src/Define.h" />
     <ClInclude Include="Src/window.h" />
+    <ClInclude Include="Src\MMD\ActionManager.h" />
+    <ClInclude Include="Src\MMD\PlayAnimQueue.h" />
+    <ClInclude Include="Src\MMD\PlayAnimTrans.h" />
     <ClInclude Include="Src\State\WalkState.h" />
     <ClInclude Include="Src\State\WalkStateManager.h" />
+    <ClInclude Include="Src\State\WaveHandState.h" />
     <ClInclude Include="Src\Util\UtilMMD.h" />
   </ItemGroup>
   <ItemGroup>
@@ -194,9 +198,12 @@
     <ClCompile Include="Src/Util/UtilTimer.cpp" />
     <ClCompile Include="Src/Util/WinUtil.cpp" />
     <ClCompile Include="Src/window.cpp" />
+    <ClCompile Include="Src\MMD\ActionManager.cpp" />
+    <ClCompile Include="Src\MMD\PlayAnimQueue.cpp" />
     <ClCompile Include="Src\State\WaitState.cpp" />
     <ClCompile Include="Src\State\WalkState.cpp" />
     <ClCompile Include="Src\State\WalkStateManager.cpp" />
+    <ClCompile Include="Src\State\WaveHandState.cpp" />
     <ClCompile Include="Src\Util\UtilMMD.cpp" />
   </ItemGroup>
   <ItemGroup>
