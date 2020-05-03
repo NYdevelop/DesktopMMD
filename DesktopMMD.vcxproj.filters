@@ -90,9 +90,6 @@
     <ClInclude Include="Src/Sound/ReadWavFile.h">
       <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Src/MMD/TransrateAnim.h">
-      <Filter>ヘッダー ファイル\MMD</Filter>
-    </ClInclude>
     <ClInclude Include="Src/Util/WinUtil.h">
       <Filter>ヘッダー ファイル\Util</Filter>
     </ClInclude>
@@ -127,6 +124,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Src\MMD\PlayAnimTrans.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MMD\AnimInterface.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,9 +167,6 @@
     <ClCompile Include="Src/Sound/ReadWavFile.cpp">
       <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
-    <ClCompile Include="Src/MMD/TransrateAnim.cpp">
-      <Filter>ソース ファイル\MMD</Filter>
-    </ClCompile>
     <ClCompile Include="Src/Util/UtilTimer.cpp">
       <Filter>ソース ファイル\Util</Filter>
     </ClCompile>
@@ -204,6 +201,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Src\State\WaveHandState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MMD\PlayAnimTrans.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

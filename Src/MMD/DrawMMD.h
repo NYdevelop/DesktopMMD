@@ -5,6 +5,7 @@
 #include "PlayAnim.h"
 
 #include "State/StateManager.h"
+#include "MMD/PlayAnimQueue.h"
 #include "Define.h"
 
 class DrawMMD
@@ -40,6 +41,11 @@ public:
 
     float GetZoom() { return m_Zoom; };
 
+    inline void SetAnimQueue(std::shared_ptr<PlayAnimQueue> queue)
+    {
+        m_AnimQueue = queue;
+    }
+
     float RotateY = 0;
     DxLib::VECTOR cameraPos = VGet(0.f, 0.f, 0.f);
 
@@ -53,6 +59,7 @@ private:
 
     PlayAnim blink;
 
+    std::shared_ptr<PlayAnimQueue> m_AnimQueue;
     std::shared_ptr<StateManager<EState>> m_StateManager;
 
     bool isDraw = true;

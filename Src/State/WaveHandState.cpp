@@ -17,50 +17,46 @@ void WaveHandState::Initialize()
 
     m_mmd->RotateY = direct_rad;
     m_mmd->UpdatePosRot();
+    MV1PhysicsResetState(model);
 
     waveHandLoop->ResetAnimTime();
 
-    // auto trans = shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
-    // trans->AttachAnime();
+    auto trans = shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
+    auto animVec = (*animationMap)[stateManager->GetPreviousStateIndex()];
+    if (animVec.size() != 0)
+    {
+        trans->SetSrcAnimIndex((int)animVec[0]);
+    }
+    trans->AttachAnime(model, waveHandLoop->GetAnimIndex());
+    trans->SetTransTime(10);
+    animQueue->AddAnim(trans);
 
-    transrateTime = 20;
-    progressTime = transrateTime;
-    //anim.AddAnim(trans); // ˆÚsŠúŠÔ
-
-    anim.AddAnim(waveHandLoop);
-    MV1PhysicsResetState(model);
+    animQueue->AddAnim(waveHandLoop);
 }
 
 void WaveHandState::Doing()
 {
-    if (progressTime-- > 0)
+    if (animQueue->Empty())
     {
-        auto rate = (float)progressTime / transrateTime;
-        MV1SetAttachAnimBlendRate(
-            model, waveHandLoop->GetAnimIndex(), 1 - rate);
-        return;
-    }
-
-    if (anim.Play() == false)
-    {
-        anim.AddAnim(waveHandLoop);
+        waveHandLoop->ResetAnimTime();
+        animQueue->AddAnim(waveHandLoop);
     }
 }
 
 void WaveHandState::End()
 {
-    anim.Clear();
-    MV1PhysicsResetState(model);
 }
 
-void WaveHandState::ModelInitial()
+int WaveHandState::ModelInitial()
 {
-    anim.SetModel(model);
+    animQueue->SetModel(model);
     waveHandLoop = std::shared_ptr < PlayAnim >(new PlayAnim);
-    waveHandLoop->AttachAnime(model, 10);
+    int ret = waveHandLoop->AttachAnime(model, (int)EAnimIndex::ANIM_WAVE_HAND);
+    waveHandLoop->IsLoop(false);
 
-    MV1SetAttachAnimBlendRate(
-        model, waveHandLoop->GetAnimIndex(), 0);
+    MV1SetAttachAnimBlendRate(model, waveHandLoop->GetAnimIndex(), 0);
+
+    return ret;
 }
 
 void WaveHandState::SetDrawMMD(std::shared_ptr<DrawMMD> mmd)

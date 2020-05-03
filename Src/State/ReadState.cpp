@@ -69,11 +69,12 @@ void ReadState::End()
     MV1SetAttachAnimBlendRate(model, lipAnim.GetAnimIndex(), 0);
 }
 
-void ReadState::ModelInitial()
+int ReadState::ModelInitial()
 {
-    lipAnim.AttachAnime(model, 6);
+    int ret = lipAnim.AttachAnime(model, (int)EAnimIndex::ANIM_LIP);
     lipAnim.IsLoop(false);
     lipAnim.SetPlaySpeed(1.0f);
+    return ret;
 }
 
 

@@ -41,12 +41,13 @@ void DanceState::End()
     MV1PhysicsResetState(model);
 }
 
-void DanceState::ModelInitial()
+int DanceState::ModelInitial()
 {
-    danceAnim.AttachAnime(model, 7);
+    int ret = danceAnim.AttachAnime(model, (int)EAnimIndex::ANIM_DANCE);
     danceAnim.IsLoop(false);
     danceAnim.SetPlaySpeed(.575f);
     MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 0);
+    return ret;
 }
 
 void DanceState::SetOutputSound(std::shared_ptr<OutputSound> output)

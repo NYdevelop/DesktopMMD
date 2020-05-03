@@ -1,9 +1,11 @@
 #pragma once
 
-class PlayAnim
+#include "AnimInterface.h"
+
+class PlayAnim : public AnimInterface
 {
 public:
-    void AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle = -1, int NameCheck = 0);
+    int AttachAnime(int modHandle, int animIndex);
 
     inline void SetMaximumTime(float time)
     {
@@ -28,13 +30,7 @@ public:
         playTime = 0;
     }
 
-    inline int GetAnimIndex()
-    {
-        return animeIndex;
-    }
-
 private:
-    int animeIndex = 0;
     float playTime = 0;
     float playSpeed = 1.0f;
     float maximumTime = 0;

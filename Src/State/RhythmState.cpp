@@ -29,9 +29,9 @@ void RhythmState::Initialize()
 void RhythmState::Doing()
 {
     // なめらかなアニメーション変化
-    unazuki2NoSound.Transrate();
-    noSound2Unazuki.Transrate();
-    noSound2Stable.Transrate();
+    unazuki2NoSound.PlayAnimation();
+    noSound2Unazuki.PlayAnimation();
+    noSound2Stable.PlayAnimation();
 
     if (m_IsNoSound == false)
     {
@@ -74,26 +74,31 @@ void RhythmState::OnceInital()
     });
 }
 
-void RhythmState::ModelInitial()
+int RhythmState::ModelInitial()
 {
-    unazuki.AttachAnime(model, 3);
+    unazuki.AttachAnime(model, (int)EAnimIndex::ANIM_UNAZUKI);
     unazuki.SetPlaySpeed(BASE_PLAY_SPEED);
 
-    noSoundAnimIndex = 1;
+    noSoundAnimIndex = (int)EAnimIndex::ANIM_NO_SOUND;
     noSoundAnimIndex = MV1AttachAnim(model, noSoundAnimIndex, -1, FALSE);//モーションの選択
 
-    stableAnimIndex = 4;
+    stableAnimIndex = (int)EAnimIndex::ANIM_UNAZUKI_STABLE;
     stableAnimIndex = MV1AttachAnim(model, stableAnimIndex, -1, FALSE);//モーションの選択
 
-    unazuki2NoSound.SetAnim(unazuki.GetAnimIndex(), noSoundAnimIndex, model);
-    noSound2Unazuki.SetAnim(noSoundAnimIndex, unazuki.GetAnimIndex(), model);
-    noSound2Stable.SetAnim(noSoundAnimIndex, stableAnimIndex, model);
+    unazuki2NoSound.SetSrcAnimIndex(unazuki.GetAnimIndex());
+    unazuki2NoSound.AttachAnime(model, noSoundAnimIndex);
+    noSound2Unazuki.SetSrcAnimIndex(noSoundAnimIndex);
+    noSound2Unazuki.AttachAnime(model, unazuki.GetAnimIndex());
+    noSound2Stable.SetSrcAnimIndex(noSoundAnimIndex);
+    noSound2Stable.AttachAnime(model, stableAnimIndex);
 
     MV1SetAttachAnimTime(model, noSoundAnimIndex, 0);//モーションの再生位置を設定
     MV1SetAttachAnimBlendRate(model, noSoundAnimIndex, 0);
 
     MV1SetAttachAnimTime(model, stableAnimIndex, 0);//モーションの再生位置を設定
     MV1SetAttachAnimBlendRate(model, stableAnimIndex, 0);
+
+    return 0;
 }
 
 void RhythmState::SetBPM(float bpm)

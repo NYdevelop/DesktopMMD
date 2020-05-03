@@ -144,9 +144,8 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
-        auto select = (EContextMenu)LOWORD(wParam);
-        switch (select) {
-        case EContextMenu::CONTEXT_EXIT: /* Exitメニュー */
+            switch ((EContextMenu)LOWORD(wParam)) {
+            case EContextMenu::CONTEXT_EXIT: /* Exitメニュー */
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
             break;
 
@@ -227,12 +226,15 @@ HRESULT ManageMMD::Initialize()
     /// 音声出力初期化
     m_Output = shared_ptr<OutputSound>(new OutputSound());
 
+    animQueue = std::shared_ptr< PlayAnimQueue >(new PlayAnimQueue);
+    m_mmd->SetAnimQueue(animQueue);
+
     /// State初期化
     InitState();
 
     LoadModel();
 
-    stateManager->SetState(EState::STATE_WAIT);
+    stateManager->Initialize(EState::STATE_WAIT);
 
     return S_OK;
 }
@@ -267,7 +269,10 @@ void ManageMMD::LoadModel()
     {
         auto sMMD = (StateMMD*)s.second.get();
         sMMD->SetModel(m_mmd->GetModelHandle());
-        sMMD->ModelInitial();
+        sMMD->SetAnimQueue(animQueue);
+        sMMD->SetStateManager(stateManager.get(), &stateAnimMap);
+        auto animIndex = sMMD->ModelInitial();
+        stateAnimMap[s.first] = vector<int>{ animIndex };
     }
 }
 
@@ -348,6 +353,7 @@ void ManageMMD::InitState()
     shared_ptr<State> rhythm(new RhythmState());
     auto rhythmPtr = (RhythmState*)rhythm.get();
     rhythmPtr->SetModel(m_mmd->GetModelHandle());
+    rhythmPtr->SetCapture(m_Capture);
     rhythmPtr->OnceInital();
     stateManager->AddState(EState::STATE_RHYTHM, move(rhythm));
 

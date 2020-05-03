@@ -14,7 +14,7 @@ public:
     void Doing();
     void End();
 
-    void ModelInitial();
+    int ModelInitial();
 
     void SetOutputSound(std::shared_ptr<OutputSound> output);
 

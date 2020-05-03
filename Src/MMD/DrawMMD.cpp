@@ -56,6 +56,7 @@ int DrawMMD::mainProcess()
 
     blink.PlayAnimation();
 
+    m_AnimQueue->Play();
     m_StateManager->Doing();
 
     MV1PhysicsCalculation(model, 1000.0f / 60.0f);
@@ -95,7 +96,7 @@ void DrawMMD::LoadModel()
         return;
     }
 
-    blink.AttachAnime(model, 2);
+    blink.AttachAnime(model, (int)EAnimIndex::ANIM_BLINK);
     blink.SetMaximumTime(250.f);
 
     MV1SetPosition(model, charaPos);

@@ -2,16 +2,18 @@
 
 #include "DxLib.h"
 
-void PlayAnim::AttachAnime(int modHandle, int animIndex, int AnimSrcMHandle, int NameCheck)
+int PlayAnim::AttachAnime(int modHandle, int animIndex)
 {
     // TODO: モーションの動的ロード
     modelHandle = modHandle;
-    animeIndex = MV1AttachAnim(modelHandle, animIndex, AnimSrcMHandle, NameCheck);//モーションの選択
-    if (animeIndex == -1)
+    m_AnimIndex = MV1AttachAnim(modelHandle, animIndex);//モーションの選択
+    if (m_AnimIndex == -1)
     {
         MessageBox(NULL, TEXT("MV1AttachAnim error"), NULL, MB_ICONERROR);
+        return -1;
     }
-    SetMaximumTime(MV1GetAttachAnimTotalTime(modelHandle, animeIndex));
+    SetMaximumTime(MV1GetAttachAnimTotalTime(modelHandle, m_AnimIndex));
+    return m_AnimIndex;
 }
 
 bool PlayAnim::PlayAnimation()
@@ -30,7 +32,7 @@ bool PlayAnim::PlayAnimation()
         playTime = 0.f;
     }
 
-    MV1SetAttachAnimTime(modelHandle, animeIndex, playTime);//モーションの再生位置を設定
+    MV1SetAttachAnimTime(modelHandle, m_AnimIndex, playTime);//モーションの再生位置を設定
 
     if (playTime >= maximumTime)
     {

@@ -164,12 +164,12 @@
     <ClInclude Include="Src/MMD/ManageMMD.h" />
     <ClInclude Include="Src/MMD/PlayAnim.h" />
     <ClInclude Include="Src/MMD/DrawMMD.h" />
-    <ClInclude Include="Src/MMD/TransrateAnim.h" />
     <ClInclude Include="Src/Util/UtilTimer.h" />
     <ClInclude Include="Src/Util/WinUtil.h" />
     <ClInclude Include="Src/Define.h" />
     <ClInclude Include="Src/window.h" />
     <ClInclude Include="Src\MMD\ActionManager.h" />
+    <ClInclude Include="Src\MMD\AnimInterface.h" />
     <ClInclude Include="Src\MMD\PlayAnimQueue.h" />
     <ClInclude Include="Src\MMD\PlayAnimTrans.h" />
     <ClInclude Include="Src\State\WalkState.h" />
@@ -194,12 +194,12 @@
     <ClCompile Include="Src/MMD/PlayAnim.cpp" />
     <ClCompile Include="Src/State/ReadState.cpp" />
     <ClCompile Include="Src/State/RhythmState.cpp" />
-    <ClCompile Include="Src/MMD/TransrateAnim.cpp" />
     <ClCompile Include="Src/Util/UtilTimer.cpp" />
     <ClCompile Include="Src/Util/WinUtil.cpp" />
     <ClCompile Include="Src/window.cpp" />
     <ClCompile Include="Src\MMD\ActionManager.cpp" />
     <ClCompile Include="Src\MMD\PlayAnimQueue.cpp" />
+    <ClCompile Include="Src\MMD\PlayAnimTrans.cpp" />
     <ClCompile Include="Src\State\WaitState.cpp" />
     <ClCompile Include="Src\State\WalkState.cpp" />
     <ClCompile Include="Src\State\WalkStateManager.cpp" />

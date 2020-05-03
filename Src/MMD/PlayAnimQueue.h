@@ -1,6 +1,7 @@
 #pragma once
 
-#include "PlayAnim.h"
+#include "Define.h"
+#include "AnimInterface.h"
 #include <queue>
 #include <memory>
 
@@ -8,7 +9,7 @@
 class PlayAnimQueue
 {
 public:
-    void AddAnim(std::shared_ptr<PlayAnim> anim);
+    void AddAnim(std::shared_ptr<AnimInterface> anim);
 
     /// ƒLƒ…[‚ª‹ó‚É‚È‚Á‚½‚çfalse‚ğ•Ô‚·
     bool Play();
@@ -17,7 +18,9 @@ public:
 
     void SetModel(int m);
 
+    bool Empty() { return m_Queue.empty(); }
+
 private:
-    std::queue<std::shared_ptr<PlayAnim>> m_Queue;
+    std::queue<std::shared_ptr<AnimInterface>> m_Queue;
     int model = 0;
 };

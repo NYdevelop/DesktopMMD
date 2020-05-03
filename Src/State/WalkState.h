@@ -14,14 +14,14 @@ public:
     void Initialize();
     void Doing();
     void End();
-    void ModelInitial();
+    int ModelInitial();
 
     void SetDrawMMD(std::shared_ptr<DrawMMD> mmd);
     void SetDirection(float direction_rad);
 
 
 private:
-    PlayAnim walkAnim;
+    std::shared_ptr <PlayAnim> walkAnim;
     std::shared_ptr<DrawMMD> m_mmd;
 
     float m_Direction = 0.f;

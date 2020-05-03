@@ -12,6 +12,13 @@ template <class T>
 class StateManager
 {
 public:
+    void Initialize(T index)
+    {
+        previousStateIndex = index;
+        currentStateIndex = index;
+        SetState(index);
+    }
+
     void AddState(T index, std::shared_ptr<State> state)
     {
         if (m_StateMap.find(index) != m_StateMap.end())
@@ -33,6 +40,7 @@ public:
         {
             currentState->End();
         }
+        previousStateIndex = currentStateIndex;
         currentState = m_StateMap[index];
         currentStateIndex = index;
 
@@ -74,8 +82,14 @@ public:
         return currentStateIndex;
     }
 
+    T GetPreviousStateIndex()
+    {
+        return previousStateIndex;
+    }
+
 private:
     std::map<T, std::shared_ptr<State>> m_StateMap;
     std::shared_ptr<State> currentState;
     T currentStateIndex;
+    T previousStateIndex;
 };

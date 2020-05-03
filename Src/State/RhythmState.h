@@ -4,7 +4,7 @@
 #include "Sound/CaptureSound.h"
 
 #include "MMD/PlayAnim.h"
-#include "MMD/TransrateAnim.h"
+#include "MMD/PlayAnimTrans.h"
 
 #include "Sound/EstimateBPM.h"
 #include "Sound/CalculateBPM.h"
@@ -21,7 +21,7 @@ public:
 
     void OnceInital();
 
-    void ModelInitial();
+    int ModelInitial();
 
     inline void SetCapture(std::shared_ptr<CaptureSound> capture)
     {
@@ -40,9 +40,9 @@ private:
     int stableAnimIndex = -1;
     int noSoundAnimIndex = -1;
 
-    TransrateAnim unazuki2NoSound;
-    TransrateAnim noSound2Unazuki;
-    TransrateAnim noSound2Stable;
+    PlayAnimTrans unazuki2NoSound;
+    PlayAnimTrans noSound2Unazuki;
+    PlayAnimTrans noSound2Stable;
 
     bool m_IsNoSound = false;
 

@@ -13,7 +13,7 @@ public:
     inline void Initialize() { std::cout << "state: wait" << std:: endl; }
     void Doing();
     inline void End() {}
-    inline void ModelInitial() {};
+    inline int ModelInitial() { return 0; };
 
     void OnceInitial();
 

@@ -4,6 +4,7 @@
 #include "Sound/CaptureSound.h"
 #include "Sound/OutputSound.h"
 #include "MMD/DrawMMD.h"
+#include "MMD/PlayAnimQueue.h"
 #include "State/StateManager.h"
 
 #include "State/WalkStateManager.h"
@@ -33,6 +34,9 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
 
     std::shared_ptr<StateManager<EState>> stateManager;
+    std::shared_ptr<PlayAnimQueue> animQueue;
 
     WalkStateManager walkManager;
+
+    std::map<EState, std::vector<int>> stateAnimMap;
 };

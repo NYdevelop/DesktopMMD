@@ -23,3 +23,15 @@ enum class EContextMenu : int
     CONTEXT_MOVE_RANDOM = 4,
     CONTEXT_EXIT = 0,
 };
+
+enum class EAnimIndex : int
+{
+    ANIM_NO_SOUND = 1,
+    ANIM_BLINK,
+    ANIM_UNAZUKI,
+    ANIM_UNAZUKI_STABLE,
+    ANIM_LIP = 6,
+    ANIM_DANCE,
+    ANIM_WALK = 9,
+    ANIM_WAVE_HAND,
+};
