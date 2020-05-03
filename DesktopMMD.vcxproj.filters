@@ -114,19 +114,22 @@
     <ClInclude Include="Src\State\WaveHandState.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\ActionManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Src\MMD\PlayAnim.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\AnimInterface.h">
+    <ClInclude Include="Src\MMD\Anim\ActionManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\PlayAnimQueue.h">
+    <ClInclude Include="Src\MMD\Anim\AnimInterface.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\PlayAnimTrans.h">
+    <ClInclude Include="Src\MMD\Anim\PlayAnimQueue.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MMD\Anim\PlayAnimTrans.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MMD\Anim\PlayAnim.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -191,19 +194,19 @@
     <ClCompile Include="Src\Util\UtilMMD.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Src\MMD\ActionManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Src\State\WaveHandState.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Src\MMD\PlayAnim.cpp">
+    <ClCompile Include="Src\MMD\Anim\PlayAnim.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Src\MMD\PlayAnimQueue.cpp">
+    <ClCompile Include="Src\MMD\Anim\ActionManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Src\MMD\PlayAnimTrans.cpp">
+    <ClCompile Include="Src\MMD\Anim\PlayAnimQueue.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MMD\Anim\PlayAnimTrans.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

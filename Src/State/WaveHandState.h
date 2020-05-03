@@ -3,7 +3,7 @@
 #include "StateMMD.h"
 
 #include "MMD/DrawMMD.h"
-#include "MMD/PlayAnimQueue.h"
+#include "MMD/Anim/PlayAnimQueue.h"
 
 class WaveHandState : public StateMMD
 {

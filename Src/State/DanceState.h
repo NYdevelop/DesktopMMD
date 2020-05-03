@@ -4,7 +4,7 @@
 
 #include <memory>
 #include "Sound/OutputSound.h"
-#include "MMD/PlayAnim.h"
+#include "MMD/Anim/PlayAnim.h"
 #include "MMD/DrawMMD.h"
 
 class DanceState : public StateMMD

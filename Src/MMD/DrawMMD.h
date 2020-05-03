@@ -2,10 +2,10 @@
 
 #include "DxLib.h"
 
-#include "MMD/PlayAnim.h"
+#include "MMD/Anim/PlayAnim.h"
 
 #include "State/StateManager.h"
-#include "MMD/PlayAnimQueue.h"
+#include "MMD/Anim/PlayAnimQueue.h"
 #include "Define.h"
 
 class DrawMMD

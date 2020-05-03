@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "MMD/PlayAnimQueue.h"
+#include "MMD/Anim/PlayAnimQueue.h"
 
 class StateMMD : public State
 {

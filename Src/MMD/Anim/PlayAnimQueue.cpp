@@ -1,7 +1,7 @@
 #include "PlayAnimQueue.h"
 
 #include "DxLib.h"
-#include "MMD/PlayAnimTrans.h"
+#include "MMD/Anim/PlayAnimTrans.h"
 
 #include <iostream>
 

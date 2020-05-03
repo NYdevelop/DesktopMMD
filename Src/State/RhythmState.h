@@ -3,8 +3,8 @@
 #include "State/StateMMD.h"
 #include "Sound/CaptureSound.h"
 
-#include "MMD/PlayAnim.h"
-#include "MMD/PlayAnimTrans.h"
+#include "MMD/Anim/PlayAnim.h"
+#include "MMD/Anim/PlayAnimTrans.h"
 
 #include "Sound/EstimateBPM.h"
 #include "Sound/CalculateBPM.h"

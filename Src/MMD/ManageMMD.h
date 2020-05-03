@@ -4,7 +4,7 @@
 #include "Sound/CaptureSound.h"
 #include "Sound/OutputSound.h"
 #include "MMD/DrawMMD.h"
-#include "MMD/PlayAnimQueue.h"
+#include "MMD/Anim/PlayAnimQueue.h"
 #include "State/StateManager.h"
 
 #include "State/WalkStateManager.h"
