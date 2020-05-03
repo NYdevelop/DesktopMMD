@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "MMD/PlayAnimTrans.h"
-
 using namespace std;
 
 void WaveHandState::Initialize()
@@ -21,16 +19,7 @@ void WaveHandState::Initialize()
 
     waveHandLoop->ResetAnimTime();
 
-    auto trans = shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
-    auto animVec = (*animationMap)[stateManager->GetPreviousStateIndex()];
-    if (animVec.size() != 0)
-    {
-        trans->SetSrcAnimIndex((int)animVec[0]);
-    }
-    trans->AttachAnime(model, waveHandLoop->GetAnimIndex());
-    trans->SetTransTime(10);
-    animQueue->AddAnim(trans);
-
+    animQueue->AddTransrate(-1, waveHandLoop->GetAnimIndex(), 10);
     animQueue->AddAnim(waveHandLoop);
 }
 
@@ -45,6 +34,7 @@ void WaveHandState::Doing()
 
 void WaveHandState::End()
 {
+    animQueue->AddTransrate(waveHandLoop->GetAnimIndex(), -1, 10);
 }
 
 int WaveHandState::ModelInitial()

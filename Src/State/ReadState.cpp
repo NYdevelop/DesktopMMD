@@ -51,14 +51,13 @@ void ReadState::Initialize()
     }
 
     m_Output->Output(L"data/text.wav");
-    MV1SetAttachAnimBlendRate(model, lipAnim.GetAnimIndex(), 1);
-    lipAnim.ResetAnimTime();
+    MV1SetAttachAnimBlendRate(model, lipAnim->GetAnimIndex(), 1);
+    lipAnim->ResetAnimTime();
+    animQueue->AddAnim(lipAnim);
 }
 
 void ReadState::Doing()
 {
-    // 口パクアニメ
-    lipAnim.PlayAnimation();
 }
 
 void ReadState::End()
@@ -66,18 +65,18 @@ void ReadState::End()
     m_Output->Stop();
     m_Output->CloseDevice();
 
-    MV1SetAttachAnimBlendRate(model, lipAnim.GetAnimIndex(), 0);
+    animQueue->SetCurrentStop();
+    animQueue->AddTransrate(lipAnim->GetAnimIndex(), -1, 10);
 }
 
 int ReadState::ModelInitial()
 {
-    int ret = lipAnim.AttachAnime(model, (int)EAnimIndex::ANIM_LIP);
-    lipAnim.IsLoop(false);
-    lipAnim.SetPlaySpeed(1.0f);
+    lipAnim = std::shared_ptr<PlayAnim>(new PlayAnim);
+    int ret = lipAnim->AttachAnime(model, (int)EAnimIndex::ANIM_LIP);
+    lipAnim->IsLoop(false);
+    lipAnim->SetPlaySpeed(1.0f);
     return ret;
 }
-
-
 
 void ReadState::SetOutputSound(std::shared_ptr<OutputSound> output)
 {

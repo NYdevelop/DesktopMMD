@@ -26,7 +26,7 @@ public:
 private:
     std::shared_ptr<OutputSound> m_Output;
 
-    PlayAnim lipAnim;
+    std::shared_ptr < PlayAnim >  lipAnim;
 
     ManageMMD* manager = nullptr;
 };

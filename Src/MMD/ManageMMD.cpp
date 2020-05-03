@@ -270,9 +270,7 @@ void ManageMMD::LoadModel()
         auto sMMD = (StateMMD*)s.second.get();
         sMMD->SetModel(m_mmd->GetModelHandle());
         sMMD->SetAnimQueue(animQueue);
-        sMMD->SetStateManager(stateManager.get(), &stateAnimMap);
-        auto animIndex = sMMD->ModelInitial();
-        stateAnimMap[s.first] = vector<int>{ animIndex };
+        sMMD->ModelInitial();
     }
 }
 

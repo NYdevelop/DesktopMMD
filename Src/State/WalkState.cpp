@@ -4,7 +4,6 @@
 #include "DxLib.h"
 
 #include "Util/WinUtil.h"
-#include "MMD/PlayAnimTrans.h"
 #include "Define.h"
 
 #define M_PI       3.14159265358979323846f
@@ -21,17 +20,7 @@ void WalkState::Initialize()
 
     walkAnim->ResetAnimTime();
 
-    // TODO: 前状態の終了処理をここで行うのはおかしい Endにて実行または情報を登録しておくべきか
-    auto trans = shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
-    auto animVec = (*animationMap)[stateManager->GetPreviousStateIndex()];
-    if (animVec.size() != 0)
-    {
-        trans->SetSrcAnimIndex((int)animVec[0]);
-    }
-    trans->AttachAnime(model, walkAnim->GetAnimIndex());
-    trans->SetTransTime(10);
-    animQueue->AddAnim(trans);
-
+    animQueue->AddTransrate(-1, walkAnim->GetAnimIndex(), 10);
     animQueue->AddAnim(walkAnim);
 }
 
@@ -56,12 +45,6 @@ void WalkState::Doing()
 
 void WalkState::End()
 {
-    // TODO: 自然な待機モーションへの移行
-    //auto trans = shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
-    //trans->SetSrcAnimIndex(walkAnim->GetAnimIndex());
-    //trans->AttachAnime(model, 0);
-    //trans->SetTransTime(10);
-    //animQueue->AddAnim(trans);
     MV1SetAttachAnimBlendRate(model, walkAnim->GetAnimIndex(), 0);
     MV1PhysicsResetState(model);
 }

@@ -16,11 +16,11 @@ bool PlayAnimTrans::PlayAnimation()
 
     if (progressTime > 0) progressTime--;
     auto rate = (float)progressTime / transrateTime;
-    if (srcAnimIndex != 0)
+    if (srcAnimIndex != -1)
     {
         MV1SetAttachAnimBlendRate(modelHandle, srcAnimIndex, rate);
     }
-    if (transrateAnimIndex != 0)
+    if (transrateAnimIndex != -1)
     {
         MV1SetAttachAnimBlendRate(modelHandle, transrateAnimIndex, 1 - rate);
     }

@@ -162,7 +162,7 @@
     <ClInclude Include="Src/State/StateMMD.h" />
     <ClInclude Include="Src/State/RhythmState.h" />
     <ClInclude Include="Src/MMD/ManageMMD.h" />
-    <ClInclude Include="Src/MMD/PlayAnim.h" />
+    <ClInclude Include="Src\MMD\PlayAnim.h" />
     <ClInclude Include="Src/MMD/DrawMMD.h" />
     <ClInclude Include="Src/Util/UtilTimer.h" />
     <ClInclude Include="Src/Util/WinUtil.h" />
@@ -191,7 +191,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src/MMD/ManageMMD.cpp" />
-    <ClCompile Include="Src/MMD/PlayAnim.cpp" />
+    <ClCompile Include="Src\MMD\PlayAnim.cpp" />
     <ClCompile Include="Src/State/ReadState.cpp" />
     <ClCompile Include="Src/State/RhythmState.cpp" />
     <ClCompile Include="Src/Util/UtilTimer.cpp" />
@@ -205,9 +205,6 @@
     <ClCompile Include="Src\State\WalkStateManager.cpp" />
     <ClCompile Include="Src\State\WaveHandState.cpp" />
     <ClCompile Include="Src\Util\UtilMMD.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Src\Sound\WAV.SYM" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

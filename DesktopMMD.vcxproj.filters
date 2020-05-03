@@ -66,9 +66,6 @@
     <ClInclude Include="Src/Sound/fft.h">
       <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Src/MMD/PlayAnim.h">
-      <Filter>ヘッダー ファイル\MMD</Filter>
-    </ClInclude>
     <ClInclude Include="Src/State/ReadState.h">
       <Filter>ヘッダー ファイル\State</Filter>
     </ClInclude>
@@ -117,16 +114,19 @@
     <ClInclude Include="Src\State\WaveHandState.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\PlayAnimQueue.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Src\MMD\ActionManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\MMD\PlayAnimTrans.h">
+    <ClInclude Include="Src\MMD\PlayAnim.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Src\MMD\AnimInterface.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MMD\PlayAnimQueue.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\MMD\PlayAnimTrans.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -154,9 +154,6 @@
     </ClCompile>
     <ClCompile Include="Src/Sound/OutputSound.cpp">
       <Filter>ソース ファイル\Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="Src/MMD/PlayAnim.cpp">
-      <Filter>ソース ファイル\MMD</Filter>
     </ClCompile>
     <ClCompile Include="Src/State/RhythmState.cpp">
       <Filter>ソース ファイル\State</Filter>
@@ -194,20 +191,20 @@
     <ClCompile Include="Src\Util\UtilMMD.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Src\MMD\PlayAnimQueue.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Src\MMD\ActionManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Src\State\WaveHandState.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Src\MMD\PlayAnim.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MMD\PlayAnimQueue.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="Src\MMD\PlayAnimTrans.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Src\Sound\WAV.SYM" />
   </ItemGroup>
 </Project>

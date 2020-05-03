@@ -9,7 +9,9 @@
 class PlayAnimQueue
 {
 public:
-    void AddAnim(std::shared_ptr<AnimInterface> anim);
+    void AddAnim(std::shared_ptr<AnimInterface> anim, bool isTransrate = false);
+
+    void AddTransrate(int srcIndex, int transrateIndex, int time);
 
     /// キューが空になったらfalseを返す
     bool Play();
@@ -18,9 +20,17 @@ public:
 
     void SetModel(int m);
 
-    bool Empty() { return m_Queue.empty(); }
+    inline bool Empty() { return m_Queue.empty(); }
+
+    inline void SetCurrentStop()
+    {
+        if (m_Queue.empty()) return;
+        currentStop = true;
+    }
 
 private:
-    std::queue<std::shared_ptr<AnimInterface>> m_Queue;
+    /// アニメインタフェースとTransrateフラグを格納
+    std::queue<std::pair <std::shared_ptr<AnimInterface>, bool>> m_Queue;
     int model = 0;
+    bool currentStop = false;
 };

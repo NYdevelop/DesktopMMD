@@ -19,8 +19,9 @@ void DanceState::Initialize()
     m_mmd->SetZoom(10.f);
     m_mmd->UpdatePosRot();
 
-    MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 1);
-    danceAnim.ResetAnimTime();
+    MV1SetAttachAnimBlendRate(model, danceAnim->GetAnimIndex(), 1);
+    danceAnim->ResetAnimTime();
+    animQueue->AddAnim(danceAnim);
     MV1PhysicsResetState(model);
 
     m_Output->Output(L"data/music.wav");
@@ -29,7 +30,6 @@ void DanceState::Initialize()
 
 void DanceState::Doing()
 {
-    danceAnim.PlayAnimation();
 }
 
 void DanceState::End()
@@ -37,16 +37,17 @@ void DanceState::End()
     m_Output->Stop();
     m_Output->CloseDevice();
 
-    MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 0);
-    MV1PhysicsResetState(model);
+    animQueue->SetCurrentStop();
+    animQueue->AddTransrate(danceAnim->GetAnimIndex(), -1, 10);
 }
 
 int DanceState::ModelInitial()
 {
-    int ret = danceAnim.AttachAnime(model, (int)EAnimIndex::ANIM_DANCE);
-    danceAnim.IsLoop(false);
-    danceAnim.SetPlaySpeed(.575f);
-    MV1SetAttachAnimBlendRate(model, danceAnim.GetAnimIndex(), 0);
+    danceAnim = std::shared_ptr<PlayAnim>(new PlayAnim);
+    int ret = danceAnim->AttachAnime(model, (int)EAnimIndex::ANIM_DANCE);
+    danceAnim->IsLoop(false);
+    danceAnim->SetPlaySpeed(.575f);
+    MV1SetAttachAnimBlendRate(model, danceAnim->GetAnimIndex(), 0);
     return ret;
 }
 

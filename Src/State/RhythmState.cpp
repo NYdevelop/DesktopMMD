@@ -85,11 +85,11 @@ int RhythmState::ModelInitial()
     stableAnimIndex = (int)EAnimIndex::ANIM_UNAZUKI_STABLE;
     stableAnimIndex = MV1AttachAnim(model, stableAnimIndex, -1, FALSE);//モーションの選択
 
-    unazuki2NoSound.SetSrcAnimIndex(unazuki.GetAnimIndex());
+    unazuki2NoSound.srcAnimIndex = unazuki.GetAnimIndex();
     unazuki2NoSound.AttachAnime(model, noSoundAnimIndex);
-    noSound2Unazuki.SetSrcAnimIndex(noSoundAnimIndex);
+    noSound2Unazuki.srcAnimIndex = noSoundAnimIndex;
     noSound2Unazuki.AttachAnime(model, unazuki.GetAnimIndex());
-    noSound2Stable.SetSrcAnimIndex(noSoundAnimIndex);
+    noSound2Stable.srcAnimIndex = noSoundAnimIndex;
     noSound2Stable.AttachAnime(model, stableAnimIndex);
 
     MV1SetAttachAnimTime(model, noSoundAnimIndex, 0);//モーションの再生位置を設定

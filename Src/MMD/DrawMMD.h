@@ -2,7 +2,7 @@
 
 #include "DxLib.h"
 
-#include "PlayAnim.h"
+#include "MMD/PlayAnim.h"
 
 #include "State/StateManager.h"
 #include "MMD/PlayAnimQueue.h"

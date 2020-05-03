@@ -37,6 +37,4 @@ private:
     std::shared_ptr<PlayAnimQueue> animQueue;
 
     WalkStateManager walkManager;
-
-    std::map<EState, std::vector<int>> stateAnimMap;
 };

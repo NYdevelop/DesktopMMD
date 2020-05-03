@@ -23,5 +23,5 @@ private:
     std::shared_ptr<OutputSound> m_Output;
     std::shared_ptr<DrawMMD> m_mmd;
 
-    PlayAnim danceAnim;
+    std::shared_ptr < PlayAnim > danceAnim;
 };
