@@ -30,6 +30,7 @@ void WalkState::Doing()
     {
         walkAnim->ResetAnimTime();
         animQueue->AddAnim(walkAnim);
+        return;
     }
 
     m_mmd->RotateY = m_Direction;

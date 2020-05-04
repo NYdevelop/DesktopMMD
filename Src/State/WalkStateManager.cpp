@@ -28,20 +28,25 @@ void WalkStateManager::Start(DxLib::VECTOR distination)
 
 void WalkStateManager::Update()
 {
-    if (m_StateManager->GetCurrentStateIndex() != EState::STATE_WALK)
+    if (m_StateManager->GetCurrentStateIndex() != EState::STATE_WALK || m_IsMove == false)
         return;
 
     // 位置のチェック
     auto distance = GetDistance(m_Distination, m_mmd->GetCharactorPos());
     if (distance < m_Threshold)
     {
-        m_IsMove = false;
-        m_StateManager->Transrate(nextState);
+        Cancel();
         return;
     }
 
     // 進行方向修正
     UpdateDirection();
+}
+
+void WalkStateManager::Cancel()
+{
+    m_IsMove = false;
+    m_StateManager->Transrate(nextState);
 }
 
 void WalkStateManager::UpdateDirection()

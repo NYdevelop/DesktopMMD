@@ -141,6 +141,7 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
+            walkManager.Cancel();
             switch ((EContextMenu)LOWORD(wParam)) {
             case EContextMenu::CONTEXT_EXIT: /* ExitÉÅÉjÉÖÅ[ */
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);

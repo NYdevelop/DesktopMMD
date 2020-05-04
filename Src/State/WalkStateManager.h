@@ -18,6 +18,8 @@ public:
 
     bool IsMove() { return m_IsMove; };
 
+    void Cancel();
+
 private:
     void UpdateDirection();
 
