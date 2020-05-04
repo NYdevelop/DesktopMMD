@@ -6,7 +6,6 @@ using namespace std;
 // プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
 int main()
 {
-    // TODO: カメラの方を向く
     // TODO: 寝る、座る
     {
         ManageMMD manager;

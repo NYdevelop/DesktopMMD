@@ -11,7 +11,8 @@ HRESULT CaptureSound::OpenDevice(UINT deviceIndex, WAVEFORMATEX format, int buff
 {
     m_WaveFormat = format;
     if (waveInOpen(&hwi, deviceIndex, &format, (DWORD)Callback, (DWORD_PTR)this, CALLBACK_FUNCTION) != MMSYSERR_NOERROR) {
-        MessageBox(NULL, TEXT("WAVEデバイスのオープンに失敗しました。"), NULL, MB_ICONERROR);
+        // MessageBox(NULL, TEXT("WAVEデバイスのオープンに失敗しました。"), NULL, MB_ICONERROR);
+        cerr << "WAVEデバイスのオープンに失敗しました。" << endl;
         return -1;
     }
 

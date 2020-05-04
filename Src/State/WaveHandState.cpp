@@ -8,6 +8,8 @@ void WaveHandState::Initialize()
 {
     cout << "state: wave hand" << endl;
 
+    m_mmd->canViewCamera = true;
+
     // ‰æ–Ê•ûŒü‚ðŒü‚­
     auto directVec = VNorm(
         VSub(m_mmd->cameraPos, m_mmd->GetCharactorPos()));
@@ -34,6 +36,7 @@ void WaveHandState::Doing()
 
 void WaveHandState::End()
 {
+    m_mmd->canViewCamera = false;
     animQueue->AddTransrate(waveHandLoop->GetAnimIndex(), -1, 10);
 }
 

@@ -26,7 +26,7 @@ public:
     void DrawFFT(WAVEFORMATEX wf);
 
 private:
-    void InitState();
+    void InitStateModel();
 
     CWindow m_Window;
     std::shared_ptr<CaptureSound> m_Capture;

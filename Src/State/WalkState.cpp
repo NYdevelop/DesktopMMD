@@ -6,13 +6,13 @@
 #include "Util/WinUtil.h"
 #include "Define.h"
 
-#define M_PI       3.14159265358979323846f
-
 using namespace std;
 
 void WalkState::Initialize()
 {
     cout << "state: walk" << endl;
+
+    m_mmd->canViewCamera = true;
 
     m_mmd->RotateY = m_Direction;
     m_mmd->UpdatePosRot();
@@ -45,6 +45,7 @@ void WalkState::Doing()
 
 void WalkState::End()
 {
+    m_mmd->canViewCamera = false;
     MV1SetAttachAnimBlendRate(model, walkAnim->GetAnimIndex(), 0);
     MV1PhysicsResetState(model);
 }

@@ -102,9 +102,6 @@ HRESULT ManageMMD::Initialize()
 
             if (mouseY - beginMousePosY != 0)
             {
-                //rayVec = m_mmd->cameraPos; //VSub(m_mmd->cameraPos, VGet(0,0,0));
-                //xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-
                 auto yVec = VNorm(VCross(xVec, rayVec));
                 float s = 1.f;
                 if (mouseY - beginMousePosY < 0)
@@ -230,9 +227,7 @@ HRESULT ManageMMD::Initialize()
     m_mmd->SetAnimQueue(animQueue);
 
     /// State‰Šú‰»
-    InitState();
-
-    LoadModel();
+    InitStateModel();
 
     stateManager->Initialize(EState::STATE_WAIT);
 
@@ -339,13 +334,13 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
     m_Capture->OpenDevice(0, wf, FFT_LENGTH * 2);
 }
 
-void ManageMMD::InitState()
+
+void ManageMMD::InitStateModel()
 {
     shared_ptr<State> wait(new WaitState());
     auto waitPtr = (WaitState*)wait.get();
     waitPtr->SetDrawMMD(m_mmd);
     waitPtr->SetWalkStateManager(&walkManager);
-    waitPtr->OnceInitial();
     stateManager->AddState(EState::STATE_WAIT, move(wait));
 
     shared_ptr<State> rhythm(new RhythmState());
@@ -378,4 +373,8 @@ void ManageMMD::InitState()
     auto waveHandPtr = (WaveHandState*)waveHand.get();
     waveHandPtr->SetDrawMMD(m_mmd);
     stateManager->AddState(EState::STATE_WAVE_HAND, waveHand);
+
+    LoadModel();
+
+    waitPtr->OnceInitial();
 }

@@ -4,6 +4,15 @@
 #include "Util/UtilMMD.h"
 
 static std::mt19937 mt;
+
+void WaitState::Initialize()
+{
+    std::cout << "state: wait" << std::endl;
+
+    /// ƒJƒƒ‰•ûŒü‚ðŒü‚­
+    m_mmd->canViewCamera = true;
+}
+
 void WaitState::Doing()
 {
     if (m_RandomMove == false) return;
@@ -17,6 +26,11 @@ void WaitState::Doing()
         (float)(mt() % dispHeight),
         m_mmd.get(),
         walkManager);
+}
+
+void WaitState::End()
+{
+    m_mmd->canViewCamera = false;
 }
 
 void WaitState::OnceInitial()

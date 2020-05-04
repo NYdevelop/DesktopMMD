@@ -44,3 +44,41 @@ float GetDistance(const VECTOR& v1, const VECTOR& v2)
     auto sub = VSub(v1, v2);
     return sqrt(VDot(sub, sub));
 }
+
+void ViewCamera(VECTOR rayVec, MATRIX world2Local, MATRIX defLocalRot, int model, int boneHead)
+{
+    auto cameraLocal = VTransformSR(rayVec, world2Local);
+    if (abs(atan2(cameraLocal.z, cameraLocal.y) - DX_PI_F / 2) < DX_PI_F / 4 &&
+        abs(atan2(cameraLocal.x, cameraLocal.z)) < DX_PI_F / 4)
+    {
+        auto rot = MGetRotVec2(VGet(0, 0, 1), cameraLocal);
+        rot.m[3][0] += defLocalRot.m[3][0];
+        rot.m[3][1] += defLocalRot.m[3][1];
+        rot.m[3][2] += defLocalRot.m[3][2];
+        // DxLib::MV1SetFrameUserLocalMatrix(model, boneHead, rot);
+        UpdateDirect(model, boneHead, rot);
+        return;
+    }
+
+    UpdateDirect(model, boneHead, defLocalRot);
+}
+
+const VECTOR Ident = VGet(0.f, 0.f, 1.f);
+void UpdateDirect(int modelHandle, int boneIndex, MATRIX targetLocalRot)
+{
+    /// ‰ñ“]Ž²ŽZo
+    auto currentRot = MV1GetFrameLocalMatrix(modelHandle, boneIndex);
+    auto norm = VCross(VTransformSR(Ident, currentRot), VTransformSR(Ident, targetLocalRot));
+    if (VDot(norm, norm) < 0.01f)
+    {
+        return;
+    }
+
+    /// Œü‚«‚ÌXV
+    auto updateRot = MMult(MGetRotAxis(norm, 1.f * DX_PI_F / 180.f), currentRot);
+    updateRot = MGetRotVec2(VGet(0, 0, 1), VTransformSR(Ident, updateRot));
+    updateRot.m[3][0] = targetLocalRot.m[3][0];
+    updateRot.m[3][1] = targetLocalRot.m[3][1];
+    updateRot.m[3][2] = targetLocalRot.m[3][2];
+    DxLib::MV1SetFrameUserLocalMatrix(modelHandle, boneIndex, updateRot);
+}

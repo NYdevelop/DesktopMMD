@@ -10,9 +10,9 @@
 class WaitState : public StateMMD
 {
 public:
-    inline void Initialize() { std::cout << "state: wait" << std:: endl; }
+    void Initialize();
     void Doing();
-    inline void End() {}
+    void End();
     inline int ModelInitial() { return 0; };
 
     void OnceInitial();

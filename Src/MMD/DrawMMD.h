@@ -49,6 +49,8 @@ public:
     float RotateY = 0;
     DxLib::VECTOR cameraPos = VGet(0.f, 0.f, 0.f);
 
+    bool canViewCamera = false;
+
 private:
     int model = 0;//モデルハンドル
     DxLib::VECTOR charaPos = VGet(0.f, 0.f, 1.f);//キャラクタの座標
@@ -63,4 +65,7 @@ private:
     std::shared_ptr<StateManager<EState>> m_StateManager;
 
     bool isDraw = true;
+
+    int boneHead = -1;
+    MATRIX defHeadLocalRot = MGetIdent();
 };

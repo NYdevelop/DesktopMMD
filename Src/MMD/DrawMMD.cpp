@@ -1,9 +1,8 @@
 #include "MMD/DrawMMD.h"
 
 #include "Util/WinUtil.h"
+#include "Util/UtilMMD.h"
 #include <iostream>
-
-#define M_PI       3.14159265358979323846f
 
 using namespace std;
 
@@ -24,7 +23,7 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//•`‰æ‘ÎÛ‚ð— ‰æ–Ê‚É‚·‚é
 
-    RotateY = -2.7f;
+    RotateY = DX_PI_F;// -2.7f;
     float posX = 0.f;
     float posY = -7.f;
     m_Zoom = 35.f;
@@ -32,7 +31,7 @@ void DrawMMD::afterInitialize()
     charaPos = VGet(posX, posY, 1.0f);
     cameraPos = VGet(0.f, 0.f, m_Zoom * -1.f);
 
-    SetupCamera_Perspective(30.f * M_PI / 180.f);
+    SetupCamera_Perspective(30.f * DX_PI_F / 180.f);
     SetCameraNearFar(1.f, 1000.0f);
     SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
 }
@@ -52,9 +51,21 @@ int DrawMMD::mainProcess()
 
     //ƒ‚ƒfƒ‹‚ÌÀ•WŽw’è
     DxLib::MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + M_PI, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
     blink.PlayAnimation();
+
+    if (canViewCamera)
+    {
+        ViewCamera(
+            VSub(GetCharactorPos(), cameraPos),
+            MTranspose(MV1GetFrameLocalWorldMatrix(model, boneHead)),
+            defHeadLocalRot, model, boneHead);
+    }
+    else
+    {
+        MV1ResetFrameUserLocalMatrix(model, boneHead);
+    }
 
     m_AnimQueue->Play();
     m_StateManager->Doing();
@@ -96,11 +107,14 @@ void DrawMMD::LoadModel()
         return;
     }
 
+    boneHead = MV1SearchFrame(model, L"“ª");
+    defHeadLocalRot = MV1GetFrameLocalMatrix(model, boneHead);
+
     blink.AttachAnime(model, (int)EAnimIndex::ANIM_BLINK);
     blink.SetMaximumTime(250.f);
 
     MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + M_PI, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
     MV1PhysicsResetState(model);
 
@@ -110,5 +124,5 @@ void DrawMMD::LoadModel()
 void DrawMMD::UpdatePosRot()
 {
     MV1SetPosition(model, charaPos);
-    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + M_PI, 0.0f));
+    MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 }
