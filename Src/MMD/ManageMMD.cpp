@@ -81,10 +81,11 @@ HRESULT ManageMMD::Initialize()
         if (IsPress(VK_MBUTTON))
         {
             static const float CAMERA_MOVE_SPEED_A = .001f;
+            static const float CAMERA_MOVE_SPEED_B = .624f;
             int mouseX, mouseY;
             GetMousePoint(&mouseX, &mouseY);
 
-            auto rayVec = m_mmd->cameraPos; //VSub(m_mmd->cameraPos, VGet(0,0,0));
+            auto rayVec = m_mmd->GetRayVec();
             auto xVec = VNorm(VCross(rayVec, VGet(0,1,0)));
             VECTOR newPos = rayVec;
             if (mouseX - beginMousePosX != 0)
@@ -95,7 +96,7 @@ HRESULT ManageMMD::Initialize()
                 newPos =
                     VAdd(
                         m_mmd->cameraPos,
-                        VScale(xVec, CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 2) * s));
+                        VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
 
                 beginMousePosX = mouseX;
             }
@@ -109,7 +110,7 @@ HRESULT ManageMMD::Initialize()
                 newPos =
                     VAdd(
                         newPos,
-                        VScale(yVec, CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 2) * s));
+                        VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
 
                 beginMousePosY = mouseY;
             }

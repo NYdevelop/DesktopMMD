@@ -163,6 +163,7 @@
     <ClInclude Include="Src/State/RhythmState.h" />
     <ClInclude Include="Src/MMD/ManageMMD.h" />
     <ClInclude Include="Src\MMD\Anim\PlayAnim.h" />
+    <ClInclude Include="Src\MMD\WindowGravity.h" />
     <ClInclude Include="Src\MMD\PlayAnim.h" />
     <ClInclude Include="Src/MMD/DrawMMD.h" />
     <ClInclude Include="Src/Util/UtilTimer.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="Src\MMD\Anim\ActionManager.cpp" />
     <ClCompile Include="Src\MMD\Anim\PlayAnimQueue.cpp" />
     <ClCompile Include="Src\MMD\Anim\PlayAnimTrans.cpp" />
+    <ClCompile Include="Src\MMD\WindowGravity.cpp" />
     <ClCompile Include="Src\State\WaitState.cpp" />
     <ClCompile Include="Src\State\WalkState.cpp" />
     <ClCompile Include="Src\State\WalkStateManager.cpp" />

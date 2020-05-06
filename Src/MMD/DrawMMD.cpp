@@ -15,6 +15,7 @@ void DrawMMD::preInitialize()
     dispHeight = rc.bottom - rc.top;
 }
 
+//int gHandle = 0;
 void DrawMMD::afterInitialize()
 {
     DrawBox(
@@ -23,17 +24,21 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//ï`âÊëŒè€Çó†âÊñ Ç…Ç∑ÇÈ
 
-    RotateY = DX_PI_F;// -2.7f;
+    RotateY = DX_PI_F;
     float posX = 0.f;
-    float posY = -7.f;
+    float posY = 0.f;
     m_Zoom = 35.f;
 
     charaPos = VGet(posX, posY, 1.0f);
     cameraPos = VGet(0.f, 0.f, m_Zoom * -1.f);
+    cameraViewOffset = VGet(0.f, 7.f, 1.f);
+    cameraViewPos = VGet(0.f, 0.f, 0.f);
 
     SetupCamera_Perspective(30.f * DX_PI_F / 180.f);
     SetCameraNearFar(1.f, 1000.0f);
-    SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
+    SetCameraPositionAndTarget_UpVecY(cameraPos, cameraViewPos);
+
+    //gHandle = MakeGraph(1920, 1040);
 }
 
 //ÉÅÉCÉìÇ∆Ç»ÇÈèàóù
@@ -47,9 +52,16 @@ int DrawMMD::mainProcess()
         0, 0, dispWidth, dispHeight,
         GetColor(1, 1, 1), TRUE);//îwåiÇê›íË(ìßâﬂÇ≥ÇπÇÈ)
 
-    SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
+    SetCameraPositionAndTarget_UpVecY(
+        cameraPos, VAdd(cameraViewPos, cameraViewOffset));
 
     //ÉÇÉfÉãÇÃç¿ïWéwíË
+    auto rayVec = cameraPos;
+    //if (abs(rayVec.y+7.f) < 0.5)
+    //{
+    //    auto screenPos = ConvWorldPosToScreenPos(charaPos);
+    //    screenPos.y = gravity.PosUpdate(screenPos.y);
+    //}
     DxLib::MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
@@ -58,7 +70,7 @@ int DrawMMD::mainProcess()
     if (canViewCamera)
     {
         ViewCamera(
-            VSub(GetCharactorPos(), cameraPos),
+            VSub(charaPos, GetRayVec()) ,
             MTranspose(MV1GetFrameLocalWorldMatrix(model, boneHead)),
             defHeadLocalRot, model, boneHead);
     }
@@ -74,6 +86,10 @@ int DrawMMD::mainProcess()
 
     //ÉÇÉfÉãÇÃï`âÊ
     DxLib::MV1DrawModel(model);
+
+    //GetDrawScreenGraph(0,0,1920,1040, gHandle);
+    //GraphFilter(gHandle, DX_GRAPH_FILTER_GAUSS, 8, 50);
+    //DrawGraph(0,0,gHandle, FALSE);
 
     //ï`âÊì‡óeÇâÊñ Ç…îΩâf
     DxLib::ScreenFlip();

@@ -10,6 +10,6 @@ void WalkStart(float screenX, float screenY, DrawMMD* mmd, WalkStateManager* wal
 
 float GetDistance(const VECTOR& v1, const VECTOR& v2);
 
-void ViewCamera(VECTOR rayVec, MATRIX world2Local, MATRIX defLocalRot, int model, int boneHead);
+void ViewCamera(VECTOR chara2Camera, MATRIX world2Local, MATRIX defLocalRot, int model, int boneHead);
 
 void UpdateDirect(int modelHandle, int boneIndex, MATRIX targetLocalRot);

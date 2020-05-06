@@ -7,6 +7,7 @@
 #include "State/StateManager.h"
 #include "MMD/Anim/PlayAnimQueue.h"
 #include "Define.h"
+#include "WindowGravity.h"
 
 class DrawMMD
 {
@@ -46,6 +47,11 @@ public:
         m_AnimQueue = queue;
     }
 
+    inline VECTOR GetRayVec()
+    {
+        return VSub(cameraPos, cameraViewPos);
+    }
+
     float RotateY = 0;
     DxLib::VECTOR cameraPos = VGet(0.f, 0.f, 0.f);
 
@@ -54,6 +60,8 @@ public:
 private:
     int model = 0;//モデルハンドル
     DxLib::VECTOR charaPos = VGet(0.f, 0.f, 1.f);//キャラクタの座標
+    VECTOR cameraViewPos = VGet(.0f, .0f, .0f);
+    VECTOR cameraViewOffset = VGet(0.f, 0.f, 1.f);//カメラ注視点
     float m_Zoom = 10.f;
 
     LONG dispWidth = 640;
@@ -68,4 +76,6 @@ private:
 
     int boneHead = -1;
     MATRIX defHeadLocalRot = MGetIdent();
+
+    WindowGravity gravity;
 };

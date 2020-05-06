@@ -45,9 +45,9 @@ float GetDistance(const VECTOR& v1, const VECTOR& v2)
     return sqrt(VDot(sub, sub));
 }
 
-void ViewCamera(VECTOR rayVec, MATRIX world2Local, MATRIX defLocalRot, int model, int boneHead)
+void ViewCamera(VECTOR chara2Camera, MATRIX world2Local, MATRIX defLocalRot, int model, int boneHead)
 {
-    auto cameraLocal = VTransformSR(rayVec, world2Local);
+    auto cameraLocal = VTransformSR(chara2Camera, world2Local);
     if (abs(atan2(cameraLocal.z, cameraLocal.y) - DX_PI_F / 2) < DX_PI_F / 4 &&
         abs(atan2(cameraLocal.x, cameraLocal.z)) < DX_PI_F / 4)
     {
