@@ -82,3 +82,16 @@ void UpdateDirect(int modelHandle, int boneIndex, MATRIX targetLocalRot)
     updateRot.m[3][2] = targetLocalRot.m[3][2];
     DxLib::MV1SetFrameUserLocalMatrix(modelHandle, boneIndex, updateRot);
 }
+
+
+// p0を平面上の点として、
+// ((v1 - p0)・n)* ((v2 - p0)・n) <= 0ならば線分は平面と衝突
+// http://marupeke296.com/COL_3D_No3_LineToPlane.html
+bool IsHitPlane(VECTOR v1, VECTOR v2, VECTOR planePoint, VECTOR planeNorm)
+{
+    if (VDot(VSub(v1, planePoint), planeNorm) * VDot(VSub(v2, planePoint), planeNorm) > 0)
+    {
+        return false;
+    }
+    return true;
+}

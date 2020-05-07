@@ -56,12 +56,11 @@ int DrawMMD::mainProcess()
         cameraPos, VAdd(cameraViewPos, cameraViewOffset));
 
     //ƒ‚ƒfƒ‹‚ÌÀ•Ww’è
-    auto rayVec = cameraPos;
-    //if (abs(rayVec.y+7.f) < 0.5)
-    //{
-    //    auto screenPos = ConvWorldPosToScreenPos(charaPos);
-    //    screenPos.y = gravity.PosUpdate(screenPos.y);
-    //}
+    auto rayVec = GetRayVec();
+    if (abs(atan2(rayVec.z, rayVec.y) + DX_PI_F / 2) < DX_PI_F / 4)
+    {
+        charaPos.y = gravity.PosUpdate(charaPos);
+    }
     DxLib::MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
@@ -70,7 +69,7 @@ int DrawMMD::mainProcess()
     if (canViewCamera)
     {
         ViewCamera(
-            VSub(charaPos, GetRayVec()) ,
+            VSub(charaPos, rayVec) ,
             MTranspose(MV1GetFrameLocalWorldMatrix(model, boneHead)),
             defHeadLocalRot, model, boneHead);
     }

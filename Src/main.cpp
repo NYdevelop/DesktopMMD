@@ -2,8 +2,14 @@
 
 using namespace std;
 
-// プログラムの実行: Ctrl + F5 または [デバッグ] > [デバッグなしで開始] メニュー
-// プログラムのデバッグ: F5 または [デバッグ] > [デバッグの開始] メニュー
+
+bool IsLarge(RECT target, RECT src)
+{
+    auto x = (target.left <= src.left) && (target.right >= src.right);
+    auto y = (target.top <= src.top) && (target.bottom >= src.bottom);
+    return x & y;
+}
+
 int main()
 {
     // TODO: 寝る、座る
