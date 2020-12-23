@@ -10,11 +10,12 @@
 #include "State/WalkStateManager.h"
 
 #include <vector>
+#include <string>
 
 class ManageMMD
 {
 public:
-    HRESULT Initialize();
+    HRESULT Initialize(const std::string& animPath, const std::string& modelPath);
     HRESULT Process();
     void Exit();
 

@@ -1,0 +1,9 @@
+[model]
+ANIM_PATH  = ../../C#/RealtimeListenMMD/Model/motion/motion
+
+// MODEL_PATH = data/Model/plinz/PrinzEugen.pmx
+MODEL_PATH = data/Model/yui/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx
+// MODEL_PATH = ../../C#/RealtimeListenMMD/Model/タヌキとキツネ ver.1/キツネ.pmx
+// MODEL_PATH = ../../C#/RealtimeListenMMD/Model/アールビット式WF改変唯依姫(ｼｮｰﾄﾍｱ)/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx
+// MODEL_PATH = ../../C#/RealtimeListenMMD/Model/Menace メナス(カノン改造)/メナス_edit.pmx
+// MODEL_PATH = ../../C#/RealtimeListenMMD/Model/ぽんぷ長式大和_水着/ぽんぷ長式大和＿水着mode.pmx

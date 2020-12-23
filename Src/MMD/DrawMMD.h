@@ -9,10 +9,12 @@
 #include "Define.h"
 #include "WindowGravity.h"
 
+#include <string>
+
 class DrawMMD
 {
 public:
-    void preInitialize();
+    DrawMMD(const std::string& animPath, const std::string& modelPath);
     void afterInitialize();
     int mainProcess();
 
@@ -78,4 +80,7 @@ private:
     MATRIX defHeadLocalRot = MGetIdent();
 
     WindowGravity gravity;
+
+    std::string m_AnimPath;
+    std::string m_ModelPath;
 };

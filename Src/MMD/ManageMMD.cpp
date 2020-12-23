@@ -15,13 +15,12 @@
 using namespace std;
 
 
-HRESULT ManageMMD::Initialize()
+HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath)
 {
     m_Window.Init();
 
     SetUserWindow(m_Window.GetHWnd());
-    m_mmd = shared_ptr<DrawMMD>(new DrawMMD());
-    m_mmd->preInitialize();
+    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath));
     if (DxLib::DxLib_Init() == -1) return E_FAIL;
     m_mmd->afterInitialize();
 
@@ -31,6 +30,7 @@ HRESULT ManageMMD::Initialize()
     int beginMousePosX = 0, beginMousePosY = 0;
     m_Window.SetDrawFunc([&](HDC hdc)
     {
+        if (m_Window.IsClose()) return;
         m_mmd->mainProcess();
         walkManager.Update();
 
@@ -142,9 +142,10 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {
-            walkManager.Cancel();
-            switch ((EContextMenu)LOWORD(wParam)) {
-            case EContextMenu::CONTEXT_EXIT: /* Exitメニュー */
+        walkManager.Cancel();
+        switch ((EContextMenu)LOWORD(wParam)) {
+        case EContextMenu::CONTEXT_EXIT: /* Exitメニュー */
+            m_Window.Close();
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
             break;
 
@@ -232,7 +233,6 @@ HRESULT ManageMMD::Initialize()
     InitStateModel();
 
     stateManager->Initialize(EState::STATE_WAIT);
-
     return S_OK;
 }
 

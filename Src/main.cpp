@@ -1,21 +1,15 @@
 #include "MMD/ManageMMD.h"
-
+#include "Util\ConfigLoader.h"
 using namespace std;
-
-
-bool IsLarge(RECT target, RECT src)
-{
-    auto x = (target.left <= src.left) && (target.right >= src.right);
-    auto y = (target.top <= src.top) && (target.bottom >= src.bottom);
-    return x & y;
-}
 
 int main()
 {
     // TODO: êQÇÈÅAç¿ÇÈ
     {
+        CConfigLoader config("config.txt");
+
         ManageMMD manager;
-        manager.Initialize();
+        manager.Initialize(config.Load("ANIM_PATH"), config.Load("MODEL_PATH"));
         manager.Process();
         manager.Exit();
     }

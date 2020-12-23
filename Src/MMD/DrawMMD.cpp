@@ -6,9 +6,12 @@
 
 using namespace std;
 
-//DxLib_Init以前で呼び出すべき処理
-void DrawMMD::preInitialize()
+DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath)
 {
+    m_AnimPath = animPath;
+    m_ModelPath = modelPath;
+
+    //DxLib_Init以前で呼び出すべき処理
     RECT rc;
     GetWindowRect(GetDesktopWindow(), &rc);
     dispWidth = rc.right - rc.left;
@@ -101,15 +104,15 @@ void DrawMMD::LoadModel()
     isDraw = false;
 
     MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_REALTIME);
-    MV1SetLoadModelPhysicsWorldGravity(-10.f);
+    //MV1SetLoadModelPhysicsWorldGravity(-10.f);
     MV1InitModel();
 
-    // TODO: 設定ファイル化
-    MV1SetLoadModelAnimFilePath(L"../../C#/RealtimeListenMMD/Model/motion/motion");
-    //model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/ぽんぷ長式大和_水着/ぽんぷ長式大和＿水着mode.pmx");
-    //model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/Menace メナス(カノン改造)/メナス_edit.pmx");
-    //model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/アールビット式WF改変唯依姫(ｼｮｰﾄﾍｱ)/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx");
-    model = MV1LoadModel(L"../../C#/RealtimeListenMMD/Model/タヌキとキツネ ver.1/キツネ.pmx");
+    TCHAR buf[255];
+    MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, m_AnimPath.c_str(), -1, buf, 255);
+    MV1SetLoadModelAnimFilePath(buf);
+
+    MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, m_ModelPath.c_str(), -1, buf, 255);
+    model = MV1LoadModel(buf);
 
     if (model == -1)
     {
