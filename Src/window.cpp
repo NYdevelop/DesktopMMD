@@ -207,6 +207,11 @@ HRESULT CWindow::Process(int fps)
     return hResult;
 }
 
+void CWindow::Close()
+{
+    m_Timer.Break_Force();
+}
+
 HWND CWindow::GetHWnd()
 {
     return m_hWnd;

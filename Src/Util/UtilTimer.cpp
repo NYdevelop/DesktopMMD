@@ -47,12 +47,11 @@ void UtilTimer::Break_Force()
     {
         return;
     }
-
-    // スレッドを止める
-    m_thread1.detach();
-
     // スレッドの中のループから抜けさせる
     this->m_alive = false;
+
+    // スレッドを止める
+    m_thread1.join();
 }
 
 bool UtilTimer::IsRunning()

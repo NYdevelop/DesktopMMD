@@ -10,6 +10,7 @@ public:
 
     HRESULT Init();
     HRESULT Process(int fps = 30);
+    void Close();
 
     HWND GetHWnd();
     HMENU GetContextMenu();
