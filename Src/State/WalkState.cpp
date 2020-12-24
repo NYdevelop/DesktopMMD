@@ -26,22 +26,13 @@ void WalkState::Initialize()
 
 void WalkState::Doing()
 {
+    // 手を振らないのはそういうモーションであるため
     if (animQueue->Empty())
     {
         walkAnim->ResetAnimTime();
         animQueue->AddAnim(walkAnim);
         return;
     }
-
-    m_mmd->RotateY = m_Direction;
-    // 進行方向ベクトル
-    auto x = sin(m_Direction) * WALK_SPEED;
-    auto z = cos(m_Direction) * WALK_SPEED;
-
-    auto pos = m_mmd->GetCharactorPos();
-    pos.x += x;
-    pos.z += z;
-    m_mmd->SetCharactorPos(pos);
 }
 
 void WalkState::End()

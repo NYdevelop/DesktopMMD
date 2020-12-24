@@ -26,5 +26,4 @@ private:
 
     float m_Direction = 0.f;
     EState nextState = EState::STATE_WAIT;
-    const float WALK_SPEED = 0.1f;
 };

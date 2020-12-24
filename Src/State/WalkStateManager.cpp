@@ -32,7 +32,8 @@ void WalkStateManager::Update()
         return;
 
     // 位置のチェック
-    auto distance = GetDistance(m_Distination, m_mmd->GetCharactorPos());
+    auto pos = m_mmd->GetCharactorPos();
+    auto distance = GetDistance(m_Distination, pos);
     if (distance < m_Threshold)
     {
         Cancel();
@@ -40,7 +41,15 @@ void WalkStateManager::Update()
     }
 
     // 進行方向修正
-    UpdateDirection();
+    auto direct = UpdateDirection();
+
+    // 進行方向ベクトル
+    auto x = sin(direct) * WALK_SPEED;
+    auto z = cos(direct) * WALK_SPEED;
+
+    pos.x += x;
+    pos.z += z;
+    m_mmd->SetCharactorPos(pos);
 }
 
 void WalkStateManager::Cancel()
@@ -49,10 +58,12 @@ void WalkStateManager::Cancel()
     m_StateManager->Transrate(nextState);
 }
 
-void WalkStateManager::UpdateDirection()
+float WalkStateManager::UpdateDirection()
 {
     auto pos = m_mmd->GetCharactorPos();
     auto directVec = VNorm(VSub(m_Distination, pos));
     auto direct_rad = atan2(directVec.x, directVec.z);
-    m_Walk->SetDirection(direct_rad);
+    // m_Walk->SetDirection(direct_rad);
+    m_mmd->RotateY = direct_rad;
+    return direct_rad;
 }
