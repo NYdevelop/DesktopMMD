@@ -93,12 +93,18 @@ LRESULT CALLBACK CWindow::WindProc(
     WPARAM wParam,
     LPARAM lParam) {
 
+    CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+    if (win != NULL && win->m_CallbackMap.find(uMsg) != win->m_CallbackMap.end())
+    {
+        win->m_CallbackMap[uMsg](wParam, lParam);
+        return 0;
+    }
 
     switch (uMsg) {
 
     case WM_COMMAND:
     {
-        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         if (win->m_CommandCallback != nullptr)
         {
             win->m_CommandCallback(wParam, lParam);
@@ -108,7 +114,7 @@ LRESULT CALLBACK CWindow::WindProc(
 
     case WM_DESTROY:
     {
-        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         win->m_Timer.Break_Force();
         ::PostQuitMessage(0);
     }
@@ -125,20 +131,10 @@ LRESULT CALLBACK CWindow::WindProc(
         ClientToScreen(hwnd, &pt);
 
         /* カーソル位置にメニューを出す */
-        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
+        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         TrackPopupMenu(win->m_ContextMenu, 0, pt.x, pt.y, 0, hwnd, NULL);
     }
     break;
-
-    case WM_MOUSEWHEEL:
-    {
-        CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
-        if (win->m_WheelCallback != nullptr)
-        {
-            win->m_WheelCallback(wParam, lParam);
-        }
-    }
-        break;
 
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -237,9 +233,9 @@ void CWindow::SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func
     m_CommandCallback = func;
 }
 
-void CWindow::SetCallbackWheel(const std::function<void(WPARAM, LPARAM)>& func)
+void CWindow::SetCallbackMsg(UINT msg, const std::function<void(WPARAM, LPARAM)>& func)
 {
-    m_WheelCallback = func;
+    m_CallbackMap[msg] = func;
 }
 
 void CWindow::Draw(HDC hDc)

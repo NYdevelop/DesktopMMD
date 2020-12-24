@@ -27,6 +27,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
     m_mmd->SetStateManager(stateManager);
 
+    bool isPressMButton = false;
     int beginMousePosX = 0, beginMousePosY = 0;
     m_Window.SetDrawFunc([&](HDC hdc)
     {
@@ -78,7 +79,13 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             WalkStart((float)MouseX, (float)MouseY, m_mmd.get(), &walkManager);
         }
 
-        if (IsPress(VK_MBUTTON))
+        // モデル上にカーソルがある場合反応するように
+        if (!IsPress(VK_MBUTTON))
+        {
+            isPressMButton = false;
+        }
+
+        if (isPressMButton)
         {
             static const float CAMERA_MOVE_SPEED_A = .001f;
             static const float CAMERA_MOVE_SPEED_B = .624f;
@@ -121,24 +128,29 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         }
     });
 
-    m_Window.SetCallbackWheel([&](WPARAM wParam, LPARAM lParam)
+    m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
+    {
+        int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
+
+                                                        // ノッチ数を求める
+        int nNotch = zDelta / WHEEL_DELTA;
+
+        if (nNotch > 0)
         {
-            int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
+            // ↑に回転（チルト）した
+            m_mmd->SetZoom(m_mmd->GetZoom() - 5.f);
+        }
+        else if (nNotch < 0)
+        {
+            // ↓に回転（チルト）した
+            m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
+        }
+    });
 
-            // ノッチ数を求める
-            int nNotch = zDelta / WHEEL_DELTA;
-
-            if (nNotch > 0)
-            {
-                // ↑に回転（チルト）した
-                m_mmd->SetZoom(m_mmd->GetZoom() - 5.f);
-            }
-            else if (nNotch < 0)
-            {
-                // ↓に回転（チルト）した
-                m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
-            }
-        });
+    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+    {
+        isPressMButton = true;
+    });
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
     {

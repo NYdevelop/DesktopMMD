@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <functional>
+#include <map>
 #include "Util/UtilTimer.h"
 
 class CWindow {
@@ -18,7 +19,7 @@ public:
 
     void SetDrawFunc(const std::function<void(HDC)>& func);
     void SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func);
-    void SetCallbackWheel(const std::function<void(WPARAM, LPARAM)>& func);
+    void SetCallbackMsg(UINT msg, const std::function<void(WPARAM, LPARAM)>& func);
 
 private:
     HRESULT InitWindow(HWND* hWnd);
@@ -46,4 +47,6 @@ private:
     std::function<void(HDC)> m_DrawFunc;
     std::function<void(WPARAM, LPARAM)> m_CommandCallback;
     std::function<void(WPARAM, LPARAM)> m_WheelCallback;
+    std::function<void()> m_MButtonCallback;
+    std::map<UINT, std::function<void(WPARAM, LPARAM)>> m_CallbackMap;
 };
