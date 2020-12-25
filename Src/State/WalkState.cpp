@@ -14,10 +14,6 @@ void WalkState::Initialize()
 
     m_mmd->canViewCamera = true;
 
-    m_mmd->RotateY = m_Direction;
-    m_mmd->UpdatePosRot();
-    MV1PhysicsResetState(model);
-
     walkAnim->ResetAnimTime();
 
     animQueue->AddTransrate(-1, walkAnim->GetAnimIndex(), 10);
@@ -55,9 +51,4 @@ int WalkState::ModelInitial()
 void WalkState::SetDrawMMD(std::shared_ptr<DrawMMD> mmd)
 {
     m_mmd = mmd;
-}
-
-void WalkState::SetDirection(float direction_rad)
-{
-    m_Direction = direction_rad;
 }

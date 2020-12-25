@@ -21,7 +21,7 @@ public:
     void Cancel();
 
 private:
-    float UpdateDirection();
+    float CalculateDirection();
 
     DxLib::VECTOR m_Distination = VGet(0,0,0);
     EState nextState = EState::STATE_WAIT;
@@ -30,7 +30,6 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
     WalkState* m_Walk = nullptr;
 
-    float m_Threshold = 1.f;
     bool m_IsMove = false;
     const float WALK_SPEED = 0.1f;
 };

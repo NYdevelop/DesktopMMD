@@ -76,7 +76,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         {
             int MouseX = 0, MouseY = 0;
             GetMousePoint(&MouseX, &MouseY);
-            WalkStart((float)MouseX, (float)MouseY, m_mmd.get(), &walkManager);
+            WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
         }
 
         // モデル上にカーソルがある場合反応するように
@@ -184,14 +184,14 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         case EContextMenu::CONTEXT_MOVE_LEFT:
         {
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-            WalkStart(100.f, CharaScreenPos.y, m_mmd.get(), &walkManager);
+            WalkStart(VGet(100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         }
             break;
 
         case EContextMenu::CONTEXT_MOVE_RIGHT:
         {
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-            WalkStart(1920.f - 100.f, CharaScreenPos.y, m_mmd.get(), &walkManager);
+            WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         }
             break;
 

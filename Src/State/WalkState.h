@@ -17,13 +17,10 @@ public:
     int ModelInitial();
 
     void SetDrawMMD(std::shared_ptr<DrawMMD> mmd);
-    void SetDirection(float direction_rad);
-
 
 private:
     std::shared_ptr <PlayAnim> walkAnim;
     std::shared_ptr<DrawMMD> m_mmd;
 
-    float m_Direction = 0.f;
     EState nextState = EState::STATE_WAIT;
 };

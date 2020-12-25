@@ -21,9 +21,10 @@ void WaitState::Doing()
     if (mt() % 500 != 0) return;
 
     // ランダムなスクリーン座標へ移動開始
+    std::uniform_real_distribution<> randRange(0.967598021, 0.99);
+    auto z = randRange(mt);
     WalkStart(
-        (float)(mt() % dispWidth),
-        (float)(mt() % dispHeight),
+        VGet((float)(mt() % dispWidth), (float)(mt() % dispHeight), z),
         m_mmd.get(),
         walkManager);
 }
