@@ -70,6 +70,7 @@ private:
     LONG dispHeight = 480;
 
     PlayAnim blink;
+    PlayAnim breath;
 
     std::shared_ptr<PlayAnimQueue> m_AnimQueue;
     std::shared_ptr<StateManager<EState>> m_StateManager;

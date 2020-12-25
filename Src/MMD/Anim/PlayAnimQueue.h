@@ -11,7 +11,7 @@ class PlayAnimQueue
 public:
     void AddAnim(std::shared_ptr<AnimInterface> anim, bool isTransrate = false);
 
-    void AddTransrate(int srcIndex, int transrateIndex, int time);
+    void AddTransrate(int srcIndex, int transrateIndex, int time, bool notMarge = false);
 
     /// ƒLƒ…[‚ª‹ó‚É‚È‚Á‚½‚çfalse‚ğ•Ô‚·
     bool Play();

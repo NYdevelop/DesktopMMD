@@ -12,9 +12,9 @@ void PlayAnimQueue::AddAnim(std::shared_ptr<AnimInterface> anim, bool isTransrat
     m_Queue.push(std::pair<std::shared_ptr<AnimInterface>, bool>(anim, isTransrate));
 }
 
-void PlayAnimQueue::AddTransrate(int srcIndex, int transrateIndex, int time)
+void PlayAnimQueue::AddTransrate(int srcIndex, int transrateIndex, int time, bool notMarge)
 {
-    if (m_Queue.empty() || m_Queue.front().second == false)
+    if (m_Queue.empty() || m_Queue.front().second == false || notMarge == true)
     {
         auto trans = std::shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
         if (srcIndex != -1)

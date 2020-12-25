@@ -34,4 +34,8 @@ enum class EAnimIndex : int
     ANIM_DANCE,
     ANIM_WALK = 9,
     ANIM_WAVE_HAND,
+    ANIM_BREATH = 11,
+    ANIM_THINK2,
+    ANIM_LOOK_SELF1,
+    ANIM_LOOK_SELF2
 };

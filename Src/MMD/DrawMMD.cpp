@@ -60,17 +60,19 @@ int DrawMMD::mainProcess()
 
     auto rayVec = GetRayVec();
 
+    // TODO: Ý’èƒtƒ@ƒCƒ‹‚©‚ç‚Ì—Ž‰ºON/OFF
     // •à‚«’†‚Í—Ž‰º‚µ‚È‚¢
-    if (m_StateManager->GetCurrentStateIndex() != EState::STATE_WALK &&
-        abs(atan2(rayVec.z, rayVec.y) + DX_PI_F / 2) < DX_PI_F / 4)
-    {
-        charaPos.y = gravity.PosUpdate(charaPos);
-    }
+    //if (m_StateManager->GetCurrentStateIndex() != EState::STATE_WALK &&
+    //    abs(atan2(rayVec.z, rayVec.y) + DX_PI_F / 2) < DX_PI_F / 4)
+    //{
+    //    charaPos.y = gravity.PosUpdate(charaPos);
+    //}
 
     DxLib::MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
     blink.PlayAnimation();
+    breath.PlayAnimation();
 
     if (canViewCamera)
     {
@@ -133,6 +135,9 @@ void DrawMMD::LoadModel()
 
     blink.AttachAnime(model, (int)EAnimIndex::ANIM_BLINK);
     blink.SetMaximumTime(250.f);
+
+    breath.AttachAnime(model, (int)EAnimIndex::ANIM_BREATH);
+    breath.SetMaximumTime(120.f);
 
     MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
