@@ -22,7 +22,7 @@ void WaitState::Doing()
 
     // ランダムなスクリーン座標へ移動開始
     std::uniform_real_distribution<> randRange(0.967598021, 0.99);
-    auto z = randRange(mt);
+    auto z = (float)randRange(mt);
     WalkStart(
         VGet((float)(mt() % dispWidth), (float)(mt() % dispHeight), z),
         m_mmd.get(),
