@@ -2,11 +2,11 @@
 
 #include "Util/UtilMMD.h"
 
-void WalkStateManager::Initialize(WalkState* walk, std::shared_ptr<DrawMMD> mmd, std::shared_ptr<StateManager<EState>> stateManager)
+void WalkStateManager::Initialize(std::shared_ptr<DrawMMD> mmd, std::shared_ptr<StateManager<EState>> stateManager, int walkAnimIndex)
 {
-    m_Walk = walk;
     m_mmd = mmd;
     m_StateManager = stateManager;
+    m_WalkAnimIndex = walkAnimIndex;
 }
 
 void WalkStateManager::SetNextState(EState state)
@@ -48,6 +48,11 @@ void WalkStateManager::Update()
     m_mmd->RotateY = direct;
     beforeDirect = direct;
 
+    if (MV1GetAttachAnimBlendRate(m_mmd->GetModelHandle(), m_WalkAnimIndex) != 1)
+    {
+        return;
+    }
+
     // 進行方向ベクトル
     auto x = sin(direct) * WALK_SPEED;
     auto z = cos(direct) * WALK_SPEED;
@@ -69,6 +74,5 @@ float WalkStateManager::CalculateDirection()
     auto pos = m_mmd->GetCharactorPos();
     auto directVec = VNorm(VSub(m_Distination, pos));
     auto direct_rad = atan2(directVec.x, directVec.z);
-    // m_Walk->SetDirection(direct_rad);
     return direct_rad;
 }

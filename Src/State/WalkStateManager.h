@@ -10,7 +10,7 @@
 class WalkStateManager
 {
 public:
-    void Initialize(WalkState* walk, std::shared_ptr<DrawMMD> mmd, std::shared_ptr<StateManager<EState>> stateManager);
+    void Initialize(std::shared_ptr<DrawMMD> mmd, std::shared_ptr<StateManager<EState>> stateManager, int walkAnimIndex);
     void SetNextState(EState state);
 
     void Start(DxLib::VECTOR distination);
@@ -28,7 +28,7 @@ private:
 
     std::shared_ptr<StateManager<EState>> m_StateManager;
     std::shared_ptr<DrawMMD> m_mmd;
-    WalkState* m_Walk = nullptr;
+    int m_WalkAnimIndex;
 
     bool m_IsMove = false;
     const float WALK_SPEED = 0.1f;

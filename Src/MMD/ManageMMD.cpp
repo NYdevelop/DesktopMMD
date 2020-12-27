@@ -380,8 +380,6 @@ void ManageMMD::InitStateModel()
     auto walkPtr = (WalkState*)walk.get();
     walkPtr->SetDrawMMD(m_mmd);
     stateManager->AddState(EState::STATE_WALK, walk);
-    walkManager.Initialize(walkPtr, m_mmd, stateManager);
-    walkManager.SetNextState(EState::STATE_WAIT);
 
     shared_ptr<State> waveHand(new WaveHandState());
     auto waveHandPtr = (WaveHandState*)waveHand.get();
@@ -389,6 +387,9 @@ void ManageMMD::InitStateModel()
     stateManager->AddState(EState::STATE_WAVE_HAND, waveHand);
 
     LoadModel();
+
+    walkManager.Initialize(m_mmd, stateManager, walkPtr->GetWalkAnimIndex());
+    walkManager.SetNextState(EState::STATE_WAIT);
 
     waitPtr->OnceInitial();
 }

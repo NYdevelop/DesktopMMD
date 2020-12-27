@@ -46,7 +46,8 @@ int WaveHandState::ModelInitial()
     waveHandLoop = std::shared_ptr < PlayAnim >(new PlayAnim);
     int ret = waveHandLoop->AttachAnime(model, (int)EAnimIndex::ANIM_WAVE_HAND);
     waveHandLoop->IsLoop(false);
-
+    waveHandLoop->SetPlaySpeed(.6f);
+    waveHandLoop->SetMaximumTime(25.f);
     MV1SetAttachAnimBlendRate(model, waveHandLoop->GetAnimIndex(), 0);
 
     return ret;

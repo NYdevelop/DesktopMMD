@@ -52,7 +52,7 @@ void WaitState::End()
 
     if (!animQueue->Empty())
     {
-        animQueue->Clear();
+        animQueue->SetCurrentStop();
         MV1PhysicsResetState(model);
     }
 }

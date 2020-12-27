@@ -18,6 +18,11 @@ public:
 
     void SetDrawMMD(std::shared_ptr<DrawMMD> mmd);
 
+    inline int GetWalkAnimIndex()
+    {
+        return walkAnim->GetAnimIndex();
+    }
+
 private:
     std::shared_ptr <PlayAnim> walkAnim;
     std::shared_ptr<DrawMMD> m_mmd;
