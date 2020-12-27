@@ -4,10 +4,13 @@
 #include "Util/UtilMMD.h"
 
 static std::mt19937 mt;
+static std::uniform_real_distribution<> randRange(0.967598021, 0.99);
 
 void WaitState::Initialize()
 {
     std::cout << "state: wait" << std::endl;
+
+    MV1PhysicsResetState(model);
 
     /// カメラ方向を向く
     m_mmd->canViewCamera = true;
@@ -15,25 +18,27 @@ void WaitState::Initialize()
 
 void WaitState::Doing()
 {
-    if (m_RandomMove == false) return;
-    if (walkManager->IsMove() == true) return;
     if (!animQueue->Empty()) return;
+    m_mmd->canViewCamera = true;
+
+    if (m_RandomMove == false)
+    {
+        if (mt() % 500 != 0) return;
+        DoWaitAnim();
+        return;
+    }
+
+    if (walkManager->IsMove() == true) return;
 
     if (mt() % 500 != 0) return;
 
     if (mt() % 2 == 0)
     {
-        auto anim = m_WaitAnimMap[mt() % 3];
-        std::cout << "wait anim : " << anim->GetAnimIndex() << std::endl;
-        anim->ResetAnimTime();
-        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
-        animQueue->AddAnim(anim);
-        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 10, true);
+        DoWaitAnim();
         return;
     }
 
     // ランダムなスクリーン座標へ移動開始
-    std::uniform_real_distribution<> randRange(0.967598021, 0.99);
     auto z = (float)randRange(mt);
     WalkStart(
         VGet((float)(mt() % dispWidth), (float)(mt() % dispHeight), z),
@@ -44,6 +49,12 @@ void WaitState::Doing()
 void WaitState::End()
 {
     m_mmd->canViewCamera = false;
+
+    if (!animQueue->Empty())
+    {
+        animQueue->Clear();
+        MV1PhysicsResetState(model);
+    }
 }
 
 void WaitState::OnceInitial()
@@ -61,11 +72,23 @@ void WaitState::OnceInitial()
     SetAnim(EAnimIndex::ANIM_LOOK_SELF2);
 }
 
+void WaitState::DoWaitAnim()
+{
+    m_mmd->canViewCamera = false;
+    auto anim = m_WaitAnimMap[mt() % m_WaitAnimMap.size()];
+    std::cout << "wait anim : " << anim->GetAnimIndex() << std::endl;
+    anim->ResetAnimTime();
+    animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
+    animQueue->AddAnim(anim);
+    animQueue->AddTransrate(anim->GetAnimIndex(), -1, 10, true);
+}
+
 void WaitState::SetAnim(EAnimIndex index)
 {
     int mapIndex = m_WaitAnimMap.size();
     m_WaitAnimMap[mapIndex] = std::shared_ptr<PlayAnim>(new PlayAnim);
     m_WaitAnimMap[mapIndex]->AttachAnime(model, (int)index);
+    m_WaitAnimMap[mapIndex]->SetPlaySpeed(.5f);
     m_WaitAnimMap[mapIndex]->IsLoop(false);
     MV1SetAttachAnimBlendRate(model, m_WaitAnimMap[mapIndex]->GetAnimIndex(), 0);
 }

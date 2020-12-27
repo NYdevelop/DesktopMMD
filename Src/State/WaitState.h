@@ -31,6 +31,7 @@ public:
     }
 
 private:
+    void DoWaitAnim();
     void SetAnim(EAnimIndex index);
 
     bool m_RandomMove = false;
@@ -38,10 +39,6 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
     WalkStateManager* walkManager = nullptr;
 
-    //std::shared_ptr < PlayAnim > think1Anim;
-    //std::shared_ptr < PlayAnim > think2Anim;
-    //std::shared_ptr < PlayAnim > lookSelf1Anim;
-    //std::shared_ptr < PlayAnim > lookSelf2Anim;
     std::map<int, std::shared_ptr < PlayAnim > > m_WaitAnimMap;
 
     int dispWidth = 640;

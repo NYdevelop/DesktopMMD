@@ -22,7 +22,6 @@ void WalkState::Initialize()
 
 void WalkState::Doing()
 {
-    // Žè‚ðU‚ç‚È‚¢‚Ì‚Í‚»‚¤‚¢‚¤ƒ‚[ƒVƒ‡ƒ“‚Å‚ ‚é‚½‚ß
     if (animQueue->Empty())
     {
         walkAnim->ResetAnimTime();
