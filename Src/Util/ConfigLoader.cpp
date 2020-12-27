@@ -68,33 +68,35 @@ std::string CConfigLoader::Load(const std::string& keyWord)
         {
             continue;
         }
-
         auto splitVec = Split(lineStr, '=');
-        if (splitVec.size() > 1)
+        if (splitVec.size() == 1)
         {
-            splitVec[0] = RemoveSpace(splitVec[0]);
-            if (splitVec[0] == keyWord)
-            {
-
-                auto splitVecQuat = Split(splitVec[1], '\"');
-                if (splitVecQuat.size() < 2)
-                {
-                    // ダブルクォーテーションない場合
-                    ret = RemoveSpace(splitVec[1]);
-                    break;
-                }
-
-                // ダブルクォーテーション内のみRemoveSpaceしない
-                ret = RemoveSpace(splitVecQuat[0]);
-                ret += "\"" + splitVecQuat[1] + "\"";
-                if (splitVecQuat.size() >= 3)
-                {
-                    ret += RemoveSpace(splitVecQuat[2]);
-                }
-                break;
-
-            }
+            continue;
         }
+
+        splitVec[0] = RemoveSpace(splitVec[0]);
+        if (splitVec[0] != keyWord)
+        {
+            continue;
+        }
+
+        // 以下、キーワードが一致した場合の処理
+        auto splitVecQuat = Split(splitVec[1], '\"');
+        if (splitVecQuat.size() < 2)
+        {
+            // ダブルクォーテーションない場合
+            ret = RemoveSpace(splitVec[1]);
+            break;
+        }
+
+        // ダブルクォーテーション内のみRemoveSpaceしない
+        ret = RemoveSpace(splitVecQuat[0]);
+        ret += "\"" + splitVecQuat[1] + "\"";
+        if (splitVecQuat.size() >= 3)
+        {
+            ret += RemoveSpace(splitVecQuat[2]);
+        }
+        break;
     }
 
     // ダブルクォーテーション除去
