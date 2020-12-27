@@ -13,8 +13,14 @@ public:
 
     std::string Load(const std::string& keyWord); // キーワード文字列読み込み
 
+    void SetRemoveDoubleQuatation(bool isRemove);
+
 private:
+    std::string RemoveSpace(const std::string& str);
+
     std::string m_FileName;                       // 設定ファイル名
+
+    bool m_IsRemoveDoubleQuatation = false;
 };
 
 #endif

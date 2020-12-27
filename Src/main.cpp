@@ -7,6 +7,7 @@ int main()
     // TODO: êQÇÈÅAç¿ÇÈ
     {
         CConfigLoader config("config.txt");
+        config.SetRemoveDoubleQuatation(true);
 
         ManageMMD manager;
         manager.Initialize(config.Load("ANIM_PATH"), config.Load("MODEL_PATH"));
