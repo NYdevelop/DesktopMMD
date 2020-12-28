@@ -27,7 +27,7 @@ public:
 
     inline void ResetAnimTime()
     {
-        playTime = 0;
+        playTime = 0.f;
     }
 
 private:

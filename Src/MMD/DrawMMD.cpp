@@ -135,9 +135,11 @@ void DrawMMD::LoadModel()
 
     blink.AttachAnime(model, (int)EAnimIndex::ANIM_BLINK);
     blink.SetMaximumTime(250.f);
+    MV1SetAttachAnimBlendRate(model, blink.GetAnimIndex(), 1);
 
     breath.AttachAnime(model, (int)EAnimIndex::ANIM_BREATH);
     breath.SetMaximumTime(120.f);
+    MV1SetAttachAnimBlendRate(model, breath.GetAnimIndex(), 1);
 
     MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));

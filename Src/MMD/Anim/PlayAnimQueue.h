@@ -28,9 +28,16 @@ public:
         currentStop = true;
     }
 
+    inline void SetDefAnimIndex(int index)
+    {
+        m_DefAnimIndex = index;
+    }
+
 private:
     /// アニメインタフェースとTransrateフラグを格納
     std::queue<std::pair <std::shared_ptr<AnimInterface>, bool>> m_Queue;
     int model = 0;
     bool currentStop = false;
+
+    int m_DefAnimIndex = -1;
 };

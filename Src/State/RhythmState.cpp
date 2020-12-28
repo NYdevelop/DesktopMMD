@@ -76,6 +76,7 @@ void RhythmState::OnceInital()
 
 int RhythmState::ModelInitial()
 {
+    // unazuki‚ÍŽè‚ð‰º‚°‚é
     unazuki.AttachAnime(model, (int)EAnimIndex::ANIM_UNAZUKI);
     unazuki.SetPlaySpeed(BASE_PLAY_SPEED);
 

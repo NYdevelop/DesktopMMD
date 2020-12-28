@@ -33,7 +33,7 @@ void WalkState::Doing()
 void WalkState::End()
 {
     m_mmd->canViewCamera = false;
-    MV1SetAttachAnimBlendRate(model, walkAnim->GetAnimIndex(), 0);
+    animQueue->AddTransrate(walkAnim->GetAnimIndex(), -1, 10);
     MV1PhysicsResetState(model);
 }
 
@@ -43,7 +43,6 @@ int WalkState::ModelInitial()
     auto ret = walkAnim->AttachAnime(model, (int)EAnimIndex::ANIM_WALK);
     walkAnim->SetPlaySpeed(1.0f);
     walkAnim->IsLoop(false);
-    MV1SetAttachAnimBlendRate(model, walkAnim->GetAnimIndex(), 0);
     return ret;
 }
 

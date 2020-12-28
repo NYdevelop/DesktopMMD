@@ -37,5 +37,6 @@ enum class EAnimIndex : int
     ANIM_BREATH = 11,
     ANIM_THINK2,
     ANIM_LOOK_SELF1,
-    ANIM_LOOK_SELF2
+    ANIM_LOOK_SELF2,
+    ANIM_DANCE_MINI,
 };

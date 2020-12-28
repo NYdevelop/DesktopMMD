@@ -19,8 +19,8 @@ void DanceState::Initialize()
     m_mmd->SetZoom(35.f);
     m_mmd->UpdatePosRot();
 
-    MV1SetAttachAnimBlendRate(model, danceAnim->GetAnimIndex(), 1);
     danceAnim->ResetAnimTime();
+    animQueue->AddTransrate(-1, danceAnim->GetAnimIndex(), 1);
     animQueue->AddAnim(danceAnim);
     MV1PhysicsResetState(model);
 
@@ -47,7 +47,6 @@ int DanceState::ModelInitial()
     int ret = danceAnim->AttachAnime(model, (int)EAnimIndex::ANIM_DANCE);
     danceAnim->IsLoop(false);
     danceAnim->SetPlaySpeed(.575f);
-    MV1SetAttachAnimBlendRate(model, danceAnim->GetAnimIndex(), 0);
     return ret;
 }
 

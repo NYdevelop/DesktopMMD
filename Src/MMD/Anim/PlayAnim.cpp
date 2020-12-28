@@ -13,6 +13,7 @@ int PlayAnim::AttachAnime(int modHandle, int animIndex)
         return -1;
     }
     SetMaximumTime(MV1GetAttachAnimTotalTime(modelHandle, m_AnimIndex));
+    MV1SetAttachAnimBlendRate(modelHandle, m_AnimIndex, 0);
     return m_AnimIndex;
 }
 
@@ -29,13 +30,14 @@ bool PlayAnim::PlayAnimation()
 
     if (playTime >= maximumTime && isLoop)
     {
-        playTime = 0.f;
+        ResetAnimTime();
     }
 
     MV1SetAttachAnimTime(modelHandle, m_AnimIndex, playTime);//ƒ‚[ƒVƒ‡ƒ“‚ÌÄ¶ˆÊ’u‚ðÝ’è
 
     if (playTime >= maximumTime)
     {
+        ResetAnimTime();
         return false;
     }
     return true;

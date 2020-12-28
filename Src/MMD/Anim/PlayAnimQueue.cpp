@@ -17,9 +17,14 @@ void PlayAnimQueue::AddTransrate(int srcIndex, int transrateIndex, int time, boo
     if (m_Queue.empty() || m_Queue.front().second == false || notMarge == true)
     {
         auto trans = std::shared_ptr<PlayAnimTrans>(new PlayAnimTrans);
+        trans->srcAnimIndex = m_DefAnimIndex;
         if (srcIndex != -1)
         {
             trans->srcAnimIndex = srcIndex;
+        }
+        if (transrateIndex == -1)
+        {
+            transrateIndex = m_DefAnimIndex;
         }
         trans->AttachAnime(model, transrateIndex);
         trans->SetTransTime(time);
@@ -42,8 +47,19 @@ bool PlayAnimQueue::Play()
 
     if (currentStop == true || m_Queue.front().first->PlayAnimation() == false)
     {
+        if (currentStop)
+        {
+            while (m_Queue.front().second == false)
+            {
+                m_Queue.pop();
+            }
+        }
+        else
+        {
+            m_Queue.pop();
+        }
+
         currentStop = false;
-        m_Queue.pop();
         if (m_Queue.empty()) return false;
     }
     return true;
