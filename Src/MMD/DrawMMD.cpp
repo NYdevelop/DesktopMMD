@@ -2,11 +2,14 @@
 
 #include "Util/WinUtil.h"
 #include "Util/UtilMMD.h"
-#include <iostream>
+#include <fstream>
 
 using namespace std;
 
-DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath)
+DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath,
+    const float charaX, const float charaY, const float charaZ,
+    const float charaDirect,
+    const float cameraX, const float cameraY, const float cameraZ)
 {
     m_AnimPath = animPath;
     m_ModelPath = modelPath;
@@ -16,9 +19,17 @@ DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath)
     GetWindowRect(GetDesktopWindow(), &rc);
     dispWidth = rc.right - rc.left;
     dispHeight = rc.bottom - rc.top;
+
+
+    RotateY = charaDirect;//DX_PI_F;
+    float posX = charaX;//0.f;
+    float posY = charaY;//0.f;
+    m_Zoom = cameraZ * -1.f;//35.f;
+
+    charaPos = VGet(charaX, charaY, charaZ);//VGet(posX, posY, 1.0f);
+    cameraPos = VGet(cameraX, cameraY, m_Zoom * -1.f);;// VGet(0.f, 0.f, m_Zoom * -1.f);
 }
 
-//int gHandle = 0;
 void DrawMMD::afterInitialize()
 {
     DrawBox(
@@ -27,13 +38,6 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//ï`âÊëŒè€Çó†âÊñ Ç…Ç∑ÇÈ
 
-    RotateY = DX_PI_F;
-    float posX = 0.f;
-    float posY = 0.f;
-    m_Zoom = 35.f;
-
-    charaPos = VGet(posX, posY, 1.0f);
-    cameraPos = VGet(0.f, 0.f, m_Zoom * -1.f);
     cameraViewOffset = VGet(0.f, 7.f, 1.f);
     cameraViewPos = VGet(0.f, 0.f, 0.f);
 
@@ -102,6 +106,25 @@ int DrawMMD::mainProcess()
     DxLib::ScreenFlip();
 
     return S_OK;
+}
+
+void Write(std::ofstream& ofs, const std::string& keyWord, const std::string& value)
+{
+    ofs << keyWord << " = " << value << std::endl;
+};
+
+void DrawMMD::Exit()
+{
+    std::ofstream ofs("config_pos.txt");
+    Write(ofs, "CHARA_POS_X", to_string(charaPos.x));
+    Write(ofs, "CHARA_POS_Y", to_string(charaPos.y));
+    Write(ofs, "CHARA_POS_Z", to_string(charaPos.z));
+
+    Write(ofs, "CHARA_DIRECT", to_string(RotateY));
+
+    Write(ofs, "CAMERA_POS_X", to_string(cameraPos.x));
+    Write(ofs, "CAMERA_POS_Y", to_string(cameraPos.y));
+    Write(ofs, "CAMERA_POS_Z", to_string(cameraPos.z));
 }
 
 void DrawMMD::LoadModel()

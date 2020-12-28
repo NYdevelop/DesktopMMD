@@ -13,6 +13,13 @@ using namespace std;
 CConfigLoader::CConfigLoader(const std::string& fileName)
     :m_FileName(fileName)
 {
+    m_IsOpen = true;
+    std::ifstream ifs(m_FileName);
+    if (ifs.fail())
+    {
+        cerr << "file is not exit." << endl;
+        m_IsOpen = false;
+    }
 }
 
 // 機能 : デストラクタ
@@ -53,6 +60,8 @@ vector<string> Split(const string& src, char delim)
 // 機能 : キーワード文字列読み込み
 std::string CConfigLoader::Load(const std::string& keyWord)
 {
+    if (m_IsOpen == false) return "";
+
     ifstream ifs(m_FileName);
     string ret("");
     string lineStr;

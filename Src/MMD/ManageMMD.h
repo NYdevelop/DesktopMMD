@@ -15,8 +15,14 @@
 class ManageMMD
 {
 public:
+    HRESULT Initialize(const std::string& animPath, const std::string& modelPath,
+        const float charaX, const float charaY, const float charaZ,
+        const float charaDirect,
+        const float cameraX, const float cameraY, const float cameraZ);
     HRESULT Initialize(const std::string& animPath, const std::string& modelPath);
+
     HRESULT Process();
+
     void Exit();
 
     void LoadModel();

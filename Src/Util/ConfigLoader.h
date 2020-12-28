@@ -15,10 +15,16 @@ public:
 
     void SetRemoveDoubleQuatation(bool isRemove);
 
+    inline bool IsOpen()
+    {
+        return m_IsOpen;
+    }
+
 private:
     std::string RemoveSpace(const std::string& str);
 
     std::string m_FileName;                       // ê›íËÉtÉ@ÉCÉãñº
+    bool m_IsOpen = false;
 
     bool m_IsRemoveDoubleQuatation = false;
 };

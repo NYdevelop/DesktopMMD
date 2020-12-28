@@ -15,12 +15,15 @@
 using namespace std;
 
 
-HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath)
+HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath,
+    const float charaX, const float charaY, const float charaZ,
+    const float charaDirect,
+    const float cameraX, const float cameraY, const float cameraZ)
 {
     m_Window.Init();
 
     SetUserWindow(m_Window.GetHWnd());
-    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath));
+    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath, charaX, charaY, charaZ, charaDirect, cameraX, cameraY, cameraZ));
     if (DxLib::DxLib_Init() == -1) return E_FAIL;
     m_mmd->afterInitialize();
 
@@ -248,6 +251,11 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     return S_OK;
 }
 
+HRESULT ManageMMD::Initialize(const std::string & animPath, const std::string & modelPath)
+{
+    return Initialize(animPath, modelPath, 0.f, 0.f, 1.f, DX_PI_F, 0.f, 0.f, -35.f);
+}
+
 HRESULT ManageMMD::Process()
 {
     m_Window.Process(60);
@@ -257,7 +265,9 @@ HRESULT ManageMMD::Process()
 
 void ManageMMD::Exit()
 {
-    // TODO: キャラクタ位置保存
+    // キャラクタ位置保存
+    m_mmd->Exit();
+
     m_Window.SetDrawFunc(nullptr);
     stateManager->End();
 

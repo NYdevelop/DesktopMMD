@@ -14,9 +14,16 @@
 class DrawMMD
 {
 public:
-    DrawMMD(const std::string& animPath, const std::string& modelPath);
+    DrawMMD(const std::string& animPath, const std::string& modelPath,
+        const float charaX, const float charaY, const float charaZ,
+        const float charaDirect,
+        const float cameraX, const float cameraY, const float cameraZ);
+
     void afterInitialize();
+
     int mainProcess();
+
+    void Exit();
 
     void LoadModel();
 

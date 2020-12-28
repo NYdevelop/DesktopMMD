@@ -9,8 +9,21 @@ int main()
         CConfigLoader config("config.txt");
         config.SetRemoveDoubleQuatation(true);
 
+        CConfigLoader configPos("config_pos.txt");
+
         ManageMMD manager;
-        manager.Initialize(config.Load("ANIM_PATH"), config.Load("MODEL_PATH"));
+
+        if (configPos.IsOpen())
+        {
+            manager.Initialize(config.Load("ANIM_PATH"), config.Load("MODEL_PATH"),
+                std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
+                std::stof(configPos.Load("CHARA_DIRECT")),
+                std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z")));
+        }
+        else
+        {
+            manager.Initialize(config.Load("ANIM_PATH"), config.Load("MODEL_PATH"));
+        }
         manager.Process();
         manager.Exit();
     }
