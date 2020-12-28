@@ -26,6 +26,7 @@ void PlayAnimQueue::AddTransrate(int srcIndex, int transrateIndex, int time, boo
         {
             transrateIndex = m_DefAnimIndex;
         }
+        if (trans->srcAnimIndex == transrateIndex) return;
         trans->AttachAnime(model, transrateIndex);
         trans->SetTransTime(time);
         AddAnim(trans, true);
