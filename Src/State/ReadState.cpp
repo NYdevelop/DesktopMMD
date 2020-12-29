@@ -50,7 +50,7 @@ void ReadState::Initialize()
         t.join();
     }
 
-    m_Output->Output(L"data/text.wav");
+    m_Output->Start(L"data/text.wav");
     MV1SetAttachAnimBlendRate(model, lipAnim->GetAnimIndex(), 1);
     lipAnim->ResetAnimTime();
     animQueue->AddAnim(lipAnim);

@@ -71,35 +71,61 @@ void WaitState::OnceInitial()
     SetAnim(EAnimIndex::ANIM_LOOK_SELF1);
     SetAnim(EAnimIndex::ANIM_LOOK_SELF2);
     SetAnim(EAnimIndex::ANIM_DANCE_MINI);
+    SetAnim(EAnimIndex::ANIM_BONYARI);
+    SetAnim(EAnimIndex::ANIM_LOOK_AROUND);
+    SetAnim(EAnimIndex::ANIM_ARM_SWING);
+    SetAnim(EAnimIndex::ANIM_STLETCH1);
+    SetAnim(EAnimIndex::ANIM_UMAUMA);
+    SetAnim(EAnimIndex::ANIM_PEACE1);
+    SetAnim(EAnimIndex::ANIM_SHIRATSUYU);
+    SetAnim(EAnimIndex::ANIM_PLINZ);
+    SetAnim(EAnimIndex::ANIM_KASHIMA);
+    SetAnim(EAnimIndex::ANIM_HAMAKAZE);
+    // SetAnim(EAnimIndex::ANIM_SEXY1);
 
-    animQueue->SetDefAnimIndex(m_WaitAnimMap[0]->GetAnimIndex());
-    MV1SetAttachAnimBlendRate(model, m_WaitAnimMap[0]->GetAnimIndex(), 1);
+    animQueue->SetDefAnimIndex(m_WaitAnimMap[4].first->GetAnimIndex());
+    MV1SetAttachAnimBlendRate(model, m_WaitAnimMap[4].first->GetAnimIndex(), 1);
 }
 
 void WaitState::DoWaitAnim()
 {
     m_mmd->canViewCamera = false;
     auto animIndex = mt() % m_WaitAnimMap.size(); //0;
-    auto anim = m_WaitAnimMap[animIndex];
+    auto anim = m_WaitAnimMap[animIndex].first;
     std::cout << "wait anim : " << anim->GetAnimIndex() << std::endl;
     anim->ResetAnimTime();
-    animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
+    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_SEXY1)
+    {
+        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 50);
+    }
+    else
+    {
+        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
+    }
     animQueue->AddAnim(anim);
-    if (animIndex == 3)
+    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_DANCE_MINI)
     {
         m_mmd->canViewCamera = true;
         int loopCount = mt() % 15 + 1;
         std::cout << "anim loop:" << loopCount << std::endl;
         for (int i = 0; i < loopCount; i++) animQueue->AddAnim(anim);
     }
-    animQueue->AddTransrate(anim->GetAnimIndex(), -1, 10, true);
+    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_SEXY1)
+    {
+        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 50, true);
+    }
+    else
+    {
+        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 10, true);
+    }
 }
 
 void WaitState::SetAnim(EAnimIndex index)
 {
     int mapIndex = m_WaitAnimMap.size();
-    m_WaitAnimMap[mapIndex] = std::shared_ptr<PlayAnim>(new PlayAnim);
-    m_WaitAnimMap[mapIndex]->AttachAnime(model, (int)index);
-    m_WaitAnimMap[mapIndex]->SetPlaySpeed(.5f);
-    m_WaitAnimMap[mapIndex]->IsLoop(false);
+    std::pair<std::shared_ptr < PlayAnim >, EAnimIndex> pair(std::shared_ptr<PlayAnim>(new PlayAnim), index);
+    m_WaitAnimMap[mapIndex] = pair;
+    m_WaitAnimMap[mapIndex].first->AttachAnime(model, (int)index);
+    m_WaitAnimMap[mapIndex].first->SetPlaySpeed(.5f);
+    m_WaitAnimMap[mapIndex].first->IsLoop(false);
 }

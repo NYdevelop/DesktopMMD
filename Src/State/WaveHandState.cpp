@@ -48,8 +48,6 @@ int WaveHandState::ModelInitial()
     waveHandLoop->IsLoop(false);
     waveHandLoop->SetPlaySpeed(.6f);
     waveHandLoop->SetMaximumTime(25.f);
-    MV1SetAttachAnimBlendRate(model, waveHandLoop->GetAnimIndex(), 0);
-
     return ret;
 }
 

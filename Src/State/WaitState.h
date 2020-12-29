@@ -39,7 +39,7 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
     WalkStateManager* walkManager = nullptr;
 
-    std::map<int, std::shared_ptr < PlayAnim > > m_WaitAnimMap;
+    std::map<int, std::pair<std::shared_ptr < PlayAnim >, EAnimIndex> > m_WaitAnimMap;
 
     int dispWidth = 640;
     int dispHeight = 480;

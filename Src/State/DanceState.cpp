@@ -10,21 +10,21 @@ void DanceState::Initialize()
 {
     cout << "state: dance" << endl;
 
-    // モデル位置リセット
-    auto pos = m_mmd->GetCharactorPos();
-    pos.x = 0.f;
-    pos.y = -7.f;
-    m_mmd->SetCharactorPos(pos);
-    m_mmd->RotateY = 3.14f;
-    m_mmd->SetZoom(35.f);
-    m_mmd->UpdatePosRot();
+    //// モデル位置リセット
+    //auto pos = m_mmd->GetCharactorPos();
+    //pos.x = 0.f;
+    //pos.y = -7.f;
+    //m_mmd->SetCharactorPos(pos);
+    //m_mmd->RotateY = 3.14f;
+    //m_mmd->SetZoom(35.f);
+    //m_mmd->UpdatePosRot();
 
     danceAnim->ResetAnimTime();
     animQueue->AddTransrate(-1, danceAnim->GetAnimIndex(), 1);
     animQueue->AddAnim(danceAnim);
     MV1PhysicsResetState(model);
 
-    m_Output->Output(L"data/music.wav");
+    m_Output->Start(L"data/music.wav");
 }
 
 

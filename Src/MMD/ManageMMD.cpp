@@ -39,7 +39,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         walkManager.Update();
 
         /// キー入力判定
-        if (IsPress(VK_SHIFT) != 0)
+        if (IsPress(VK_CONTROL) == true)
         {
             if (IsPress(VK_RIGHT))
             {
@@ -75,7 +75,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         }
         m_mmd->SetCharactorPos(pos);
 
-        if (IsPress('M'))
+        if (IsPress(VK_CONTROL) && IsPress('M'))
         {
             int MouseX = 0, MouseY = 0;
             GetMousePoint(&MouseX, &MouseY);
@@ -133,10 +133,28 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
 
     m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
     {
+        static const float VOLUME_DELTA = 0.01f;
         int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
+        int nNotch = zDelta / WHEEL_DELTA;    // ノッチ数を求める
 
-                                                        // ノッチ数を求める
-        int nNotch = zDelta / WHEEL_DELTA;
+        if (IsPress(VK_CONTROL))
+        {
+            auto v = m_Output->GetVolume();
+            if (nNotch > 0)
+            {
+                // ↑に回転（チルト）した
+                v += VOLUME_DELTA;
+                m_Output->SetVolume(v);
+            }
+            else if (nNotch < 0)
+            {
+                // ↓に回転（チルト）した
+                v -= VOLUME_DELTA;
+                m_Output->SetVolume(v);
+            }
+            cout << "volume:" << v << endl;
+            return;
+        }
 
         if (nNotch > 0)
         {
@@ -251,16 +269,9 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     return S_OK;
 }
 
-HRESULT ManageMMD::Initialize(const std::string & animPath, const std::string & modelPath)
-{
-    return Initialize(animPath, modelPath, 0.f, 0.f, 1.f, DX_PI_F, 0.f, 0.f, -35.f);
-}
-
 HRESULT ManageMMD::Process()
 {
-    m_Window.Process(60);
-
-    return S_OK;
+    return m_Window.Process(60);
 }
 
 void ManageMMD::Exit()

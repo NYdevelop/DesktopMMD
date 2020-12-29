@@ -13,6 +13,7 @@ void RhythmState::Initialize()
     cout << BASE_PLAY_SPEED << endl;
     m_Bpm = BASE_BPM;
 
+    animQueue->AddTransrate(-1, unazuki.GetAnimIndex(), 10);
     m_Capture->SetCaptureCallback([this](WAVEHDR wh)
     {
         auto wf = m_Capture->GetWaveFormatEx();
@@ -47,7 +48,8 @@ void RhythmState::End()
 
     MV1SetAttachAnimBlendRate(model, noSoundAnimIndex, 0);
     MV1SetAttachAnimBlendRate(model, stableAnimIndex, 0);
-    MV1SetAttachAnimBlendRate(model, unazuki.GetAnimIndex(), 0);
+    //MV1SetAttachAnimBlendRate(model, unazuki.GetAnimIndex(), 0);
+    animQueue->AddTransrate(unazuki.GetAnimIndex(), -1, 10);
 }
 
 void RhythmState::OnceInital()
