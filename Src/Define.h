@@ -49,5 +49,5 @@ enum class EAnimIndex : int
     ANIM_PLINZ,
     ANIM_KASHIMA,
     ANIM_HAMAKAZE,
-    ANIM_SEXY1,
+    ANIM_ZERO_TWO_DANCE,
 };

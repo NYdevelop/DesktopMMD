@@ -23,6 +23,8 @@ void WaitState::Doing()
 {
     if (!animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty()) return;
     m_mmd->canViewCamera = true;
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->Restart();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->Restart();
 
     if (m_RandomMove == false)
     {
@@ -70,36 +72,12 @@ void WaitState::OnceInitial()
     std::random_device rnd;          // 非決定的な乱数生成器
     mt = move(std::mt19937(rnd()));  // メルセンヌ・ツイスタの32ビット版、引数は初期シード
 
-    // TODO: 設定値読込
-    //rapidxml::xml_document<> doc;
-    //rapidxml::file<> input("config_anim.xml");
-    //doc.parse<0>(input.data());
-    //for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
-    //    child != nullptr;
-    //    child = child->next_sibling()) {
-    //    for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
-    //    {
-    //        std::cout << attr->name() << ": " << attr->value() << std::endl;
-    //    }
-    //}
-    SetAnim(EAnimIndex::ANIM_THINK2);
-    SetAnim(EAnimIndex::ANIM_LOOK_SELF1);
-    SetAnim(EAnimIndex::ANIM_LOOK_SELF2);
-    SetAnim(EAnimIndex::ANIM_DANCE_MINI);
-    SetAnim(EAnimIndex::ANIM_BONYARI);
-    SetAnim(EAnimIndex::ANIM_LOOK_AROUND);
-    SetAnim(EAnimIndex::ANIM_ARM_SWING);
-    SetAnim(EAnimIndex::ANIM_STLETCH1);
-    // SetAnim(EAnimIndex::ANIM_UMAUMA);
-    // SetAnim(EAnimIndex::ANIM_PEACE1);
-    // SetAnim(EAnimIndex::ANIM_SHIRATSUYU);
-    // SetAnim(EAnimIndex::ANIM_PLINZ);
-    // SetAnim(EAnimIndex::ANIM_KASHIMA);
-    // SetAnim(EAnimIndex::ANIM_HAMAKAZE);
-    // SetAnim(EAnimIndex::ANIM_ZERO_TWO_DANCE);
+    // 設定値読込
+    loadConfig();
 
-    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetDefAnimIndex(std::get<0>(m_WaitAnimMap[4])->GetAnimIndex());
-    MV1SetAttachAnimBlendRate(model, std::get<0>(m_WaitAnimMap[4])->GetAnimIndex(), 1);
+    auto animIndex = std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[4])->GetAnimIndex();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetDefAnimIndex(animIndex);
+    MV1SetAttachAnimBlendRate(model, animIndex, 1);
 }
 
 void WaitState::DoWaitAnim()
@@ -107,18 +85,14 @@ void WaitState::DoWaitAnim()
     auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
     m_mmd->canViewCamera = false;
     auto animIndexMap = mt() % m_WaitAnimMap.size();
-    auto anim = std::get<0>(m_WaitAnimMap[animIndexMap]);
-    auto animIndex = std::get<1>(m_WaitAnimMap[animIndexMap]);
-    std::cout << "wait anim : " << anim->GetAnimIndex() << std::endl;
+    auto tmpTuple = m_WaitAnimMap[animIndexMap];
+    auto anim = std::get<EAnimMap::ITEM_ANIM>(tmpTuple);
     anim->ResetAnimTime();
-    if (animIndex == EAnimIndex::ANIM_ZERO_TWO_DANCE)
-    {
-        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 30);
-    }
-    else
-    {
-        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
-    }
+    auto animIndex = std::get<EAnimMap::ITEM_INDEX>(tmpTuple);
+    std::cout << "wait anim : " << (int)animIndex << std::endl;
+
+    auto transframe = std::get<EAnimMap::ITEM_TRANSE_FRAME>(tmpTuple);
+    animQueue->AddTransrate(-1, anim->GetAnimIndex(), transframe);
     animQueue->AddAnim(anim);
     if (animIndex == EAnimIndex::ANIM_DANCE_MINI)
     {
@@ -127,22 +101,64 @@ void WaitState::DoWaitAnim()
         std::cout << "anim loop:" << loopCount << std::endl;
         for (int i = 0; i < loopCount; i++) animQueue->AddAnim(anim);
     }
-    if (animIndex == EAnimIndex::ANIM_ZERO_TWO_DANCE)
+    animQueue->AddTransrate(anim->GetAnimIndex(), -1, transframe, true);
+
+    if (std::get<EAnimMap::ITEM_BLINK>(tmpTuple) == false)
     {
-        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 30, true);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->Pause();
     }
-    else
+    if (std::get<EAnimMap::ITEM_BREATH>(tmpTuple) == false)
     {
-        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 10, true);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->Pause();
     }
 }
 
-void WaitState::SetAnim(EAnimIndex index)
+void WaitState::SetAnim(EAnimIndex index, bool isBlink, bool isBreath, int transFrame)
 {
     int mapIndex = m_WaitAnimMap.size();
-    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, false, false);
+    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isBlink, isBreath, transFrame);
     m_WaitAnimMap[mapIndex] = tmp;
-    std::get<0>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
-    std::get<0>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
-    std::get<0>(m_WaitAnimMap[mapIndex])->IsLoop(false);
+    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
+    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
+    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->IsLoop(false);
+}
+
+void WaitState::loadConfig()
+{
+    rapidxml::xml_document<> doc;
+    rapidxml::file<> input("config_anim.xml");
+    doc.parse<0>(input.data());
+    for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
+        child != nullptr;
+        child = child->next_sibling())
+    {
+        std::string name("");
+        int animNum = 0;
+        bool isBlink = true;
+        bool isBreath = true;
+        int transframe = 10;
+
+        for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
+        {
+            //std::cout << attr->name() << ": " << attr->value() << std::endl;
+            std::string name(attr->name());
+            if (name == "num")
+            {
+                animNum = std::stoi(attr->value());
+            }
+            else if (name == "blink")
+            {
+                isBlink = attr->value() == "false" ? false : true;
+            }
+            else if (name == "breath")
+            {
+                isBreath = attr->value() == "false" ? false : true;
+            }
+            else if (name == "transframe")
+            {
+                transframe = std::stoi(attr->value());
+            }
+        }
+        SetAnim((EAnimIndex)animNum, isBlink, isBreath, transframe);
+    }
 }

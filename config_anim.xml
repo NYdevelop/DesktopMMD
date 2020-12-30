@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<anim>
+  <item name="think2"      num="12" blink="false" breath="true" />
+  <item name="look_self1"  num="13" blink="true"  breath="true" />
+  <item name="look_self2"  num="14" blink="true"  breath="true" />
+  <item name="dance_mini"  num="15" blink="true"  breath="true" />
+  <item name="bonyari"     num="16" blink="true"  breath="true" />
+  <item name="look_around" num="17" blink="true"  breath="true" />
+  <item name="arm_swing"   num="18" blink="true"  breath="true" />
+  <item name="stletch1"    num="19" blink="true"  breath="true" />
+  <item name="umauma"      num="20" blink="false" breath="true" />
+  <item name="peace1"      num="21" blink="false" breath="true" />
+  <item name="shiratsuyu"  num="22" blink="true"  breath="true" />
+  <item name="plinz"       num="23" blink="true"  breath="true" />
+  <item name="kashima"     num="24" blink="true"  breath="true" />
+  <item name="hamakaze"    num="25" blink="true"  breath="true" />
+  <item name="zero_two_dance" num="26" blink="true" breath="true" transframe="30" />
+</anim>

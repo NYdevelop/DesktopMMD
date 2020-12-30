@@ -80,3 +80,18 @@ void PlayAnimQueue::SetModel(int m)
 {
     model = m;
 }
+
+void PlayAnimQueue::Pause()
+{
+    auto index = m_Queue.front().first->GetAnimIndex();
+    MV1SetAttachAnimBlendRate(model, index, 0);
+    isPause = true;
+}
+
+void PlayAnimQueue::Restart()
+{
+    if (isPause == false) return;
+    auto index = m_Queue.front().first->GetAnimIndex();
+    MV1SetAttachAnimBlendRate(model, index, 1);
+    isPause = false;
+}

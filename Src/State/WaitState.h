@@ -32,14 +32,24 @@ public:
 
 private:
     void DoWaitAnim();
-    void SetAnim(EAnimIndex index);
+    void SetAnim(EAnimIndex index, bool isBlink = true, bool isBreath = true, int transFrame = 10);
+    void loadConfig();
 
     bool m_RandomMove = false;
     bool m_IsWaitAnim = false;
     std::shared_ptr<DrawMMD> m_mmd;
     WalkStateManager* walkManager = nullptr;
 
-    std::map<int, std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool> > m_WaitAnimMap;
+    enum EAnimMap : int
+    {
+        ITEM_ANIM,
+        ITEM_INDEX,
+        ITEM_BLINK,
+        ITEM_BREATH,
+        ITEM_TRANSE_FRAME
+    };
+
+    std::map<int, std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, int> > m_WaitAnimMap;
 
     int dispWidth = 640;
     int dispHeight = 480;
