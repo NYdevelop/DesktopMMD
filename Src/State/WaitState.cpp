@@ -3,6 +3,9 @@
 #include <random>
 #include "Util/UtilMMD.h"
 
+#include "Util\rapidxml-1.13\rapidxml.hpp"
+#include "Util\rapidxml-1.13\rapidxml_utils.hpp"
+
 static std::mt19937 mt;
 static std::uniform_real_distribution<> randRange(0.967598021, 0.99);
 
@@ -18,7 +21,7 @@ void WaitState::Initialize()
 
 void WaitState::Doing()
 {
-    if (!animQueue->Empty()) return;
+    if (!animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty()) return;
     m_mmd->canViewCamera = true;
 
     if (m_RandomMove == false)
@@ -50,9 +53,9 @@ void WaitState::End()
 {
     m_mmd->canViewCamera = false;
 
-    if (!animQueue->Empty())
+    if (!animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty())
     {
-        animQueue->SetCurrentStop();
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetCurrentStop();
         MV1PhysicsResetState(model);
     }
 }
@@ -64,9 +67,21 @@ void WaitState::OnceInitial()
     dispWidth = rc.right - rc.left;
     dispHeight = rc.bottom - rc.top;
 
-    std::random_device rnd;     // 非決定的な乱数生成器
-    mt = move(std::mt19937(rnd()));            // メルセンヌ・ツイスタの32ビット版、引数は初期シード
+    std::random_device rnd;          // 非決定的な乱数生成器
+    mt = move(std::mt19937(rnd()));  // メルセンヌ・ツイスタの32ビット版、引数は初期シード
 
+    // TODO: 設定値読込
+    //rapidxml::xml_document<> doc;
+    //rapidxml::file<> input("config_anim.xml");
+    //doc.parse<0>(input.data());
+    //for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
+    //    child != nullptr;
+    //    child = child->next_sibling()) {
+    //    for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
+    //    {
+    //        std::cout << attr->name() << ": " << attr->value() << std::endl;
+    //    }
+    //}
     SetAnim(EAnimIndex::ANIM_THINK2);
     SetAnim(EAnimIndex::ANIM_LOOK_SELF1);
     SetAnim(EAnimIndex::ANIM_LOOK_SELF2);
@@ -75,44 +90,46 @@ void WaitState::OnceInitial()
     SetAnim(EAnimIndex::ANIM_LOOK_AROUND);
     SetAnim(EAnimIndex::ANIM_ARM_SWING);
     SetAnim(EAnimIndex::ANIM_STLETCH1);
-    SetAnim(EAnimIndex::ANIM_UMAUMA);
-    SetAnim(EAnimIndex::ANIM_PEACE1);
-    SetAnim(EAnimIndex::ANIM_SHIRATSUYU);
-    SetAnim(EAnimIndex::ANIM_PLINZ);
-    SetAnim(EAnimIndex::ANIM_KASHIMA);
-    SetAnim(EAnimIndex::ANIM_HAMAKAZE);
-    // SetAnim(EAnimIndex::ANIM_SEXY1);
+    // SetAnim(EAnimIndex::ANIM_UMAUMA);
+    // SetAnim(EAnimIndex::ANIM_PEACE1);
+    // SetAnim(EAnimIndex::ANIM_SHIRATSUYU);
+    // SetAnim(EAnimIndex::ANIM_PLINZ);
+    // SetAnim(EAnimIndex::ANIM_KASHIMA);
+    // SetAnim(EAnimIndex::ANIM_HAMAKAZE);
+    // SetAnim(EAnimIndex::ANIM_ZERO_TWO_DANCE);
 
-    animQueue->SetDefAnimIndex(m_WaitAnimMap[4].first->GetAnimIndex());
-    MV1SetAttachAnimBlendRate(model, m_WaitAnimMap[4].first->GetAnimIndex(), 1);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetDefAnimIndex(std::get<0>(m_WaitAnimMap[4])->GetAnimIndex());
+    MV1SetAttachAnimBlendRate(model, std::get<0>(m_WaitAnimMap[4])->GetAnimIndex(), 1);
 }
 
 void WaitState::DoWaitAnim()
 {
+    auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
     m_mmd->canViewCamera = false;
-    auto animIndex = mt() % m_WaitAnimMap.size(); //0;
-    auto anim = m_WaitAnimMap[animIndex].first;
+    auto animIndexMap = mt() % m_WaitAnimMap.size();
+    auto anim = std::get<0>(m_WaitAnimMap[animIndexMap]);
+    auto animIndex = std::get<1>(m_WaitAnimMap[animIndexMap]);
     std::cout << "wait anim : " << anim->GetAnimIndex() << std::endl;
     anim->ResetAnimTime();
-    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_SEXY1)
+    if (animIndex == EAnimIndex::ANIM_ZERO_TWO_DANCE)
     {
-        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 50);
+        animQueue->AddTransrate(-1, anim->GetAnimIndex(), 30);
     }
     else
     {
         animQueue->AddTransrate(-1, anim->GetAnimIndex(), 10);
     }
     animQueue->AddAnim(anim);
-    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_DANCE_MINI)
+    if (animIndex == EAnimIndex::ANIM_DANCE_MINI)
     {
         m_mmd->canViewCamera = true;
         int loopCount = mt() % 15 + 1;
         std::cout << "anim loop:" << loopCount << std::endl;
         for (int i = 0; i < loopCount; i++) animQueue->AddAnim(anim);
     }
-    if (m_WaitAnimMap[animIndex].second == EAnimIndex::ANIM_SEXY1)
+    if (animIndex == EAnimIndex::ANIM_ZERO_TWO_DANCE)
     {
-        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 50, true);
+        animQueue->AddTransrate(anim->GetAnimIndex(), -1, 30, true);
     }
     else
     {
@@ -123,9 +140,9 @@ void WaitState::DoWaitAnim()
 void WaitState::SetAnim(EAnimIndex index)
 {
     int mapIndex = m_WaitAnimMap.size();
-    std::pair<std::shared_ptr < PlayAnim >, EAnimIndex> pair(std::shared_ptr<PlayAnim>(new PlayAnim), index);
-    m_WaitAnimMap[mapIndex] = pair;
-    m_WaitAnimMap[mapIndex].first->AttachAnime(model, (int)index);
-    m_WaitAnimMap[mapIndex].first->SetPlaySpeed(.5f);
-    m_WaitAnimMap[mapIndex].first->IsLoop(false);
+    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, false, false);
+    m_WaitAnimMap[mapIndex] = tmp;
+    std::get<0>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
+    std::get<0>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
+    std::get<0>(m_WaitAnimMap[mapIndex])->IsLoop(false);
 }

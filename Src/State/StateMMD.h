@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "MMD/Anim/PlayAnimQueue.h"
+#include "MMD/Anim/ActionManager.h"
 
 class StateMMD : public State
 {
@@ -11,14 +11,14 @@ public:
         model = modelHandle;
     }
 
-    inline void SetAnimQueue(std::shared_ptr<PlayAnimQueue> queue)
+    inline void SetAnimManager(const std::shared_ptr<ActionManager>& manage)
     {
-        animQueue = queue;
+        animManager = manage;
     }
 
     virtual int ModelInitial() = 0;
 
 protected:
     int model = 0;
-    std::shared_ptr<PlayAnimQueue> animQueue;
+    std::shared_ptr<ActionManager> animManager;
 };

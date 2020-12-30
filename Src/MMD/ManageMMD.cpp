@@ -37,6 +37,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         if (m_Window.IsClose()) return;
         m_mmd->mainProcess();
         walkManager.Update();
+        animManager->Play();
 
         /// ÉLÅ[ì¸óÕîªíË
         if (IsPress(VK_CONTROL) == true)
@@ -75,7 +76,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         }
         m_mmd->SetCharactorPos(pos);
 
-        if (IsPress(VK_CONTROL) && IsPress('M'))
+        if (IsPress(VK_HOME))
         {
             int MouseX = 0, MouseY = 0;
             GetMousePoint(&MouseX, &MouseY);
@@ -259,8 +260,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     /// âπê∫èoóÕèâä˙âª
     m_Output = shared_ptr<OutputSound>(new OutputSound());
 
-    animQueue = std::shared_ptr< PlayAnimQueue >(new PlayAnimQueue);
-    m_mmd->SetAnimQueue(animQueue);
+    animManager = std::shared_ptr< ActionManager >(new ActionManager);
 
     /// Stateèâä˙âª
     InitStateModel();
@@ -299,7 +299,7 @@ void ManageMMD::LoadModel()
     {
         auto sMMD = (StateMMD*)s.second.get();
         sMMD->SetModel(m_mmd->GetModelHandle());
-        sMMD->SetAnimQueue(animQueue);
+        sMMD->SetAnimManager(animManager);
         sMMD->ModelInitial();
     }
 }
@@ -408,6 +408,24 @@ void ManageMMD::InitStateModel()
     stateManager->AddState(EState::STATE_WAVE_HAND, waveHand);
 
     LoadModel();
+
+    {
+        std::shared_ptr<PlayAnim> blink(new PlayAnim);
+        blink->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BLINK);
+        blink->SetMaximumTime(250.f);
+        blink->IsLoop(true);
+        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), blink->GetAnimIndex(), 1);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->AddAnim(blink);
+    }
+
+    {
+        std::shared_ptr<PlayAnim> breath(new PlayAnim);
+        breath->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BREATH);
+        breath->SetMaximumTime(120.f);
+        breath->IsLoop(true);
+        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), breath->GetAnimIndex(), 1);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->AddAnim(breath);
+    }
 
     walkManager.Initialize(m_mmd, stateManager, walkPtr->GetWalkAnimIndex());
     walkManager.SetNextState(EState::STATE_WAIT);

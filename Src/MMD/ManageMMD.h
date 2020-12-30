@@ -40,7 +40,7 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
 
     std::shared_ptr<StateManager<EState>> stateManager;
-    std::shared_ptr<PlayAnimQueue> animQueue;
+    std::shared_ptr<ActionManager> animManager;
 
     WalkStateManager walkManager;
 };

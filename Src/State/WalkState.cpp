@@ -16,16 +16,16 @@ void WalkState::Initialize()
 
     walkAnim->ResetAnimTime();
 
-    animQueue->AddTransrate(-1, walkAnim->GetAnimIndex(), 10);
-    animQueue->AddAnim(walkAnim);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, walkAnim->GetAnimIndex(), 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(walkAnim);
 }
 
 void WalkState::Doing()
 {
-    if (animQueue->Empty())
+    if (animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty())
     {
         walkAnim->ResetAnimTime();
-        animQueue->AddAnim(walkAnim);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(walkAnim);
         return;
     }
 }
@@ -33,7 +33,7 @@ void WalkState::Doing()
 void WalkState::End()
 {
     m_mmd->canViewCamera = false;
-    animQueue->AddTransrate(walkAnim->GetAnimIndex(), -1, 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(walkAnim->GetAnimIndex(), -1, 10);
     MV1PhysicsResetState(model);
 }
 

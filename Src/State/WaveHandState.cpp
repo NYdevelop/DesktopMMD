@@ -21,28 +21,28 @@ void WaveHandState::Initialize()
 
     waveHandLoop->ResetAnimTime();
 
-    animQueue->AddTransrate(-1, waveHandLoop->GetAnimIndex(), 10);
-    animQueue->AddAnim(waveHandLoop);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, waveHandLoop->GetAnimIndex(), 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(waveHandLoop);
 }
 
 void WaveHandState::Doing()
 {
-    if (animQueue->Empty())
+    if (animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty())
     {
         waveHandLoop->ResetAnimTime();
-        animQueue->AddAnim(waveHandLoop);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(waveHandLoop);
     }
 }
 
 void WaveHandState::End()
 {
     m_mmd->canViewCamera = false;
-    animQueue->AddTransrate(waveHandLoop->GetAnimIndex(), -1, 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(waveHandLoop->GetAnimIndex(), -1, 10);
 }
 
 int WaveHandState::ModelInitial()
 {
-    animQueue->SetModel(model);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetModel(model);
     waveHandLoop = std::shared_ptr < PlayAnim >(new PlayAnim);
     int ret = waveHandLoop->AttachAnime(model, (int)EAnimIndex::ANIM_WAVE_HAND);
     waveHandLoop->IsLoop(false);

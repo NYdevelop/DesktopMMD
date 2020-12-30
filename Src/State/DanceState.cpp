@@ -20,8 +20,8 @@ void DanceState::Initialize()
     //m_mmd->UpdatePosRot();
 
     danceAnim->ResetAnimTime();
-    animQueue->AddTransrate(-1, danceAnim->GetAnimIndex(), 1);
-    animQueue->AddAnim(danceAnim);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, danceAnim->GetAnimIndex(), 1);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(danceAnim);
     MV1PhysicsResetState(model);
 
     m_Output->Start(L"data/music.wav");
@@ -37,8 +37,8 @@ void DanceState::End()
     m_Output->Stop();
     m_Output->CloseDevice();
 
-    animQueue->SetCurrentStop();
-    animQueue->AddTransrate(danceAnim->GetAnimIndex(), -1, 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetCurrentStop();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(danceAnim->GetAnimIndex(), -1, 10);
 }
 
 int DanceState::ModelInitial()

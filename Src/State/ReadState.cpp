@@ -53,7 +53,7 @@ void ReadState::Initialize()
     m_Output->Start(L"data/text.wav");
     MV1SetAttachAnimBlendRate(model, lipAnim->GetAnimIndex(), 1);
     lipAnim->ResetAnimTime();
-    animQueue->AddAnim(lipAnim);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(lipAnim);
 }
 
 void ReadState::Doing()
@@ -65,8 +65,8 @@ void ReadState::End()
     m_Output->Stop();
     m_Output->CloseDevice();
 
-    animQueue->SetCurrentStop();
-    animQueue->AddTransrate(lipAnim->GetAnimIndex(), -1, 10);
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetCurrentStop();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(lipAnim->GetAnimIndex(), -1, 10);
 }
 
 int ReadState::ModelInitial()

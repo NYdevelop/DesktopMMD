@@ -75,13 +75,10 @@ int DrawMMD::mainProcess()
     DxLib::MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
 
-    blink.PlayAnimation();
-    breath.PlayAnimation();
-
     if (canViewCamera)
     {
         ViewCamera(
-            VSub(charaPos, rayVec) ,
+            VSub(MV1GetFramePosition(model, boneHead), rayVec) ,
             MTranspose(MV1GetFrameLocalWorldMatrix(model, boneHead)),
             defHeadLocalRot, model, boneHead);
     }
@@ -90,7 +87,6 @@ int DrawMMD::mainProcess()
         MV1ResetFrameUserLocalMatrix(model, boneHead);
     }
 
-    m_AnimQueue->Play();
     m_StateManager->Doing();
 
     MV1PhysicsCalculation(model, 1000.0f / 60.0f);
@@ -156,13 +152,6 @@ void DrawMMD::LoadModel()
     boneHead = MV1SearchFrame(model, L"“ª");
     defHeadLocalRot = MV1GetFrameLocalMatrix(model, boneHead);
 
-    blink.AttachAnime(model, (int)EAnimIndex::ANIM_BLINK);
-    blink.SetMaximumTime(250.f);
-    MV1SetAttachAnimBlendRate(model, blink.GetAnimIndex(), 1);
-
-    breath.AttachAnime(model, (int)EAnimIndex::ANIM_BREATH);
-    breath.SetMaximumTime(120.f);
-    MV1SetAttachAnimBlendRate(model, breath.GetAnimIndex(), 1);
 
     MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));

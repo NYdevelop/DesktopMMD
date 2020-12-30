@@ -5,7 +5,7 @@
 #include "MMD/Anim/PlayAnim.h"
 
 #include "State/StateManager.h"
-#include "MMD/Anim/PlayAnimQueue.h"
+#include "MMD/Anim/ActionManager.h"
 #include "Define.h"
 #include "WindowGravity.h"
 
@@ -46,15 +46,11 @@ public:
     inline void SetZoom(float zoom)
     {
         m_Zoom = zoom;
+        std::cout << "zoom: " << m_Zoom << std::endl;
         cameraPos = VScale(VNorm(cameraPos), zoom);
     }
 
     float GetZoom() { return m_Zoom; };
-
-    inline void SetAnimQueue(std::shared_ptr<PlayAnimQueue> queue)
-    {
-        m_AnimQueue = queue;
-    }
 
     inline VECTOR GetRayVec()
     {
@@ -76,10 +72,6 @@ private:
     LONG dispWidth = 640;
     LONG dispHeight = 480;
 
-    PlayAnim blink;
-    PlayAnim breath;
-
-    std::shared_ptr<PlayAnimQueue> m_AnimQueue;
     std::shared_ptr<StateManager<EState>> m_StateManager;
 
     bool isDraw = true;

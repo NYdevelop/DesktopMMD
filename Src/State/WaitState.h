@@ -2,9 +2,9 @@
 
 #include "StateMMD.h"
 
-#include <iostream>
 #include <memory>
 #include <map>
+#include <tuple>
 #include "WalkStateManager.h"
 #include "MMD/DrawMMD.h"
 
@@ -39,7 +39,7 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
     WalkStateManager* walkManager = nullptr;
 
-    std::map<int, std::pair<std::shared_ptr < PlayAnim >, EAnimIndex> > m_WaitAnimMap;
+    std::map<int, std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool> > m_WaitAnimMap;
 
     int dispWidth = 640;
     int dispHeight = 480;
