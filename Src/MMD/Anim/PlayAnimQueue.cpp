@@ -42,11 +42,11 @@ void PlayAnimQueue::AddTransrate(int srcIndex, int transrateIndex, int time, boo
     trans->transrateAnimIndex = transrateIndex;
 }
 
-bool PlayAnimQueue::Play()
+bool PlayAnimQueue::Play(float time)
 {
     if (m_Queue.empty()) return false;
 
-    if (currentStop == true || m_Queue.front().first->PlayAnimation() == false)
+    if (currentStop == true || m_Queue.front().first->PlayAnimation(time) == false)
     {
         if (currentStop)
         {

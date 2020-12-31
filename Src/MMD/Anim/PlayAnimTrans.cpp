@@ -10,7 +10,7 @@ int PlayAnimTrans::AttachAnime(int modHandle, int animIndex)
     return 0;
 }
 
-bool PlayAnimTrans::PlayAnimation()
+bool PlayAnimTrans::PlayAnimation(float time)
 {
     if (progressTime == 0) return false;
 
@@ -24,7 +24,11 @@ bool PlayAnimTrans::PlayAnimation()
     {
         MV1SetAttachAnimBlendRate(modelHandle, transrateAnimIndex, 1 - rate);
     }
-    if (progressTime == 0) return false;
+    if (progressTime == 0)
+    {
+        MV1PhysicsResetState(modelHandle);
+        return false;
+    }
     return true;
 }
 

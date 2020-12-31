@@ -31,6 +31,7 @@ public:
 
     void SetState(T index)
     {
+        isInitialize = false;
         if (m_StateMap.find(index) == m_StateMap.end())
         {
             throw "state transrate index error";
@@ -45,6 +46,7 @@ public:
         currentStateIndex = index;
 
         currentState->Initialize();
+        isInitialize = true;
     }
 
     void Transrate(T index)
@@ -59,6 +61,7 @@ public:
 
     void Doing()
     {
+        if (isInitialize == false) return;
         if (currentState == nullptr)
         {
             throw "current state error";
@@ -92,4 +95,5 @@ private:
     std::shared_ptr<State> currentState;
     T currentStateIndex;
     T previousStateIndex;
+    bool isInitialize = false;
 };

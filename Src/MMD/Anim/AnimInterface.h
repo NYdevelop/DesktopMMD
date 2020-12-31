@@ -8,7 +8,7 @@ public:
         m_AnimIndex = animIndex;
         return 0;
     }
-    virtual bool PlayAnimation() = 0;
+    virtual bool PlayAnimation(float time = -1) = 0;
 
     int GetAnimIndex() { return m_AnimIndex; }
 

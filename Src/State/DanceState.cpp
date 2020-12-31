@@ -6,30 +6,35 @@
 
 using namespace std;
 
+chrono::time_point<chrono::system_clock> start;
+
 void DanceState::Initialize()
 {
     cout << "state: dance" << endl;
-
-    //// モデル位置リセット
-    //auto pos = m_mmd->GetCharactorPos();
-    //pos.x = 0.f;
-    //pos.y = -7.f;
-    //m_mmd->SetCharactorPos(pos);
-    //m_mmd->RotateY = 3.14f;
-    //m_mmd->SetZoom(35.f);
-    //m_mmd->UpdatePosRot();
+    isDance = true;
 
     danceAnim->ResetAnimTime();
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, danceAnim->GetAnimIndex(), 1);
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(danceAnim);
-    MV1PhysicsResetState(model);
 
+    start = chrono::system_clock::now();
     m_Output->Start(L"data/music.wav");
 }
 
-
 void DanceState::Doing()
 {
+    if (isDance == false)
+    {
+        animManager->Play();
+        return;
+    }
+
+    static const float MILLISEC_TO_FRAME = 1000.f / 30.f;
+    auto tmp = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
+    if (tmp->Play(std::chrono::duration_cast<std::chrono::milliseconds>(chrono::system_clock::now() - start).count() / MILLISEC_TO_FRAME) == false)
+    {
+        isDance = false;
+    }
 }
 
 void DanceState::End()
@@ -43,8 +48,9 @@ void DanceState::End()
 
 int DanceState::ModelInitial()
 {
+    // TODO: ダンスを選択できるように
     danceAnim = std::shared_ptr<PlayAnim>(new PlayAnim);
-    int ret = danceAnim->AttachAnime(model, (int)EAnimIndex::ANIM_DANCE);
+    int ret = danceAnim->AttachAnime(model, (int)EAnimIndex::ANIM_DANCE2);
     danceAnim->IsLoop(false);
     danceAnim->SetPlaySpeed(.575f);
     return ret;

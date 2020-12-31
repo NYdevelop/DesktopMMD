@@ -17,11 +17,15 @@ int PlayAnim::AttachAnime(int modHandle, int animIndex)
     return m_AnimIndex;
 }
 
-bool PlayAnim::PlayAnimation()
+bool PlayAnim::PlayAnimation(float time)
 {
     if (playTime < maximumTime)
     {
         playTime += playSpeed;
+        if (time != -1)
+        {
+            playTime = time;
+        }
         if (playTime > maximumTime)
         {
             playTime = maximumTime;

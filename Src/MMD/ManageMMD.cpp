@@ -37,7 +37,10 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         if (m_Window.IsClose()) return;
         m_mmd->mainProcess();
         walkManager.Update();
-        animManager->Play();
+        if (stateManager->GetCurrentStateIndex() != EState::STATE_DANCE)
+        {
+            animManager->Play();
+        }
 
         /// ƒL[“ü—Í”»’è
         if (IsPress(VK_CONTROL) == true)

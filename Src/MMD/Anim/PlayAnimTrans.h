@@ -8,7 +8,7 @@ public:
     int AttachAnime(int modHandle, int animIndex);
 
     /// ˆÚsI—¹False‚ğ•Ô‚·
-    bool PlayAnimation();
+    bool PlayAnimation(float time = -1);
 
     void SetTransTime(int time);
 

@@ -24,4 +24,5 @@ private:
     std::shared_ptr<DrawMMD> m_mmd;
 
     std::shared_ptr < PlayAnim > danceAnim;
+    bool isDance = false;
 };

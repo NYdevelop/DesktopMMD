@@ -23,7 +23,7 @@ public:
     }
 
     /// ÅŒã‚Ü‚ÅÄ¶‚µ‚½‚çFalse‚ğ•Ô‚·
-    bool PlayAnimation();
+    bool PlayAnimation(float time = -1);
 
     inline void ResetAnimTime()
     {

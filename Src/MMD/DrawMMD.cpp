@@ -136,8 +136,10 @@ void DrawMMD::LoadModel()
     MV1SetLoadModelAnimFilePath(buf);
 
     MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, m_ModelPath.c_str(), -1, buf, 255);
+    std::cout << "load start..." << std::endl;
     model = MV1LoadModel(buf);
 
+    std::cout << "load finish." << std::endl;
     if (model == -1)
     {
         MessageBox(NULL, TEXT("model load error"), NULL, MB_ICONERROR);

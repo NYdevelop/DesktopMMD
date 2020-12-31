@@ -14,7 +14,7 @@ public:
     void AddTransrate(int srcIndex, int transrateIndex, int time, bool notMarge = false);
 
     /// ƒLƒ…[‚ª‹ó‚É‚È‚Á‚½‚çfalse‚ğ•Ô‚·
-    bool Play();
+    bool Play(float time = -1);
 
     void Clear();
 
