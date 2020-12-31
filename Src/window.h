@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <functional>
 #include <map>
+#include <vector>
 #include "Util/UtilTimer.h"
 
 class CWindow {
@@ -20,6 +21,8 @@ public:
     void SetDrawFunc(const std::function<void(HDC)>& func);
     void SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func);
     void SetCallbackMsg(UINT msg, const std::function<void(WPARAM, LPARAM)>& func);
+
+    void InitContextMenu(const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config);
 
 private:
     HRESULT InitWindow(HWND* hWnd);
@@ -42,7 +45,6 @@ private:
     int                   m_nHeight;
 
     HMENU m_ContextMenu;
-    HMENU m_ModeMenu;
 
     std::function<void(HDC)> m_DrawFunc;
     std::function<void(WPARAM, LPARAM)> m_CommandCallback;

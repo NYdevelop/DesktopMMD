@@ -10,20 +10,6 @@ enum class EState
     STATE_WAVE_HAND,
 };
 
-enum class EContextMenu : int
-{
-    CONTEXT_MODE = 1,
-    CONTEXT_MODE_WAIT = 11,
-    CONTEXT_MODE_RHYTHM = 12,
-    CONTEXT_MODE_READ = 13,
-    CONTEXT_MODE_DANCE = 14,
-    CONTEXT_MODE_WAVE_HAND = 15,
-    CONTEXT_MOVE_LEFT = 2,
-    CONTEXT_MOVE_RIGHT = 3,
-    CONTEXT_MOVE_RANDOM = 4,
-    CONTEXT_EXIT = 0,
-};
-
 enum class EAnimIndex : int
 {
     ANIM_NO_SOUND = 1,
@@ -50,4 +36,5 @@ enum class EAnimIndex : int
     ANIM_KASHIMA,
     ANIM_HAMAKAZE,
     ANIM_ZERO_TWO_DANCE,
+    ANIM_DANCE2,
 };

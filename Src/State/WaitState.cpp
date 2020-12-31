@@ -131,7 +131,6 @@ void WaitState::LoadConfig(const std::string& configPath)
         child != nullptr;
         child = child->next_sibling())
     {
-        std::string name("");
         int animNum = 0;
         bool isBlink = true;
         bool isBreath = true;

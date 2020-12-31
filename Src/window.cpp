@@ -66,23 +66,6 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
         SW_SHOWDEFAULT);   // 
     UpdateWindow(hTmpWnd);
 
-    /// コンテキストメニュー作成
-    m_ContextMenu = CreatePopupMenu();
-    m_ModeMenu = CreatePopupMenu();
-
-    /* メニュー項目追加 */
-    AppendMenu(m_ContextMenu, MF_POPUP, (UINT)m_ModeMenu, L"Mode");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_LEFT,   L"左端へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RIGHT,  L"右端へ移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MOVE_RANDOM, L"ランダム移動");
-    AppendMenu(m_ContextMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_EXIT,        L"Exit");
-
-    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_WAIT,   L"Wait");
-    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_RHYTHM, L"Rhythm");
-    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_READ,   L"Read");
-    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_DANCE,  L"Dance");
-    AppendMenu(m_ModeMenu, MF_STRING, (UINT_PTR)EContextMenu::CONTEXT_MODE_WAVE_HAND, L"手を振る");
-
     return S_OK;
 }
 
@@ -104,7 +87,6 @@ LRESULT CALLBACK CWindow::WindProc(
 
     case WM_COMMAND:
     {
-        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         if (win->m_CommandCallback != nullptr)
         {
             win->m_CommandCallback(wParam, lParam);
@@ -114,7 +96,6 @@ LRESULT CALLBACK CWindow::WindProc(
 
     case WM_DESTROY:
     {
-        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         win->m_Timer.Break_Force();
         ::PostQuitMessage(0);
     }
@@ -131,7 +112,6 @@ LRESULT CALLBACK CWindow::WindProc(
         ClientToScreen(hwnd, &pt);
 
         /* カーソル位置にメニューを出す */
-        //CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
         TrackPopupMenu(win->m_ContextMenu, 0, pt.x, pt.y, 0, hwnd, NULL);
     }
     break;
@@ -147,8 +127,7 @@ LRESULT CALLBACK CWindow::WindProc(
 
 CWindow::CWindow() :
     m_BackGround(CreateSolidBrush(BACKGROUND)),
-    m_ContextMenu(0),
-    m_ModeMenu(0)
+    m_ContextMenu(0)
 {
     m_hWnd = NULL;
 
@@ -236,6 +215,15 @@ void CWindow::SetCallbackCommand(const std::function<void(WPARAM, LPARAM)>& func
 void CWindow::SetCallbackMsg(UINT msg, const std::function<void(WPARAM, LPARAM)>& func)
 {
     m_CallbackMap[msg] = func;
+}
+
+void CWindow::InitContextMenu(const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config)
+{
+    m_ContextMenu = std::get<0>(config[0]);
+    for (auto& t : config)
+    {
+        AppendMenu(std::get<0>(t), std::get<1>(t), std::get<2>(t), std::get<3>(t).c_str());
+    }
 }
 
 void CWindow::Draw(HDC hDc)
