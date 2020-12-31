@@ -32,8 +32,8 @@ public:
 
 private:
     void DoWaitAnim();
-    void SetAnim(EAnimIndex index, bool isBlink = true, bool isBreath = true, int transFrame = 10);
-    void loadConfig();
+    void SetAnim(EAnimIndex index, bool isViewCam = true, bool isBlink = true, bool isBreath = true, int transFrame = 10, int rand = 0);
+    void LoadConfig(const std::string& configPath);
 
     bool m_RandomMove = false;
     bool m_IsWaitAnim = false;
@@ -44,12 +44,14 @@ private:
     {
         ITEM_ANIM,
         ITEM_INDEX,
+        ITEM_VIEW_CAM,
         ITEM_BLINK,
         ITEM_BREATH,
-        ITEM_TRANSE_FRAME
+        ITEM_TRANSE_FRAME,
+        ITEM_RANDOM_LOOP,
     };
 
-    std::map<int, std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, int> > m_WaitAnimMap;
+    std::map<int, std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, bool, int, int> > m_WaitAnimMap;
 
     int dispWidth = 640;
     int dispHeight = 480;

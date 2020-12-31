@@ -73,7 +73,7 @@ void WaitState::OnceInitial()
     mt = move(std::mt19937(rnd()));  // メルセンヌ・ツイスタの32ビット版、引数は初期シード
 
     // 設定値読込
-    loadConfig();
+    LoadConfig("config_anim.xml");
 
     auto animIndex = std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[4])->GetAnimIndex();
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetDefAnimIndex(animIndex);
@@ -83,21 +83,20 @@ void WaitState::OnceInitial()
 void WaitState::DoWaitAnim()
 {
     auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
-    m_mmd->canViewCamera = false;
     auto animIndexMap = mt() % m_WaitAnimMap.size();
     auto tmpTuple = m_WaitAnimMap[animIndexMap];
     auto anim = std::get<EAnimMap::ITEM_ANIM>(tmpTuple);
     anim->ResetAnimTime();
+    m_mmd->canViewCamera = std::get<EAnimMap::ITEM_VIEW_CAM>(tmpTuple);
     auto animIndex = std::get<EAnimMap::ITEM_INDEX>(tmpTuple);
     std::cout << "wait anim : " << (int)animIndex << std::endl;
 
     auto transframe = std::get<EAnimMap::ITEM_TRANSE_FRAME>(tmpTuple);
     animQueue->AddTransrate(-1, anim->GetAnimIndex(), transframe);
     animQueue->AddAnim(anim);
-    if (animIndex == EAnimIndex::ANIM_DANCE_MINI)
+    if (std::get<EAnimMap::ITEM_RANDOM_LOOP>(tmpTuple) != 0)
     {
-        m_mmd->canViewCamera = true;
-        int loopCount = mt() % 15 + 1;
+        int loopCount = mt() % std::get<EAnimMap::ITEM_RANDOM_LOOP>(tmpTuple);
         std::cout << "anim loop:" << loopCount << std::endl;
         for (int i = 0; i < loopCount; i++) animQueue->AddAnim(anim);
     }
@@ -113,20 +112,20 @@ void WaitState::DoWaitAnim()
     }
 }
 
-void WaitState::SetAnim(EAnimIndex index, bool isBlink, bool isBreath, int transFrame)
+void WaitState::SetAnim(EAnimIndex index, bool isViewCam, bool isBlink, bool isBreath, int transFrame, int rand)
 {
     int mapIndex = m_WaitAnimMap.size();
-    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isBlink, isBreath, transFrame);
+    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, bool, int, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
     m_WaitAnimMap[mapIndex] = tmp;
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->IsLoop(false);
 }
 
-void WaitState::loadConfig()
+void WaitState::LoadConfig(const std::string& configPath)
 {
     rapidxml::xml_document<> doc;
-    rapidxml::file<> input("config_anim.xml");
+    rapidxml::file<> input(configPath.c_str());
     doc.parse<0>(input.data());
     for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
         child != nullptr;
@@ -136,7 +135,9 @@ void WaitState::loadConfig()
         int animNum = 0;
         bool isBlink = true;
         bool isBreath = true;
+        bool isViewCam = false;
         int transframe = 10;
+        int rand = 0;
 
         for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
         {
@@ -154,11 +155,19 @@ void WaitState::loadConfig()
             {
                 isBreath = attr->value() == "false" ? false : true;
             }
+            else if (name == "view_cam")
+            {
+                isViewCam = attr->value() == "false" ? false : true;
+            }
             else if (name == "transframe")
             {
                 transframe = std::stoi(attr->value());
             }
+            else if (name == "rand")
+            {
+                rand = std::stoi(attr->value());
+            }
         }
-        SetAnim((EAnimIndex)animNum, isBlink, isBreath, transframe);
+        SetAnim((EAnimIndex)animNum, isViewCam, isBlink, isBreath, transframe, rand);
     }
 }
