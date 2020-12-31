@@ -12,10 +12,10 @@
 
 #include "Sound/fft.h"
 
-#include "Util\rapidxml-1.13\rapidxml.hpp"
-#include "Util\rapidxml-1.13\rapidxml_utils.hpp"
+
 
 using namespace std;
+
 
 
 HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath,
@@ -29,65 +29,10 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     // コンテキストメニューの初期化
     std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>> contextMenuConfig;
     {
-        auto loadNode = [](rapidxml::xml_node<>* node, HMENU& context)
-        {
-            std::wstring menuName(L"");
-            UINT menuNum = 0;
-            for (auto attr = node->first_attribute(); attr != nullptr; attr = attr->next_attribute())
-            {
-                //std::cout << attr->name() << ": " << attr->value() << std::endl;
-                std::string name(attr->name());
-                if (name == "name")
-                {
-                    std::string v(attr->value());
-                    const size_t len = v.size() + 1;
-                    TCHAR* tmp = new TCHAR[len];
-                    MultiByteToWideChar(CP_UTF8, 0, v.c_str(), -1, tmp, len);
-                    std::wstring ret(tmp);
-                    delete[] tmp;
-                    menuName = ret;
-                }
-                else if (name == "num")
-                {
-                    menuNum = std::stoi(attr->value());
-                }
-            }
-
-            return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
-        };
-
-        auto context = CreatePopupMenu();
         rapidxml::xml_document<> doc;
-        rapidxml::file<> input("config_menu.xml");
+        rapidxml::file<> input("config.xml");
         doc.parse<0>(input.data());
-        for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
-            child != nullptr;
-            child = child->next_sibling())
-        {
-            auto info = loadNode(child, context);
-
-            // さらに子がいるかどうか
-            auto childSub = child->first_node();
-            if (childSub != nullptr)
-            {
-                std::get<1>(info) = MF_POPUP;
-                auto subMenu = CreatePopupMenu();
-                std::get<2>(info) = (UINT)subMenu;
-                contextMenuConfig.emplace_back(info);
-
-                for (rapidxml::xml_node<>* i = childSub;
-                    i != nullptr;
-                    i = i->next_sibling())
-                {
-                    auto f = loadNode(i, subMenu);
-                    contextMenuConfig.emplace_back(f);
-                }
-                continue;
-            }
-
-            contextMenuConfig.emplace_back(info);
-        }
-
+        LoadContextNode(doc.first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
         m_Window.InitContextMenu(contextMenuConfig);
     }
 
@@ -245,10 +190,10 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         isPressMButton = true;
     });
 
-
+    // コンテキストメニュー操作設定
     static std::map<UINT, function<void()>> contextCommand;
     {
-        auto searchContextId = [](const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& contextMenuConfig, const std::wstring& menuName)
+        static auto searchContextId = [](const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& contextMenuConfig, const std::wstring& menuName)
         {
             auto itr = find_if(contextMenuConfig.begin(), contextMenuConfig.end(), [&menuName](auto& x) { return std::get<3>(x) == menuName; });
             if (itr == contextMenuConfig.end()) throw "not find...";
@@ -272,8 +217,14 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         {
             stateManager->Transrate(EState::STATE_READ);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"Dance")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"CLC ME")] = [&]()
         {
+            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 0;
+            stateManager->Transrate(EState::STATE_DANCE);
+        };
+        contextCommand[searchContextId(contextMenuConfig, L"Stay Tonight")] = [&]()
+        {
+            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 1;
             stateManager->Transrate(EState::STATE_DANCE);
         };
         contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&]()
@@ -450,7 +401,6 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
     m_Capture->OpenDevice(0, wf, FFT_LENGTH * 2);
 }
 
-
 void ManageMMD::InitStateModel()
 {
     shared_ptr<State> wait(new WaitState());
@@ -512,4 +462,62 @@ void ManageMMD::InitStateModel()
     walkManager.SetNextState(EState::STATE_WAIT);
 
     waitPtr->OnceInitial();
+}
+
+
+std::tuple<HMENU, ULONG, UINT, std::wstring> ManageMMD::LoadContextNode(rapidxml::xml_node<>* node, HMENU & context)
+{
+    std::wstring menuName(L"");
+    UINT menuNum = 0;
+    for (auto attr = node->first_attribute(); attr != nullptr; attr = attr->next_attribute())
+    {
+        std::string name(attr->name());
+        if (name == "name")
+        {
+            std::string v(attr->value());
+
+            // UTF-8からSHIFT_JISへの変換
+            const size_t len = v.size() + 1;
+            TCHAR* tmp = new TCHAR[len];
+            MultiByteToWideChar(CP_UTF8, 0, v.c_str(), -1, tmp, len);
+            std::wstring ret(tmp);
+            delete[] tmp;
+            menuName = ret;
+        }
+        else if (name == "num")
+        {
+            menuNum = std::stoi(attr->value());
+        }
+    }
+
+    return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
+}
+
+void ManageMMD::LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
+{
+    if (sub != nullptr)
+    {
+        std::get<1>(*sub) = MF_POPUP;
+        auto subMenu = CreatePopupMenu();
+        std::get<2>(*sub) = (UINT)subMenu;
+        config.emplace_back(*sub);
+        context = subMenu;
+    }
+
+    for (rapidxml::xml_node<>* child = node;
+        child != nullptr;
+        child = child->next_sibling())
+    {
+        auto info = LoadContextNode(child, context);
+
+        // さらに子がいるかどうか
+        auto childSub = child->first_node();
+        if (childSub != nullptr)
+        {
+            LoadContextNode(childSub, context, config, &info);
+            continue;
+        }
+
+        config.emplace_back(info);
+    }
 }

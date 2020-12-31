@@ -49,14 +49,9 @@ void OutputSound::Start(const std::wstring & wavFileName, UINT deviceIndex)
 
 void OutputSound::Stop()
 {
+    m_FileReader.CloseWaveFile();
     if (hwo == nullptr) return;
     m_IsStop = true;
-    //auto ret = waveOutReset(hwo);
-    ////auto ret = waveOutClose(hwo);
-    //if (ret != MMSYSERR_NOERROR)
-    //{
-    //    std::cerr << "waveOutReset error." << std::endl;
-    //}
     m_CurrentBuffer = 0;
 }
 

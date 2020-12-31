@@ -19,10 +19,15 @@ public:
     void SetOutputSound(std::shared_ptr<OutputSound> output);
     void SetDrawMMD(std::shared_ptr<DrawMMD> mmd);
 
+    int DanceIndex = 0;
+
 private:
     std::shared_ptr<OutputSound> m_Output;
     std::shared_ptr<DrawMMD> m_mmd;
 
-    std::shared_ptr < PlayAnim > danceAnim;
+    std::vector<std::shared_ptr < PlayAnim > > danceAnim;
+    std::vector<std::wstring> danceMusic;
+
+    int currentAnimIndex = -1;
     bool isDance = false;
 };

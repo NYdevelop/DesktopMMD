@@ -12,6 +12,9 @@
 #include <vector>
 #include <string>
 
+#include "Util\rapidxml-1.13\rapidxml.hpp"
+#include "Util\rapidxml-1.13\rapidxml_utils.hpp"
+
 class ManageMMD
 {
 public:
@@ -33,6 +36,14 @@ public:
 
 private:
     void InitStateModel();
+
+    static std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<>* node, HMENU& context);
+
+    static void LoadContextNode(
+        rapidxml::xml_node<>* node,
+        HMENU context,
+        std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config,
+        std::tuple<HMENU, ULONG, UINT, std::wstring>* sub = nullptr);
 
     CWindow m_Window;
     std::shared_ptr<CaptureSound> m_Capture;

@@ -73,7 +73,7 @@ void WaitState::OnceInitial()
     mt = move(std::mt19937(rnd()));  // メルセンヌ・ツイスタの32ビット版、引数は初期シード
 
     // 設定値読込
-    LoadConfig("config_anim.xml");
+    LoadConfig("config.xml");
 
     auto animIndex = std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[4])->GetAnimIndex();
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->SetDefAnimIndex(animIndex);
@@ -127,7 +127,7 @@ void WaitState::LoadConfig(const std::string& configPath)
     rapidxml::xml_document<> doc;
     rapidxml::file<> input(configPath.c_str());
     doc.parse<0>(input.data());
-    for (rapidxml::xml_node<>* child = doc.first_node()->first_node();
+    for (rapidxml::xml_node<>* child = doc.first_node("anim")->first_node();
         child != nullptr;
         child = child->next_sibling())
     {
