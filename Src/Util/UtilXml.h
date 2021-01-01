@@ -8,7 +8,6 @@ std::string GetAttribute(rapidxml::xml_node<>* node, const std::string& name);
 
 #include "Util.h"
 #include "WinUtil.h"
-#include <array>
 template<class T>
 inline T ConvertType(const std::string& str)
 {
@@ -21,8 +20,28 @@ inline std::wstring ConvertType<std::wstring>(const std::string& str)
     return StringToWString(str);
 }
 
-template<size_t n, size_t A>
-inline std::string AccessVecElement(const std::array<std::string, A>& vec)
+#include <algorithm>
+template<>
+inline bool ConvertType<bool>(const std::string& str)
+{
+    std::string lower(str);
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    return lower == "true" ? true : false;
+}
+
+template<class T>
+inline T ConvertType(const std::string& str, const T& def)
+{
+    if (str.empty())
+    {
+        return def;
+    }
+    return ConvertType<T>(str);
+}
+
+
+template<size_t n>
+inline std::string AccessVecElement(const std::vector<std::string>& vec)
 {
     return vec[n];
 }
@@ -33,13 +52,11 @@ inline T GetAttrVal(rapidxml::xml_node<>* node, const std::string& name)
     return ConvertType<T>(GetAttribute(node, name));
 }
 
-//template<class T1, class T2>
-//inline std::tuple<T1, T2> GetAttributes(rapidxml::xml_node<>* node, const std::vector<std::string>& names)
-//{
-//    return std::tuple<T1, T2>(
-//        GetAttrVal<T1>(node, names[0]),
-//        GetAttrVal<T2>(node, names[1]));
-//}
+template <class T>
+inline T GetAttrVal(rapidxml::xml_node<>* node, const std::string& name, const T& def)
+{
+    return ConvertType<T>(GetAttribute(node, name), def);
+}
 
 // N≠0なら、先頭を削ってNをデクリメント
 template <size_t N, class T0, class ... T>
@@ -53,35 +70,69 @@ struct type_at<0, T0, T...>
 };
 
 
-template <size_t n, size_t A, class ... T>
-inline auto GetAttrVal_Auto(rapidxml::xml_node<>* node, const std::array<std::string, A>& names)
+template <size_t n, class ... T>
+inline auto GetAttrVal_Auto(rapidxml::xml_node<>* node, const std::vector<std::string>& names)
 {
-    return GetAttrVal< type_at<n, T...>::type >(node, AccessVecElement<n, A>(names));
+    return GetAttrVal< type_at<n, T...>::type >(node, AccessVecElement<n>(names));
 }
 
-template <size_t n, size_t A, class ... T>
-inline void SetAttrVal(rapidxml::xml_node<>* node, const std::array<std::string, A>& names, std::tuple<T...>& ret)
+template <size_t n, class U, class ... T>
+inline auto GetAttrVal_Auto(rapidxml::xml_node<>* node, const std::vector<std::string>& names, const U& def)
 {
-    std::get<n>(ret) = GetAttrVal_Auto<n, A, T...>(node, names);
+    return GetAttrVal< type_at<n, T...>::type >(node, AccessVecElement<n>(names), def);
 }
 
-template<size_t A, std::size_t... indices, class ... T>
-void SetTuple(std::index_sequence<indices...>, rapidxml::xml_node<>* node, const std::array<std::string, A>& names, std::tuple<T...>& ret)
+template <size_t n, class ... T>
+inline void SetAttrVal(rapidxml::xml_node<>* node, const std::vector<std::string>& names, std::tuple<T...>& ret)
+{
+    std::get<n>(ret) = GetAttrVal_Auto<n, T...>(node, names);
+}
+
+template <size_t n, class ... T>
+inline void SetAttrVal(rapidxml::xml_node<>* node, const std::vector<std::string>& names, std::tuple<T...>& ret, const std::tuple<T...>& def)
+{
+    std::get<n>(ret) = GetAttrVal_Auto<n, type_at<n, T...>::type, T...>(node, names, std::get<n>(def));
+}
+
+
+template<std::size_t... indices, class ... T>
+void SetTuple(std::index_sequence<indices...>, rapidxml::xml_node<>* node, const std::vector<std::string>& names, std::tuple<T...>& ret)
 {
     using swallow = int[];
     (void)swallow
     {
-        (SetAttrVal<indices, A, T...>(node, names, ret), 0)...
+        (SetAttrVal<indices, T...>(node, names, ret), 0)...
     };
 }
 
-
-template <size_t A, class... T>
-inline std::tuple<T...> GetAttributes(rapidxml::xml_node<>* node, const std::array<std::string, A>& names)
+template<std::size_t... indices, class ... T>
+void SetTuple(std::index_sequence<indices...>, rapidxml::xml_node<>* node, const std::vector<std::string>& names, std::tuple<T...>& ret, const std::tuple<T...>& def)
 {
-    static_assert(std::tuple_size<std::tuple<T...>>::value == A, "GetAttributes size error.");
+    using swallow = int[];
+    (void)swallow
+    {
+        (SetAttrVal<indices, T...>(node, names, ret, def), 0)...
+    };
+}
+
+template <class... T>
+inline std::tuple<T...> GetAttributes(rapidxml::xml_node<>* node, const std::vector<std::string>& names)
+{
+    assert(std::tuple_size<std::tuple<T...>>::value == names.size());
     std::tuple<T...> ret;
     SetTuple(std::make_index_sequence< std::tuple_size<std::tuple<T...>>::value >(), node, names, ret);
+
+    // SetAttrVal<0, T...>(node, names, ret);
+
+    return ret;
+}
+
+template <class... T>
+inline std::tuple<T...> GetAttributes(rapidxml::xml_node<>* node, const std::vector<std::string>& names, const std::tuple<T...>& def)
+{
+    assert(std::tuple_size<std::tuple<T...>>::value == names.size());
+    std::tuple<T...> ret;
+    SetTuple(std::make_index_sequence< std::tuple_size<std::tuple<T...>>::value >(), node, names, ret, def);
 
     // SetAttrVal<0, T...>(node, names, ret);
 

@@ -112,10 +112,10 @@ void WaitState::DoWaitAnim()
     }
 }
 
-void WaitState::SetAnim(EAnimIndex index, bool isViewCam, bool isBlink, bool isBreath, int transFrame, int rand)
+void WaitState::SetAnim(int index, bool isViewCam, bool isBlink, bool isBreath, int transFrame, int rand)
 {
     int mapIndex = m_WaitAnimMap.size();
-    std::tuple<std::shared_ptr < PlayAnim >, EAnimIndex, bool, bool, bool, int, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
+    std::tuple<std::shared_ptr < PlayAnim >, int, bool, bool, bool, int, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
     m_WaitAnimMap[mapIndex] = tmp;
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
@@ -131,28 +131,10 @@ void WaitState::LoadConfig(const std::string& configPath)
         child != nullptr;
         child = child->next_sibling())
     {
-        int animNum = std::stoi(GetAttribute(child, "num"));
-
-        bool isBlink = true;
-        auto tmp = GetAttribute(child, "blink");
-        if (!tmp.empty()) isBlink = tmp == "false" ? false : true;
-
-        bool isBreath = true;
-        tmp = GetAttribute(child, "breath");
-        if (!tmp.empty()) isBreath = tmp == "false" ? false : true;
-
-        bool isViewCam = false;
-        tmp = GetAttribute(child, "view_cam");
-        if (!tmp.empty()) isViewCam = tmp == "false" ? false : true;
-
-        int transframe = 10;
-        tmp = GetAttribute(child, "trasframe");
-        if (!tmp.empty()) transframe = std::stoi(tmp);
-
-        int rand = 0;
-        tmp = GetAttribute(child, "rand");
-        if (!tmp.empty()) rand = std::stoi(tmp);
-
-        SetAnim((EAnimIndex)animNum, isViewCam, isBlink, isBreath, transframe, rand);
+        auto t = GetAttributes<int, bool, bool, bool, int, int>(
+            child,
+            {"num", "view_cam", "blink", "breath", "transframe", "rand"},
+            {0, false, true, true, 10, 0});
+        SetAnim(std::get<0>(t), std::get<1>(t), std::get<2>(t), std::get<3>(t), std::get<4>(t), std::get<5>(t));
     }
 }

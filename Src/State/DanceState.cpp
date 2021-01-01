@@ -59,6 +59,7 @@ void DanceState::End()
     currentAnimIndex = -1;
 }
 
+#include <array>
 int DanceState::ModelInitial()
 {
     rapidxml::xml_document<> doc;
@@ -68,8 +69,10 @@ int DanceState::ModelInitial()
         child != nullptr;
         child = child->next_sibling())
     {
-        auto animNum = std::stoi(GetAttribute(child, "anim_num"));
-        std::wstring musicPath(StringToWString(GetAttribute(child, "music_path")));
+        auto t = GetAttributes<int, std::wstring>(child, { "anim_num", "music_path" });
+
+        auto animNum = std::get<0>(t);
+        std::wstring musicPath(std::get<1>(t));
 
         auto danceAnimPtr = std::shared_ptr<PlayAnim>(new PlayAnim);
         danceAnimPtr->AttachAnime(model, animNum);

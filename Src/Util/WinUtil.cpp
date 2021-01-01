@@ -52,8 +52,9 @@ bool IsPress(int key)
 #include "UtilXml.h"
 std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<>* node, HMENU & context)
 {
-    std::wstring menuName(StringToWString(GetAttribute(node, "name")));
-    UINT menuNum = std::stoi(GetAttribute(node, "num"));
+    auto t = GetAttributes<std::wstring, UINT>(node, { "name", "num" });
+    std::wstring menuName(std::get<0>(t));
+    UINT menuNum = std::get<1>(t);
     return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
 }
 
