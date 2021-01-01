@@ -45,6 +45,10 @@ public:
 
     inline void SetZoom(float zoom)
     {
+        if (zoom < 5.f)
+        {
+            zoom = 5;
+        }
         m_Zoom = zoom;
         std::cout << "zoom: " << m_Zoom << std::endl;
         cameraPos = VScale(VNorm(cameraPos), zoom);
