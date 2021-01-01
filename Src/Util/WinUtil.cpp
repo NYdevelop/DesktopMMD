@@ -45,7 +45,7 @@ std::string WStringToString(std::wstring const& src)
 
 bool IsPress(int key)
 {
-    return (bool)(GetKeyState(key) & 0x8000);
+    return (GetKeyState(key) & 0x8000) > 0;
 }
 
 
