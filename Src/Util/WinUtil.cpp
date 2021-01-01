@@ -1,24 +1,18 @@
 #include "WinUtil.h"
 
-#include <Windows.h>
-
 #include <vector>
 #include <system_error>
 
 using namespace std;
 
-std::wstring StringToWString(std::string const& src)
+std::wstring StringToWString(std::string const& src, unsigned int charCode)
 {
-    auto const dest_size = ::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, nullptr, 0U);
-    std::vector<wchar_t> dest(dest_size, L'\0');
-    if (::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, dest.data(), dest_size) == 0) {
-        MessageBox(NULL, TEXT("StringToWString error. GetLastError: " + static_cast<int>(::GetLastError())), NULL, MB_ICONERROR);
-        // throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-        return nullptr;
-    }
-    dest.resize(std::char_traits<wchar_t>::length(dest.data()));
-    dest.shrink_to_fit();
-    return std::wstring(dest.begin(), dest.end());
+    const size_t len = src.size() + 1;
+    TCHAR* tmp = new TCHAR[len];
+    MultiByteToWideChar(charCode, 0, src.c_str(), -1, tmp, len);
+    std::wstring ret(tmp);
+    delete[] tmp;
+    return ret;
 }
 
 
@@ -51,5 +45,43 @@ std::string WStringToString(std::wstring const& src)
 
 bool IsPress(int key)
 {
-    return GetKeyState(key) & 0x8000;
+    return (bool)(GetKeyState(key) & 0x8000);
+}
+
+
+#include "UtilXml.h"
+std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<>* node, HMENU & context)
+{
+    std::wstring menuName(StringToWString(GetAttribute(node, "name")));
+    UINT menuNum = std::stoi(GetAttribute(node, "num"));
+    return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
+}
+
+void LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
+{
+    if (sub != nullptr)
+    {
+        std::get<1>(*sub) = MF_POPUP;
+        auto subMenu = CreatePopupMenu();
+        std::get<2>(*sub) = (UINT)subMenu;
+        config.emplace_back(*sub);
+        context = subMenu;
+    }
+
+    for (rapidxml::xml_node<>* child = node;
+        child != nullptr;
+        child = child->next_sibling())
+    {
+        auto info = LoadContextNode(child, context);
+
+        // ‚³‚ç‚ÉŽq‚ª‚¢‚é‚©‚Ç‚¤‚©
+        auto childSub = child->first_node();
+        if (childSub != nullptr)
+        {
+            LoadContextNode(childSub, context, config, &info);
+            continue;
+        }
+
+        config.emplace_back(info);
+    }
 }

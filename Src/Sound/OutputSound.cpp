@@ -49,9 +49,9 @@ void OutputSound::Start(const std::wstring & wavFileName, UINT deviceIndex)
 
 void OutputSound::Stop()
 {
-    m_FileReader.CloseWaveFile();
     if (hwo == nullptr) return;
     m_IsStop = true;
+    m_FileReader.CloseWaveFile();
     m_CurrentBuffer = 0;
 }
 
@@ -78,7 +78,7 @@ HRESULT OutputSound::CloseDevice()
     return S_OK;
 }
 
-void OutputSound::InputData()//WAVEHDR wh)
+void OutputSound::InputData()
 {
     if (OutHdr[m_CurrentBuffer].lpData == NULL) return;
 
@@ -91,10 +91,16 @@ void OutputSound::InputData()//WAVEHDR wh)
 
 void OutputSound::ReadNext()
 {
-    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec;
+    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / 2;
     size = m_FileReader.ReadWaveFile(OutHdr[m_CurrentBuffer].lpData, size);
-    DoVolume(OutHdr[m_CurrentBuffer].lpData, size, &m_FileWaveFormat);
     OutHdr[m_CurrentBuffer].dwBufferLength = size;
+    if (size == 0)
+    {
+        Stop();
+        CloseDevice();
+        return;
+    }
+    DoVolume(OutHdr[m_CurrentBuffer].lpData, size, &m_FileWaveFormat);
 }
 
 void OutputSound::SetVolume(float val)
@@ -116,7 +122,8 @@ void OutputSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwPar
     switch (uMsg) {
     case MM_WOM_DONE:
         OutputSound* outputSound = (OutputSound*)dwInstance;
-        if (((WAVEHDR*)dwParam1)->dwUser || outputSound->m_IsStop) {    //waveOutResetŠÖ”‚Å’â~‚µ‚½
+        if (((WAVEHDR*)dwParam1)->dwUser || outputSound->m_IsStop)
+        {    //waveOutResetŠÖ”‚Å’â~‚µ‚½
             outputSound->m_CurrentBuffer = 0;
             return;
         }

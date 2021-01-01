@@ -3,7 +3,7 @@
 #include <random>
 #include "Util/UtilMMD.h"
 
-#include "Util\rapidxml-1.13\rapidxml.hpp"
+#include "Util\UtilXml.h"
 #include "Util\rapidxml-1.13\rapidxml_utils.hpp"
 
 static std::mt19937 mt;
@@ -131,42 +131,28 @@ void WaitState::LoadConfig(const std::string& configPath)
         child != nullptr;
         child = child->next_sibling())
     {
-        int animNum = 0;
-        bool isBlink = true;
-        bool isBreath = true;
-        bool isViewCam = false;
-        int transframe = 10;
-        int rand = 0;
+        int animNum = std::stoi(GetAttribute(child, "num"));
 
-        for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
-        {
-            //std::cout << attr->name() << ": " << attr->value() << std::endl;
-            std::string name(attr->name());
-            if (name == "num")
-            {
-                animNum = std::stoi(attr->value());
-            }
-            else if (name == "blink")
-            {
-                isBlink = attr->value() == "false" ? false : true;
-            }
-            else if (name == "breath")
-            {
-                isBreath = attr->value() == "false" ? false : true;
-            }
-            else if (name == "view_cam")
-            {
-                isViewCam = attr->value() == "false" ? false : true;
-            }
-            else if (name == "transframe")
-            {
-                transframe = std::stoi(attr->value());
-            }
-            else if (name == "rand")
-            {
-                rand = std::stoi(attr->value());
-            }
-        }
+        bool isBlink = true;
+        auto tmp = GetAttribute(child, "blink");
+        if (!tmp.empty()) isBlink = tmp == "false" ? false : true;
+
+        bool isBreath = true;
+        tmp = GetAttribute(child, "breath");
+        if (!tmp.empty()) isBreath = tmp == "false" ? false : true;
+
+        bool isViewCam = false;
+        tmp = GetAttribute(child, "view_cam");
+        if (!tmp.empty()) isViewCam = tmp == "false" ? false : true;
+
+        int transframe = 10;
+        tmp = GetAttribute(child, "trasframe");
+        if (!tmp.empty()) transframe = std::stoi(tmp);
+
+        int rand = 0;
+        tmp = GetAttribute(child, "rand");
+        if (!tmp.empty()) rand = std::stoi(tmp);
+
         SetAnim((EAnimIndex)animNum, isViewCam, isBlink, isBreath, transframe, rand);
     }
 }

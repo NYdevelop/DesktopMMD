@@ -24,6 +24,8 @@ public:
 
     void SetVolume(float val);
 
+    inline bool IsPlay() { return !m_IsStop; }
+
 private:
     static void CALLBACK Callback(
         HWAVEIN hwi,

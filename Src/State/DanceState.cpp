@@ -4,7 +4,7 @@
 #include "DxLib.h"
 #include <chrono>
 
-#include "Util\rapidxml-1.13\rapidxml.hpp"
+#include "Util\UtilXml.h"
 #include "Util\rapidxml-1.13\rapidxml_utils.hpp"
 
 using namespace std;
@@ -39,6 +39,13 @@ void DanceState::Doing()
     if (tmp->Play(std::chrono::duration_cast<std::chrono::milliseconds>(chrono::system_clock::now() - start).count() / MILLISEC_TO_FRAME) == false)
     {
         isDance = false;
+        if (DanceIndex == 2)
+        {
+            isDance = true;
+            animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(danceAnim[DanceIndex]);
+            start = chrono::system_clock::now();
+            if (!m_Output->IsPlay()) m_Output->Start(danceMusic[DanceIndex]);
+        }
     }
 }
 
@@ -61,26 +68,8 @@ int DanceState::ModelInitial()
         child != nullptr;
         child = child->next_sibling())
     {
-        int animNum = 0;
-        std::wstring musicPath(L"");
-        for (auto attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute())
-        {
-            std::string name(attr->name());
-            if (name == "anim_num")
-            {
-                animNum = std::stoi(attr->value());
-            }
-            else if (name == "music_path")
-            {
-                std::string v(attr->value());
-                const size_t len = v.size() + 1;
-                TCHAR* tmp = new TCHAR[len];
-                MultiByteToWideChar(CP_UTF8, 0, v.c_str(), -1, tmp, len);
-                std::wstring ret(tmp);
-                delete[] tmp;
-                musicPath = ret;
-            }
-        }
+        auto animNum = std::stoi(GetAttribute(child, "anim_num"));
+        std::wstring musicPath(StringToWString(GetAttribute(child, "music_path")));
 
         auto danceAnimPtr = std::shared_ptr<PlayAnim>(new PlayAnim);
         danceAnimPtr->AttachAnime(model, animNum);

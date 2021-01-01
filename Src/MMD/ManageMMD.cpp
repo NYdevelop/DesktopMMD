@@ -12,11 +12,9 @@
 
 #include "Sound/fft.h"
 
-
+#include "Util\rapidxml-1.13\rapidxml_utils.hpp"
 
 using namespace std;
-
-
 
 HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath,
     const float charaX, const float charaY, const float charaZ,
@@ -225,6 +223,11 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         contextCommand[searchContextId(contextMenuConfig, L"Stay Tonight")] = [&]()
         {
             ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 1;
+            stateManager->Transrate(EState::STATE_DANCE);
+        };
+        contextCommand[searchContextId(contextMenuConfig, L"Zero Two")] = [&]()
+        {
+            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 2;
             stateManager->Transrate(EState::STATE_DANCE);
         };
         contextCommand[searchContextId(contextMenuConfig, L"éËÇêUÇÈ")] = [&]()
@@ -465,59 +468,3 @@ void ManageMMD::InitStateModel()
 }
 
 
-std::tuple<HMENU, ULONG, UINT, std::wstring> ManageMMD::LoadContextNode(rapidxml::xml_node<>* node, HMENU & context)
-{
-    std::wstring menuName(L"");
-    UINT menuNum = 0;
-    for (auto attr = node->first_attribute(); attr != nullptr; attr = attr->next_attribute())
-    {
-        std::string name(attr->name());
-        if (name == "name")
-        {
-            std::string v(attr->value());
-
-            // UTF-8Ç©ÇÁSHIFT_JISÇ÷ÇÃïœä∑
-            const size_t len = v.size() + 1;
-            TCHAR* tmp = new TCHAR[len];
-            MultiByteToWideChar(CP_UTF8, 0, v.c_str(), -1, tmp, len);
-            std::wstring ret(tmp);
-            delete[] tmp;
-            menuName = ret;
-        }
-        else if (name == "num")
-        {
-            menuNum = std::stoi(attr->value());
-        }
-    }
-
-    return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
-}
-
-void ManageMMD::LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
-{
-    if (sub != nullptr)
-    {
-        std::get<1>(*sub) = MF_POPUP;
-        auto subMenu = CreatePopupMenu();
-        std::get<2>(*sub) = (UINT)subMenu;
-        config.emplace_back(*sub);
-        context = subMenu;
-    }
-
-    for (rapidxml::xml_node<>* child = node;
-        child != nullptr;
-        child = child->next_sibling())
-    {
-        auto info = LoadContextNode(child, context);
-
-        // Ç≥ÇÁÇ…éqÇ™Ç¢ÇÈÇ©Ç«Ç§Ç©
-        auto childSub = child->first_node();
-        if (childSub != nullptr)
-        {
-            LoadContextNode(childSub, context, config, &info);
-            continue;
-        }
-
-        config.emplace_back(info);
-    }
-}
