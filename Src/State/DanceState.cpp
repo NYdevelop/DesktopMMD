@@ -64,7 +64,8 @@ int DanceState::ModelInitial()
     rapidxml::xml_document<> doc;
     rapidxml::file<> input("config.xml");
     doc.parse<0>(input.data());
-    NodeApply(doc.first_node("dance")->first_node(), [&](auto child)
+    auto base = doc.first_node("DesktopMMD");
+    NodeApply(base->first_node("dance")->first_node(), [&](auto child)
     {
         auto t = GetAttributes<int, std::wstring, bool>(child, { "anim_num", "music_path", "loop" }, {0, L"", false});
 

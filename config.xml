@@ -1,78 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<menu>
-  <item name="Mode" num="1">
-    <mode name="Wait"     num="11" />
-    <mode name="Rhythm"   num="12" />
-    <mode name="Read"     num="13" />
-    <mode name="Dance"    num="14">
-      <dance name="CLC ME" num="141" />
-      <dance name="Stay Tonight" num="142" /> 
-      <dance name="Zero Two" num="143" />
-      <dance name="hifi"     num="144" />
-      <dance name="dance"    num="145" />
-    </mode>
-    <mode name="手を振る" num="15" />
-  </item>
-  <item name="左端へ移動"   num="2" />
-  <item name="右端へ移動"   num="3" />
-  <item name="ランダム移動" num="4" />
-  <item name="Model"        num="5">
-    <model name="アメリカ"  num="51" />
-    <model name="hibiki"    num="52" />
-    <model name="gumi"      num="53" />
-    <model name="plinz"     num="54" />
-    <model name="yui"       num="55" />
-    <model name="きつね"    num="56" />
-    <model name="メナス"    num="57" />
-    <model name="大和"      num="58" />
-    <model name="美鈴1"       num="59" />
-    <model name="美鈴 china"  num="60" />
-    <model name="hibiki_21"   num="61" />
-    <model name="hibiki_gunz" num="62" />
-  </item>
-  <item name="Light" num="6" />
-  <item name="Exit"         num="0" />
-</menu>
-<dance>
-  <item anim_num="7"  music_path="data/music_clc.wav" />
-  <item anim_num="27" music_path="data/music_staynight.wav" />
-  <item anim_num="28" music_path="data/zerotwo.wav" loop="true" />
-  <item anim_num="29" music_path="E:\softs\MikuMikuDance_v926x64\UserFile\Motion\ハイファイレイヴァ―\【ぼっちで】 ハイファイレイヴァー 【ヅラズレ寸前wりりあにゃん】 - ニコニコ動画.wav" />
-  <item anim_num="30" music_path="data/zerotwo.wav" />
-</dance>
-<anim>
-  <item name="think2"      num="12" blink="false" breath="true" />
-  <item name="look_self1"  num="13" blink="true"  breath="true" />
-  <item name="look_self2"  num="14" blink="true"  breath="true" />
-  <item name="dance_mini"  num="15" blink="true"  breath="true" view_cam="true" rand="15" />
-  <item name="bonyari"     num="16" blink="true"  breath="true" />
-  <item name="look_around" num="17" blink="true"  breath="true" />
-  <item name="arm_swing"   num="18" blink="true"  breath="true" />
-  <item name="stletch1"    num="19" blink="true"  breath="true" />
-  <item name="umauma"      num="20" blink="false" breath="true" view_cam="true"/>
-<!--  <item name="peace1"      num="21" blink="false" breath="true" />
-  <item name="shiratsuyu"  num="22" blink="true"  breath="true" />
-  <item name="plinz"       num="23" blink="true"  breath="true" />
-  <item name="kashima"     num="24" blink="true"  breath="true" />
-  <item name="hamakaze"    num="25" blink="true"  breath="true" />
-  <item name="zero_two_dance" num="26" blink="true" breath="true" view_cam="true" transframe="30" />-->
-</anim>
-<model>
-  <item path="data/model/america/アメリカ ver 0.8.pmx" />
-  <item path="data\model\hibiki\Hibiki Saiba 3.08 (Long Hair) (MrJinSenpai).pmx" />
-  <item path="data/Model/gumi/HK Gumi Swimsuit.pmx" />
-  <item path="data/Model/plinz/PrinzEugen.pmx" />
-  <item path="data/Model/yui/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx" />
-  <item path="../../C#/RealtimeListenMMD/Model/タヌキとキツネ ver.1/キツネ.pmx" />
-  <item path="../../C#/RealtimeListenMMD/Model/Menace メナス(カノン改造)/メナス_edit.pmx" />
-  <item path="../../C#/RealtimeListenMMD/Model/ぽんぷ長式大和_水着/ぽんぷ長式大和＿水着mode.pmx" />
-  <item path="data\model\meirin\紅美鈴Ver2.00(ダンス_水着-南半球な水着_Tバック_ポニテ2_ハイヒールサンダル).pmx" />
-  <item path="data\model\meirin\紅美鈴Ver2.00(ダンス_チャイナドレス-ミニ_ポニテ_ハイヒールサンダル).pmx" />
-  <item path="data\model\hibiki\Hibiki Saiba 3.08 (Long Hair)_21.pmx" />
-  <item path="E:\softs\MikuMikuDance_v926x64\UserFile\Model\Hibiki Saiba 3.08 (Gantz Outfit) (MrJinSenpai)\Hibiki Saiba 3.08 (Long Hair) (Gantz Outfit) (MrJinSenpai)_e.pmx" />
-  <item path="" />
-</model>
-<config>
-  <anim path="../../C#/RealtimeListenMMD/Model/motion/motion" />
-  <light mode="true" />
-</config>
+<DesktopMMD>
+  <menu>
+    <item name="Mode" num="1">
+      <mode name="Wait"     num="11" />
+      <mode name="Rhythm"   num="12" />
+      <mode name="Read"     num="13" />
+      <mode name="Dance"    num="14">
+        <dance name="CLC ME" num="141" />
+        <dance name="Stay Tonight" num="142" /> 
+        <dance name="Zero Two" num="143" />
+        <dance name="hifi"     num="144" />
+        <dance name="dance"    num="145" />
+      </mode>
+      <mode name="手を振る" num="15" />
+    </item>
+    <item name="左端へ移動"   num="2" />
+    <item name="右端へ移動"   num="3" />
+    <item name="ランダム移動" num="4" />
+    <item name="Model"        num="5">
+      <model name="きつね"    num="51" />
+      <model name="アメリカ"  num="52" />
+      <model name="hibiki"    num="53" />
+      <model name="gumi"      num="54" />
+      <model name="plinz"     num="55" />
+      <model name="yui"       num="56" />
+      <model name="メナス"    num="57" />
+      <model name="大和"      num="58" />
+      <model name="美鈴1"       num="59" />
+      <model name="美鈴 china"  num="60" />
+      <model name="hibiki_21"   num="61" />
+      <model name="hibiki_gunz" num="62" />
+    </item>
+    <item name="Light" num="6" />
+    <item name="Exit"         num="0" />
+  </menu>
+  <dance>
+    <item anim_num="7"  music_path="data/music_clc.wav" />
+    <item anim_num="27" music_path="data/music_staynight.wav" />
+    <item anim_num="28" music_path="data/zerotwo.wav" loop="true" />
+    <item anim_num="29" music_path="E:\softs\MikuMikuDance_v926x64\UserFile\Motion\ハイファイレイヴァ―\【ぼっちで】 ハイファイレイヴァー 【ヅラズレ寸前wりりあにゃん】 - ニコニコ動画.wav" />
+    <item anim_num="30" music_path="data/zerotwo.wav" />
+  </dance>
+  <anim>
+    <item name="think2"      num="12" blink="false" breath="true" />
+    <item name="look_self1"  num="13" blink="true"  breath="true" />
+    <item name="look_self2"  num="14" blink="true"  breath="true" />
+    <item name="dance_mini"  num="15" blink="true"  breath="true" view_cam="true" rand="15" />
+    <item name="bonyari"     num="16" blink="true"  breath="true" />
+    <item name="look_around" num="17" blink="true"  breath="true" />
+    <item name="arm_swing"   num="18" blink="true"  breath="true" />
+    <item name="stletch1"    num="19" blink="true"  breath="true" />
+    <item name="umauma"      num="20" blink="false" breath="true" view_cam="true"/>
+  <!--  <item name="peace1"      num="21" blink="false" breath="true" />
+    <item name="shiratsuyu"  num="22" blink="true"  breath="true" />
+    <item name="plinz"       num="23" blink="true"  breath="true" />
+    <item name="kashima"     num="24" blink="true"  breath="true" />
+    <item name="hamakaze"    num="25" blink="true"  breath="true" />
+    <item name="zero_two_dance" num="26" blink="true" breath="true" view_cam="true" transframe="30" />-->
+  </anim>
+  <model>
+    <item path="../../C#/RealtimeListenMMD/Model/タヌキとキツネ ver.1/キツネ.pmx" />
+    <item path="data/model/america/アメリカ ver 0.8.pmx" />
+    <item path="data\model\hibiki\Hibiki Saiba 3.08 (Long Hair) (MrJinSenpai).pmx" />
+    <item path="data/Model/gumi/HK Gumi Swimsuit.pmx" />
+    <item path="data/Model/plinz/PrinzEugen.pmx" />
+    <item path="data/Model/yui/唯依姫(ｼｮｰﾄﾍｱ)1.00.pmx" />
+    <item path="../../C#/RealtimeListenMMD/Model/Menace メナス(カノン改造)/メナス_edit.pmx" />
+    <item path="../../C#/RealtimeListenMMD/Model/ぽんぷ長式大和_水着/ぽんぷ長式大和＿水着mode.pmx" />
+    <item path="data\model\meirin\紅美鈴Ver2.00(ダンス_水着-南半球な水着_Tバック_ポニテ2_ハイヒールサンダル).pmx" />
+    <item path="data\model\meirin\紅美鈴Ver2.00(ダンス_チャイナドレス-ミニ_ポニテ_ハイヒールサンダル).pmx" />
+    <item path="data\model\hibiki\Hibiki Saiba 3.08 (Long Hair)_21.pmx" />
+    <item path="E:\softs\MikuMikuDance_v926x64\UserFile\Model\Hibiki Saiba 3.08 (Gantz Outfit) (MrJinSenpai)\Hibiki Saiba 3.08 (Long Hair) (Gantz Outfit) (MrJinSenpai)_e.pmx" />
+    <item path="" />
+  </model>
+  <config>
+    <anim path="../../C#/RealtimeListenMMD/Model/motion/motion" />
+    <light mode="true" />
+    <capture mode="false" />
+  </config>
+</DesktopMMD>

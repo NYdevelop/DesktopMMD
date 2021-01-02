@@ -127,7 +127,8 @@ void WaitState::LoadConfig(const std::string& configPath)
     rapidxml::xml_document<> doc;
     rapidxml::file<> input(configPath.c_str());
     doc.parse<0>(input.data());
-    NodeApply(doc.first_node("anim")->first_node(), [&](auto child)
+    auto base = doc.first_node("DesktopMMD");
+    NodeApply(base->first_node("anim")->first_node(), [&](auto child)
     {
         auto t = GetAttributes<int, bool, bool, bool, int, int>(
             child,

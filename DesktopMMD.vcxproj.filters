@@ -232,6 +232,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="config.txt" />
+    <Xml Include="config.xml" />
   </ItemGroup>
 </Project>
