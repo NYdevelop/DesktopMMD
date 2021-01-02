@@ -34,8 +34,8 @@ HRESULT ManageMMD::Initialize()
         m_Window.InitContextMenu(contextMenuConfig);
     }
 
-    static const auto animPath = GetAttribute(doc.first_node("model")->first_node(), "path");
-    static const auto modelPath = GetAttribute(doc.first_node("model")->first_node("models")->first_node(), "path");
+    static const auto animPath = GetAttribute(doc.first_node("config")->first_node("anim"), "path");
+    static const auto modelPath = GetAttribute(doc.first_node("model")->first_node(), "path");
     CConfigLoader configPos("config_pos.txt");
     if (configPos.IsOpen())
     {
@@ -298,9 +298,8 @@ HRESULT ManageMMD::Initialize()
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
             WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] = [&](UINT)
+        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] = [&](UINT id)
         {
-            auto id = searchContextId(contextMenuConfig, L"ランダム移動");
             auto waitState = (WaitState*)stateManager->GetStateMap()[EState::STATE_WAIT].get();
 
             //チェック状態取得
@@ -319,6 +318,32 @@ HRESULT ManageMMD::Initialize()
             CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_CHECKED);
         };
 
+        const auto lightContextId = searchContextId(contextMenuConfig, L"Light");
+        auto lightMode = GetAttrVal<bool>(doc.first_node("config")->first_node("light"), "mode", false);
+        m_mmd->SetEnableLight(lightMode);
+        if (lightMode)
+        {
+            CheckMenuItem(m_Window.GetContextMenu(), lightContextId, MF_BYCOMMAND | MFS_CHECKED);
+        }
+        contextCommand[lightContextId] = [&](UINT id)
+        {
+            //チェック状態取得
+            auto uState = GetMenuState(m_Window.GetContextMenu(), id, MF_BYCOMMAND);
+
+            if (uState & MFS_CHECKED)
+            {
+                //チェックはずす
+                m_mmd->SetEnableLight(false);
+                CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_UNCHECKED);
+                return;
+            }
+
+            //チェックする
+            m_mmd->SetEnableLight(true);
+            CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_CHECKED);
+        };
+
+
         // dance選択コマンド
         for (size_t i = 0; i<contextNodeVec.size(); i++)
         {
@@ -334,7 +359,7 @@ HRESULT ManageMMD::Initialize()
 
         // model選択コマンド
         static std::vector<std::string> models;
-        NodeApply(doc.first_node("model")->first_node("models")->first_node(), [&](auto child)
+        NodeApply(doc.first_node("model")->first_node(), [&](auto child)
         {
             models.emplace_back(GetAttribute(child, "path"));
         });
@@ -367,26 +392,6 @@ HRESULT ManageMMD::Initialize()
                 stateManager->Initialize(EState::STATE_WAIT);
             };
         }
-
-        static float opacity = 1.f;
-        contextCommand[searchContextId(contextMenuConfig, L"+")] = [&](UINT)
-        {
-            opacity += 0.1f;
-            if (opacity > 1.f)
-            {
-                opacity = 1.f;
-            }
-            MV1SetOpacityRate(m_mmd->GetModelHandle(), opacity);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"-")] = [&](UINT)
-        {
-            opacity -= 0.1f;
-            if (opacity < 0.f)
-            {
-                opacity = 0.f;
-            }
-            MV1SetOpacityRate(m_mmd->GetModelHandle(), opacity);
-        };
     }
 
     m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)

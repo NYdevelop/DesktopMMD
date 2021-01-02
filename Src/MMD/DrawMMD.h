@@ -66,6 +66,8 @@ public:
 
     bool canViewCamera = false;
 
+    void SetEnableLight(bool enable);
+
 private:
     int model = 0;//モデルハンドル
     DxLib::VECTOR charaPos = VGet(0.f, 0.f, 1.f);//キャラクタの座標

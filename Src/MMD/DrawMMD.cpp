@@ -38,8 +38,6 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//ï`âÊëŒè€Çó†âÊñ Ç…Ç∑ÇÈ
 
-    SetUseLighting(FALSE);
-
     cameraViewOffset = VGet(0.f, 7.f, 1.f);
     cameraViewPos = VGet(0.f, 0.f, 0.f);
 
@@ -172,4 +170,10 @@ void DrawMMD::UpdatePosRot()
 {
     MV1SetPosition(model, charaPos);
     MV1SetRotationXYZ(model, VGet(0.0f, RotateY + DX_PI_F, 0.0f));
+}
+
+void DrawMMD::SetEnableLight(bool enable)
+{
+    auto val = enable ? TRUE : FALSE;
+    SetUseLighting(val);
 }
