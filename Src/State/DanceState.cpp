@@ -16,14 +16,14 @@ void DanceState::Initialize()
     cout << "state: dance" << endl;
     isDance = true;
 
-    auto anim = danceAnim[DanceIndex];
+    auto anim = std::get<DANCE_ANIM>(danceConfig[DanceIndex]);
     anim->ResetAnimTime();
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, anim->GetAnimIndex(), 1);
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(anim);
     currentAnimIndex = anim->GetAnimIndex();
 
     start = chrono::system_clock::now();
-    m_Output->Start(danceMusic[DanceIndex]);
+    m_Output->Start(std::get<DANCE_MUSIC_PATH>(danceConfig[DanceIndex]));
 }
 
 void DanceState::Doing()
@@ -39,12 +39,12 @@ void DanceState::Doing()
     if (tmp->Play(std::chrono::duration_cast<std::chrono::milliseconds>(chrono::system_clock::now() - start).count() / MILLISEC_TO_FRAME) == false)
     {
         isDance = false;
-        if (DanceIndex == 2)
+        if (std::get<DANCE_LOOP>(danceConfig[DanceIndex]) == true)
         {
             isDance = true;
-            animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(danceAnim[DanceIndex]);
+            tmp->AddAnim(std::get<DANCE_ANIM>(danceConfig[DanceIndex]));
             start = chrono::system_clock::now();
-            if (!m_Output->IsPlay()) m_Output->Start(danceMusic[DanceIndex]);
+            if (!m_Output->IsPlay()) m_Output->Start(std::get<DANCE_MUSIC_PATH>(danceConfig[DanceIndex]));
         }
     }
 }
@@ -66,17 +66,13 @@ int DanceState::ModelInitial()
     doc.parse<0>(input.data());
     NodeApply(doc.first_node("dance")->first_node(), [&](auto child)
     {
-        auto t = GetAttributes<int, std::wstring>(child, { "anim_num", "music_path" });
+        auto t = GetAttributes<int, std::wstring, bool>(child, { "anim_num", "music_path", "loop" }, {0, L"", false});
 
-        auto animNum = std::get<0>(t);
-        std::wstring musicPath(std::get<1>(t));
-
+        auto animNum = std::get<DANCE_ANIM>(t);
         auto danceAnimPtr = std::shared_ptr<PlayAnim>(new PlayAnim);
         danceAnimPtr->AttachAnime(model, animNum);
         danceAnimPtr->IsLoop(false);
-
-        danceAnim.emplace_back(danceAnimPtr);
-        danceMusic.emplace_back(musicPath);
+        danceConfig.emplace_back(std::tuple<std::shared_ptr < PlayAnim >, std::wstring, bool>(danceAnimPtr, std::get<DANCE_MUSIC_PATH>(t), std::get<DANCE_LOOP>(t)));
     });
     return 0;
 }

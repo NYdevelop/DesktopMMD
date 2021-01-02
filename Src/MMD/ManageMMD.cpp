@@ -490,5 +490,3 @@ void ManageMMD::InitStateModel()
 
     waitPtr->OnceInitial();
 }
-
-

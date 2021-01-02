@@ -25,8 +25,13 @@ private:
     std::shared_ptr<OutputSound> m_Output;
     std::shared_ptr<DrawMMD> m_mmd;
 
-    std::vector<std::shared_ptr < PlayAnim > > danceAnim;
-    std::vector<std::wstring> danceMusic;
+    enum EDanceConfig : int
+    {
+        DANCE_ANIM = 0,
+        DANCE_MUSIC_PATH,
+        DANCE_LOOP,
+    };
+    std::vector<std::tuple<std::shared_ptr < PlayAnim >, std::wstring, bool > > danceConfig;
 
     int currentAnimIndex = -1;
     bool isDance = false;

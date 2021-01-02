@@ -181,7 +181,9 @@
     <ClInclude Include="Src\State\WalkStateManager.h" />
     <ClInclude Include="Src\State\WaveHandState.h" />
     <ClInclude Include="Src\Util\ConfigLoader.h" />
+    <ClInclude Include="Src\Util\Util.h" />
     <ClInclude Include="Src\Util\UtilMMD.h" />
+    <ClInclude Include="Src\Util\UtilXml.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src/Sound/CalculateBPM.cpp" />
@@ -213,6 +215,7 @@
     <ClCompile Include="Src\State\WaveHandState.cpp" />
     <ClCompile Include="Src\Util\ConfigLoader.cpp" />
     <ClCompile Include="Src\Util\UtilMMD.cpp" />
+    <ClCompile Include="Src\Util\UtilXml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="config.txt" />
