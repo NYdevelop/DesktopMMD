@@ -51,7 +51,6 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     {
         if (m_Window.IsClose()) return;
         if (m_mmd->mainProcess() == S_FALSE) return;
-        
         {
             std::lock_guard<std::mutex> lock(modelMutex);
             walkManager.Update();
@@ -61,8 +60,8 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             }
         }
 
+        /// キー入力判定
         {
-            /// キー入力判定
             if (IsPress(VK_CONTROL) == true)
             {
                 if (IsPress(VK_RIGHT))
@@ -153,7 +152,6 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
                 m_mmd->cameraPos = newPos;
                 return;
             }
-
         }
     });
 
@@ -200,7 +198,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     });
 
     // コンテキストメニュー操作設定
-    static std::map<UINT, function<void()>> contextCommand;
+    static std::map<UINT, function<void(UINT)>> contextCommand;
     {
         static auto searchContextId = [](const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& contextMenuConfig, const std::wstring& menuName)
         {
@@ -209,40 +207,40 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             return std::get<2>(*itr);
         };
 
-        contextCommand[searchContextId(contextMenuConfig, L"Exit")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"Exit")] = [&](UINT)
         {
             m_Window.Close();
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
         };
 
-        contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&](UINT)
         {
             stateManager->Transrate(EState::STATE_WAIT);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = [&](UINT)
         {
             stateManager->Transrate(EState::STATE_RHYTHM);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"Read")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"Read")] = [&](UINT)
         {
             stateManager->Transrate(EState::STATE_READ);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&](UINT)
         {
             stateManager->Transrate(EState::STATE_WAVE_HAND);
         };
 
-        contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&](UINT)
         {
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
             WalkStart(VGet(100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = [&](UINT)
         {
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
             WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] = [&](UINT)
         {
             auto id = searchContextId(contextMenuConfig, L"ランダム移動");
             auto waitState = (WaitState*)stateManager->GetStateMap()[EState::STATE_WAIT].get();
@@ -264,20 +262,20 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         };
 
         // dance選択コマンド
-        int danceCount = 0;
         for (size_t i = 0; i<contextNodeVec.size(); i++)
         {
             if (contextNodeVec[i] != "dance") continue;
-            auto menuName = std::get<3>(contextMenuConfig[i]);
-            contextCommand[searchContextId(contextMenuConfig, menuName)] = [&]()
+            auto contextConfig = contextMenuConfig[i];
+            auto menuName = std::get<3>(contextConfig);
+            contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
             {
-                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = danceCount++;
+                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = (id - 141);
                 stateManager->Transrate(EState::STATE_DANCE);
             };
         }
 
         static const std::string ANIM_PATH = animPath;
-        contextCommand[searchContextId(contextMenuConfig, L"america")] = [&]()
+        contextCommand[searchContextId(contextMenuConfig, L"america")] = [&](UINT)
         {
             std::lock_guard<std::mutex> lock(modelMutex);
             m_mmd->Exit();
@@ -296,7 +294,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         auto id = (UINT)LOWORD(wParam);
         if (!contextCommand.empty() && contextCommand.find(id) != contextCommand.end())
         {
-            contextCommand[id]();
+            contextCommand[id](id);
         }
     });
 

@@ -23,4 +23,3 @@ void NodeApply(rapidxml::xml_node<>* node, const std::function<void(rapidxml::xm
         func(child);
     }
 }
-
