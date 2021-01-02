@@ -69,8 +69,8 @@ public:
 private:
     int model = 0;//モデルハンドル
     DxLib::VECTOR charaPos = VGet(0.f, 0.f, 1.f);//キャラクタの座標
-    VECTOR cameraViewPos = VGet(.0f, .0f, .0f);
-    VECTOR cameraViewOffset = VGet(0.f, 0.f, 1.f);//カメラ注視点
+    VECTOR cameraViewPos = VGet(.0f, .0f, .0f); //カメラ注視点
+    VECTOR cameraViewOffset = VGet(0.f, 0.f, 1.f);
     float m_Zoom = 10.f;
 
     LONG dispWidth = 640;

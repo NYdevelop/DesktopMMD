@@ -13,15 +13,12 @@
 #include "Sound/fft.h"
 
 #include "Util\rapidxml-1.13\rapidxml_utils.hpp"
-
-#include <mutex>
+#include "Util\UtilXml.h"
+#include "Util\ConfigLoader.h"
 
 using namespace std;
 
-HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath,
-    const float charaX, const float charaY, const float charaZ,
-    const float charaDirect,
-    const float cameraX, const float cameraY, const float cameraZ)
+HRESULT ManageMMD::Initialize()
 {
     m_Window.Init();
     SetUserWindow(m_Window.GetHWnd());
@@ -29,30 +26,44 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
     // コンテキストメニューの初期化
     std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>> contextMenuConfig;
     std::vector<std::string> contextNodeVec;
+    rapidxml::xml_document<> doc;
+    rapidxml::file<> input("config.xml");
+    doc.parse<0>(input.data());
     {
-        rapidxml::xml_document<> doc;
-        rapidxml::file<> input("config.xml");
-        doc.parse<0>(input.data());
         contextNodeVec = LoadContextNode(doc.first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
         m_Window.InitContextMenu(contextMenuConfig);
     }
 
-    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath, charaX, charaY, charaZ, charaDirect, cameraX, cameraY, cameraZ));
+    static const auto animPath = GetAttribute(doc.first_node("model")->first_node(), "path");
+    static const auto modelPath = GetAttribute(doc.first_node("model")->first_node("models")->first_node(), "path");
+    CConfigLoader configPos("config_pos.txt");
+    if (configPos.IsOpen())
+    {
+        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath,
+            std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
+            std::stof(configPos.Load("CHARA_DIRECT")),
+            std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z"))));
+    }
+    else
+    {
+        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath));
+    }
     if (DxLib::DxLib_Init() == -1) return E_FAIL;
     m_mmd->afterInitialize();
 
     stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
     m_mmd->SetStateManager(stateManager);
 
-    bool isPressMButton = false;
+    bool isPressMButton = false, isPressLButton = false;
     int beginMousePosX = 0, beginMousePosY = 0;
-    std::mutex modelMutex;
+    VECTOR xVecLButton, yVecLButton;
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         if (m_Window.IsClose()) return;
-        if (m_mmd->mainProcess() == S_FALSE) return;
+        /// アニメ適用
         {
             std::lock_guard<std::mutex> lock(modelMutex);
+            if (m_mmd->mainProcess() == S_FALSE) return;
             walkManager.Update();
             if (stateManager->GetCurrentStateIndex() != EState::STATE_DANCE)
             {
@@ -105,12 +116,10 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
                 WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
             }
 
-            // モデル上にカーソルがある場合反応するように
             if (!IsPress(VK_MBUTTON))
             {
                 isPressMButton = false;
             }
-
             if (isPressMButton)
             {
                 static const float CAMERA_MOVE_SPEED_A = .001f;
@@ -152,7 +161,61 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
                 m_mmd->cameraPos = newPos;
                 return;
             }
+
+            if (!IsPress(VK_LBUTTON))
+            {
+                isPressLButton = false;
+            }
+            if (isPressLButton)
+            {
+                int mouseX, mouseY;
+                GetMousePoint(&mouseX, &mouseY);
+
+                VECTOR newPos = m_mmd->cameraPos;
+                auto diffX = mouseX - beginMousePosX;
+                if (diffX != 0)
+                {
+                    auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
+                    newPos = VAdd( newPos, diff);
+                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+
+                    beginMousePosX = mouseX;
+                }
+
+                auto diffY = mouseY - beginMousePosY;
+                if (diffY != 0)
+                {
+                    auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
+                    newPos = VAdd( newPos, diff);
+                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+
+                    beginMousePosY = mouseY;
+                }
+                m_mmd->cameraPos = newPos;
+            }
         }
+    });
+
+    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+    {
+        int mouseX, mouseY;
+        GetMousePoint(&mouseX, &mouseY);
+        beginMousePosX = mouseX;
+        beginMousePosY = mouseY;
+        isPressMButton = true;
+    });
+
+    m_Window.SetCallbackMsg(WM_LBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+    {
+        isPressLButton = true;
+        int mouseX, mouseY;
+        GetMousePoint(&mouseX, &mouseY);
+        beginMousePosX = mouseX;
+        beginMousePosY = mouseY;
+
+        auto rayVec = m_mmd->GetRayVec();
+        xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+        yVecLButton = VNorm(VCross(xVecLButton, rayVec));
     });
 
     m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
@@ -190,11 +253,6 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             // ↓に回転（チルト）した
             m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
         }
-    });
-
-    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-    {
-        isPressMButton = true;
     });
 
     // コンテキストメニュー操作設定
@@ -266,25 +324,68 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         {
             if (contextNodeVec[i] != "dance") continue;
             auto contextConfig = contextMenuConfig[i];
-            auto menuName = std::get<3>(contextConfig);
+            static const int FIRST_DANCE_INDEX = std::get<2>(contextConfig);
             contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
             {
-                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = (id - 141);
+                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = (id - FIRST_DANCE_INDEX);
                 stateManager->Transrate(EState::STATE_DANCE);
             };
         }
 
-        static const std::string ANIM_PATH = animPath;
-        contextCommand[searchContextId(contextMenuConfig, L"america")] = [&](UINT)
+        // model選択コマンド
+        static std::vector<std::string> models;
+        NodeApply(doc.first_node("model")->first_node("models")->first_node(), [&](auto child)
         {
-            std::lock_guard<std::mutex> lock(modelMutex);
-            m_mmd->Exit();
-            m_mmd = shared_ptr<DrawMMD>(new DrawMMD(ANIM_PATH, "data/Model/gumi/HK Gumi Swimsuit.pmx"));
-            //"data/model/hibiki/Hibiki Saiba 3.08 (Long Hair) (MrJinSenpai).pmx"));
-            m_mmd->afterInitialize();
-            m_mmd->SetStateManager(stateManager);
-            InitStateModel();
-            stateManager->Initialize(EState::STATE_WAIT);
+            models.emplace_back(GetAttribute(child, "path"));
+        });
+        for (size_t i = 0; i < contextNodeVec.size(); i++)
+        {
+            if (contextNodeVec[i] != "model") continue;
+            auto contextConfig = contextMenuConfig[i];
+            static const int FIRST_MODEL_ID = std::get<2>(contextConfig);
+            contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
+            {
+                stateManager->Transrate(EState::STATE_WAIT);
+
+                std::lock_guard<std::mutex> lock(modelMutex);
+                m_mmd->Exit();
+                m_mmd = nullptr;
+
+                CConfigLoader configPos("config_pos.txt");
+                if (configPos.IsOpen())
+                {
+                    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(
+                        animPath,
+                        models[id - FIRST_MODEL_ID],
+                        std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
+                        std::stof(configPos.Load("CHARA_DIRECT")),
+                        std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z"))));
+                }
+                m_mmd->afterInitialize();
+                m_mmd->SetStateManager(stateManager);
+                InitStateModel();
+                stateManager->Initialize(EState::STATE_WAIT);
+            };
+        }
+
+        static float opacity = 1.f;
+        contextCommand[searchContextId(contextMenuConfig, L"+")] = [&](UINT)
+        {
+            opacity += 0.1f;
+            if (opacity > 1.f)
+            {
+                opacity = 1.f;
+            }
+            MV1SetOpacityRate(m_mmd->GetModelHandle(), opacity);
+        };
+        contextCommand[searchContextId(contextMenuConfig, L"-")] = [&](UINT)
+        {
+            opacity -= 0.1f;
+            if (opacity < 0.f)
+            {
+                opacity = 0.f;
+            }
+            MV1SetOpacityRate(m_mmd->GetModelHandle(), opacity);
         };
     }
 

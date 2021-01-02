@@ -11,15 +11,12 @@
 
 #include <vector>
 #include <string>
-
+#include <mutex>
 
 class ManageMMD
 {
 public:
-    HRESULT Initialize(const std::string& animPath, const std::string& modelPath,
-        const float charaX = 0.f, const float charaY = 0.f, const float charaZ = 1.f,
-        const float charaDirect = DX_PI_F,
-        const float cameraX = 0.f, const float cameraY = 0.f, const float cameraZ = -35.f);
+    HRESULT Initialize();
 
     HRESULT Process();
 
@@ -43,4 +40,6 @@ private:
     std::shared_ptr<ActionManager> animManager;
 
     WalkStateManager walkManager;
+
+    std::mutex modelMutex;
 };

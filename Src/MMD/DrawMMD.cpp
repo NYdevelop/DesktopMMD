@@ -38,6 +38,8 @@ void DrawMMD::afterInitialize()
 
     DxLib::SetDrawScreen(DX_SCREEN_BACK);//•`‰æ‘ÎÛ‚ğ— ‰æ–Ê‚É‚·‚é
 
+    SetUseLighting(FALSE);
+
     cameraViewOffset = VGet(0.f, 7.f, 1.f);
     cameraViewPos = VGet(0.f, 0.f, 0.f);
 
