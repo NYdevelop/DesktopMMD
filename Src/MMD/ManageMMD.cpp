@@ -14,6 +14,8 @@
 
 #include "Util\rapidxml-1.13\rapidxml_utils.hpp"
 
+#include <mutex>
+
 using namespace std;
 
 HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& modelPath,
@@ -26,11 +28,12 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
 
     // コンテキストメニューの初期化
     std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>> contextMenuConfig;
+    std::vector<std::string> contextNodeVec;
     {
         rapidxml::xml_document<> doc;
         rapidxml::file<> input("config.xml");
         doc.parse<0>(input.data());
-        LoadContextNode(doc.first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
+        contextNodeVec = LoadContextNode(doc.first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
         m_Window.InitContextMenu(contextMenuConfig);
     }
 
@@ -43,106 +46,114 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
 
     bool isPressMButton = false;
     int beginMousePosX = 0, beginMousePosY = 0;
+    std::mutex modelMutex;
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         if (m_Window.IsClose()) return;
-        m_mmd->mainProcess();
-        walkManager.Update();
-        if (stateManager->GetCurrentStateIndex() != EState::STATE_DANCE)
+        if (m_mmd->mainProcess() == S_FALSE) return;
+        
         {
-            animManager->Play();
+            std::lock_guard<std::mutex> lock(modelMutex);
+            walkManager.Update();
+            if (stateManager->GetCurrentStateIndex() != EState::STATE_DANCE)
+            {
+                animManager->Play();
+            }
         }
 
-        /// キー入力判定
-        if (IsPress(VK_CONTROL) == true)
         {
-            if (IsPress(VK_RIGHT))
+            /// キー入力判定
+            if (IsPress(VK_CONTROL) == true)
             {
-                m_mmd->RotateY -= .1f;
+                if (IsPress(VK_RIGHT))
+                {
+                    m_mmd->RotateY -= .1f;
+                }
+
+                if (IsPress(VK_LEFT))
+                {
+                    m_mmd->RotateY += .1f;
+                }
+
+                if (IsPress(VK_UP))
+                {
+                    m_mmd->SetZoom(m_mmd->GetZoom() + .1f);
+                }
+
+                if (IsPress(VK_DOWN))
+                {
+                    m_mmd->SetZoom(m_mmd->GetZoom() - .1f);
+                }
+                return;
             }
 
-            if (IsPress(VK_LEFT))
-            {
-                m_mmd->RotateY += .1f;
-            }
-
+            auto pos = m_mmd->GetCharactorPos();
             if (IsPress(VK_UP))
             {
-                m_mmd->SetZoom(m_mmd->GetZoom() + .1f);
+                pos.y += .1f;
             }
 
             if (IsPress(VK_DOWN))
             {
-                m_mmd->SetZoom(m_mmd->GetZoom() - .1f);
+                pos.y -= .1f;
             }
-            return;
-        }
+            m_mmd->SetCharactorPos(pos);
 
-        auto pos = m_mmd->GetCharactorPos();
-        if (IsPress(VK_UP))
-        {
-            pos.y += .1f;
-        }
-
-        if (IsPress(VK_DOWN))
-        {
-            pos.y -= .1f;
-        }
-        m_mmd->SetCharactorPos(pos);
-
-        if (IsPress(VK_HOME))
-        {
-            int MouseX = 0, MouseY = 0;
-            GetMousePoint(&MouseX, &MouseY);
-            WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
-        }
-
-        // モデル上にカーソルがある場合反応するように
-        if (!IsPress(VK_MBUTTON))
-        {
-            isPressMButton = false;
-        }
-
-        if (isPressMButton)
-        {
-            static const float CAMERA_MOVE_SPEED_A = .001f;
-            static const float CAMERA_MOVE_SPEED_B = .624f;
-            int mouseX, mouseY;
-            GetMousePoint(&mouseX, &mouseY);
-
-            auto rayVec = m_mmd->GetRayVec();
-            auto xVec = VNorm(VCross(rayVec, VGet(0,1,0)));
-            VECTOR newPos = rayVec;
-            if (mouseX - beginMousePosX != 0)
+            if (IsPress(VK_HOME))
             {
-                float s = 1.f;
-                if (mouseX - beginMousePosX < 0)
-                    s = -1.f;
-                newPos =
-                    VAdd(
-                        m_mmd->cameraPos,
-                        VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-
-                beginMousePosX = mouseX;
+                int MouseX = 0, MouseY = 0;
+                GetMousePoint(&MouseX, &MouseY);
+                WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
             }
 
-            if (mouseY - beginMousePosY != 0)
+            // モデル上にカーソルがある場合反応するように
+            if (!IsPress(VK_MBUTTON))
             {
-                auto yVec = VNorm(VCross(xVec, rayVec));
-                float s = 1.f;
-                if (mouseY - beginMousePosY < 0)
-                    s = -1.f;
-                newPos =
-                    VAdd(
-                        newPos,
-                        VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-
-                beginMousePosY = mouseY;
+                isPressMButton = false;
             }
 
-            newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
-            m_mmd->cameraPos = newPos;
-            return;
+            if (isPressMButton)
+            {
+                static const float CAMERA_MOVE_SPEED_A = .001f;
+                static const float CAMERA_MOVE_SPEED_B = .624f;
+                int mouseX, mouseY;
+                GetMousePoint(&mouseX, &mouseY);
+
+                auto rayVec = m_mmd->GetRayVec();
+                auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+                VECTOR newPos = rayVec;
+                if (mouseX - beginMousePosX != 0)
+                {
+                    float s = 1.f;
+                    if (mouseX - beginMousePosX < 0)
+                        s = -1.f;
+                    newPos =
+                        VAdd(
+                            m_mmd->cameraPos,
+                            VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+
+                    beginMousePosX = mouseX;
+                }
+
+                if (mouseY - beginMousePosY != 0)
+                {
+                    auto yVec = VNorm(VCross(xVec, rayVec));
+                    float s = 1.f;
+                    if (mouseY - beginMousePosY < 0)
+                        s = -1.f;
+                    newPos =
+                        VAdd(
+                            newPos,
+                            VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+
+                    beginMousePosY = mouseY;
+                }
+
+                newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
+                m_mmd->cameraPos = newPos;
+                return;
+            }
+
         }
     });
 
@@ -203,6 +214,7 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             m_Window.Close();
             SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
         };
+
         contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&]()
         {
             stateManager->Transrate(EState::STATE_WAIT);
@@ -215,25 +227,11 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
         {
             stateManager->Transrate(EState::STATE_READ);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"CLC ME")] = [&]()
-        {
-            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 0;
-            stateManager->Transrate(EState::STATE_DANCE);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"Stay Tonight")] = [&]()
-        {
-            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 1;
-            stateManager->Transrate(EState::STATE_DANCE);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"Zero Two")] = [&]()
-        {
-            ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = 2;
-            stateManager->Transrate(EState::STATE_DANCE);
-        };
         contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&]()
         {
             stateManager->Transrate(EState::STATE_WAVE_HAND);
         };
+
         contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&]()
         {
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
@@ -263,6 +261,32 @@ HRESULT ManageMMD::Initialize(const std::string& animPath, const std::string& mo
             //チェックする
             waitState->SetRandomMove(true);
             CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | MFS_CHECKED);
+        };
+
+        // dance選択コマンド
+        int danceCount = 0;
+        for (size_t i = 0; i<contextNodeVec.size(); i++)
+        {
+            if (contextNodeVec[i] != "dance") continue;
+            auto menuName = std::get<3>(contextMenuConfig[i]);
+            contextCommand[searchContextId(contextMenuConfig, menuName)] = [&]()
+            {
+                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = danceCount++;
+                stateManager->Transrate(EState::STATE_DANCE);
+            };
+        }
+
+        static const std::string ANIM_PATH = animPath;
+        contextCommand[searchContextId(contextMenuConfig, L"america")] = [&]()
+        {
+            std::lock_guard<std::mutex> lock(modelMutex);
+            m_mmd->Exit();
+            m_mmd = shared_ptr<DrawMMD>(new DrawMMD(ANIM_PATH, "data/Model/gumi/HK Gumi Swimsuit.pmx"));
+            //"data/model/hibiki/Hibiki Saiba 3.08 (Long Hair) (MrJinSenpai).pmx"));
+            m_mmd->afterInitialize();
+            m_mmd->SetStateManager(stateManager);
+            InitStateModel();
+            stateManager->Initialize(EState::STATE_WAIT);
         };
     }
 
@@ -337,6 +361,24 @@ void ManageMMD::LoadModel()
         sMMD->SetAnimManager(animManager);
         sMMD->ModelInitial();
     }
+
+    {
+        std::shared_ptr<PlayAnim> blink(new PlayAnim);
+        blink->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BLINK);
+        blink->SetMaximumTime(250.f);
+        blink->IsLoop(true);
+        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), blink->GetAnimIndex(), 1);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->AddAnim(blink);
+    }
+
+    {
+        std::shared_ptr<PlayAnim> breath(new PlayAnim);
+        breath->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BREATH);
+        breath->SetMaximumTime(120.f);
+        breath->IsLoop(true);
+        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), breath->GetAnimIndex(), 1);
+        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->AddAnim(breath);
+    }
 }
 
 bool ManageMMD::IsRunning()
@@ -406,6 +448,8 @@ void ManageMMD::DrawFFT(WAVEFORMATEX wf)
 
 void ManageMMD::InitStateModel()
 {
+    stateManager->Clear();
+
     shared_ptr<State> wait(new WaitState());
     auto waitPtr = (WaitState*)wait.get();
     waitPtr->SetDrawMMD(m_mmd);
@@ -442,24 +486,6 @@ void ManageMMD::InitStateModel()
     stateManager->AddState(EState::STATE_WAVE_HAND, waveHand);
 
     LoadModel();
-
-    {
-        std::shared_ptr<PlayAnim> blink(new PlayAnim);
-        blink->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BLINK);
-        blink->SetMaximumTime(250.f);
-        blink->IsLoop(true);
-        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), blink->GetAnimIndex(), 1);
-        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->AddAnim(blink);
-    }
-
-    {
-        std::shared_ptr<PlayAnim> breath(new PlayAnim);
-        breath->AttachAnime(m_mmd->GetModelHandle(), (int)EAnimIndex::ANIM_BREATH);
-        breath->SetMaximumTime(120.f);
-        breath->IsLoop(true);
-        MV1SetAttachAnimBlendRate(m_mmd->GetModelHandle(), breath->GetAnimIndex(), 1);
-        animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->AddAnim(breath);
-    }
 
     walkManager.Initialize(m_mmd, stateManager, walkPtr->GetWalkAnimIndex());
     walkManager.SetNextState(EState::STATE_WAIT);

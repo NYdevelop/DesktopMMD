@@ -5,6 +5,9 @@
 
 std::string GetAttribute(rapidxml::xml_node<>* node, const std::string& name);
 
+#include <functional>
+void NodeApply(rapidxml::xml_node<>* node, const std::function<void(rapidxml::xml_node<>*)>& func);
+
 
 #include "Util.h"
 #include "WinUtil.h"
@@ -19,6 +22,13 @@ inline std::wstring ConvertType<std::wstring>(const std::string& str)
 {
     return StringToWString(str);
 }
+
+template<>
+inline std::string ConvertType<std::string>(const std::string& str)
+{
+    return str;
+}
+
 
 #include <algorithm>
 template<>

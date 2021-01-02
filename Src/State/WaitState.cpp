@@ -127,14 +127,12 @@ void WaitState::LoadConfig(const std::string& configPath)
     rapidxml::xml_document<> doc;
     rapidxml::file<> input(configPath.c_str());
     doc.parse<0>(input.data());
-    for (rapidxml::xml_node<>* child = doc.first_node("anim")->first_node();
-        child != nullptr;
-        child = child->next_sibling())
+    NodeApply(doc.first_node("anim")->first_node(), [&](auto child)
     {
         auto t = GetAttributes<int, bool, bool, bool, int, int>(
             child,
             {"num", "view_cam", "blink", "breath", "transframe", "rand"},
             {0, false, true, true, 10, 0});
         SetAnim(std::get<0>(t), std::get<1>(t), std::get<2>(t), std::get<3>(t), std::get<4>(t), std::get<5>(t));
-    }
+    });
 }

@@ -58,7 +58,8 @@ std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<
     return std::tuple<HMENU, ULONG, UINT, std::wstring>(context, MF_STRING, menuNum, menuName);
 }
 
-void LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
+static std::vector<std::string> nodeVec;
+std::vector<std::string> LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
 {
     if (sub != nullptr)
     {
@@ -69,10 +70,9 @@ void LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std:
         context = subMenu;
     }
 
-    for (rapidxml::xml_node<>* child = node;
-        child != nullptr;
-        child = child->next_sibling())
+    NodeApply(node, [&](auto child)
     {
+        nodeVec.emplace_back(child->name());
         auto info = LoadContextNode(child, context);
 
         // ‚³‚ç‚ÉŽq‚ª‚¢‚é‚©‚Ç‚¤‚©
@@ -80,9 +80,10 @@ void LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std:
         if (childSub != nullptr)
         {
             LoadContextNode(childSub, context, config, &info);
-            continue;
+            return;
         }
 
         config.emplace_back(info);
-    }
+    });
+    return nodeVec;
 }

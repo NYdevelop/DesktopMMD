@@ -51,7 +51,7 @@ void DrawMMD::afterInitialize()
 //ƒƒCƒ“‚Æ‚È‚éˆ—
 int DrawMMD::mainProcess()
 {
-    if (isDraw == false) return S_OK;
+    if (isDraw == false) return S_FALSE;
 
     //•`‰æ“à—e‚ğ‘Síœ
     DxLib::ClearDrawScreen();
@@ -111,6 +111,9 @@ void Write(std::ofstream& ofs, const std::string& keyWord, const std::string& va
 
 void DrawMMD::Exit()
 {
+    isDraw = false;
+    MV1DeleteModel(model);
+
     std::ofstream ofs("config_pos.txt");
     Write(ofs, "CHARA_POS_X", to_string(charaPos.x));
     Write(ofs, "CHARA_POS_Y", to_string(charaPos.y));

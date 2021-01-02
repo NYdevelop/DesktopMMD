@@ -18,7 +18,7 @@ bool IsPress(int key);
 
 std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<>* node, HMENU& context);
 
-void LoadContextNode(
+std::vector<std::string> LoadContextNode(
     rapidxml::xml_node<>* node,
     HMENU context,
     std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config,

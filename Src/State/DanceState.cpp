@@ -59,15 +59,12 @@ void DanceState::End()
     currentAnimIndex = -1;
 }
 
-#include <array>
 int DanceState::ModelInitial()
 {
     rapidxml::xml_document<> doc;
     rapidxml::file<> input("config.xml");
     doc.parse<0>(input.data());
-    for (rapidxml::xml_node<>* child = doc.first_node("dance")->first_node();
-        child != nullptr;
-        child = child->next_sibling())
+    NodeApply(doc.first_node("dance")->first_node(), [&](auto child)
     {
         auto t = GetAttributes<int, std::wstring>(child, { "anim_num", "music_path" });
 
@@ -80,7 +77,7 @@ int DanceState::ModelInitial()
 
         danceAnim.emplace_back(danceAnimPtr);
         danceMusic.emplace_back(musicPath);
-    }
+    });
     return 0;
 }
 

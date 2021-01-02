@@ -14,3 +14,13 @@ std::string GetAttribute(rapidxml::xml_node<>* node, const std::string & name)
     return std::string();
 }
 
+void NodeApply(rapidxml::xml_node<>* node, const std::function<void(rapidxml::xml_node<>*)>& func)
+{
+    for (rapidxml::xml_node<>* child = node;
+        child != nullptr;
+        child = child->next_sibling())
+    {
+        func(child);
+    }
+}
+

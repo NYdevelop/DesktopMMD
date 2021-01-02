@@ -90,6 +90,13 @@ public:
         return previousStateIndex;
     }
 
+    void Clear()
+    {
+        isInitialize = false;
+        End();
+        m_StateMap.clear();
+    }
+
 private:
     std::map<T, std::shared_ptr<State>> m_StateMap;
     std::shared_ptr<State> currentState;
