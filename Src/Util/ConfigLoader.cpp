@@ -30,7 +30,7 @@ CConfigLoader::~CConfigLoader()
 vector<string> Split(const string& src, char delim)
 {
     size_t first = 0;
-    int last = src.find_first_of(delim);
+    auto last = src.find_first_of(delim);
 
     std::vector<std::string> result;
     if (last == string::npos)
