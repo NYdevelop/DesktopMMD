@@ -50,14 +50,19 @@ void ReadState::Initialize()
         t.join();
     }
 
-    m_Output->Start(L"data/text.wav");
-    MV1SetAttachAnimBlendRate(model, lipAnim->GetAnimIndex(), 1);
     lipAnim->ResetAnimTime();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, lipAnim->GetAnimIndex(), 10);
     animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(lipAnim);
+
+    start = chrono::system_clock::now();
+    m_Output->Start(L"data/text.wav");
 }
 
 void ReadState::Doing()
 {
+    static const float MILLISEC_TO_FRAME = 1000.f / 30.f;
+    auto tmp = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
+    tmp->Play(std::chrono::duration_cast<std::chrono::milliseconds>(chrono::system_clock::now() - start).count() / MILLISEC_TO_FRAME);
 }
 
 void ReadState::End()

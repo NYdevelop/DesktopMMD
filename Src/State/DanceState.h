@@ -3,6 +3,7 @@
 #include "State/StateMMD.h"
 
 #include <memory>
+#include <chrono>
 #include "Sound/OutputSound.h"
 #include "MMD/Anim/PlayAnim.h"
 #include "MMD/DrawMMD.h"
@@ -17,13 +18,11 @@ public:
     int ModelInitial();
 
     void SetOutputSound(std::shared_ptr<OutputSound> output);
-    void SetDrawMMD(std::shared_ptr<DrawMMD> mmd);
 
     int DanceIndex = 0;
 
 private:
     std::shared_ptr<OutputSound> m_Output;
-    std::shared_ptr<DrawMMD> m_mmd;
 
     enum EDanceConfig : int
     {
@@ -35,4 +34,5 @@ private:
 
     int currentAnimIndex = -1;
     bool isDance = false;
+    std::chrono::time_point<std::chrono::system_clock> start;
 };

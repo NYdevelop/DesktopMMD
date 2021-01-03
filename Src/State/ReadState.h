@@ -2,9 +2,9 @@
 #include "State/StateMMD.h"
 
 #include <memory>
+#include <chrono>
 #include "Sound/OutputSound.h"
 #include "MMD/Anim/PlayAnim.h"
-
 #include "MMD/ManageMMD.h"
 
 class ReadState : public StateMMD
@@ -29,4 +29,6 @@ private:
     std::shared_ptr < PlayAnim >  lipAnim;
 
     ManageMMD* manager = nullptr;
+
+    std::chrono::time_point<std::chrono::system_clock> start;
 };

@@ -2,14 +2,12 @@
 
 #include <iostream>
 #include "DxLib.h"
-#include <chrono>
 
 #include "Util\UtilXml.h"
 #include "Util\rapidxml-1.13\rapidxml_utils.hpp"
 
 using namespace std;
 
-chrono::time_point<chrono::system_clock> start;
 
 void DanceState::Initialize()
 {
@@ -84,7 +82,3 @@ void DanceState::SetOutputSound(std::shared_ptr<OutputSound> output)
     m_Output = output;
 }
 
-void DanceState::SetDrawMMD(std::shared_ptr<DrawMMD> mmd)
-{
-    m_mmd = mmd;
-}

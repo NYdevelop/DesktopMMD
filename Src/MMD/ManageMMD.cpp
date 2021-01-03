@@ -35,21 +35,21 @@ HRESULT ManageMMD::Initialize()
         m_Window.InitContextMenu(contextMenuConfig);
     }
 
-    static const auto animPath = GetAttribute(base->first_node("config")->first_node("anim"), "path");
+    static const auto ANIM_PATH = GetAttribute(base->first_node("config")->first_node("anim"), "path");
     auto modelNode = base->first_node("model")->first_node();
     //for (int i = 1; i < 13; i++) modelNode = modelNode->next_sibling();
     static const auto modelPath = GetAttribute(modelNode, "path");
     CConfigLoader configPos("config_pos.txt");
     if (configPos.IsOpen())
     {
-        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath,
+        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(ANIM_PATH, modelPath,
             std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
             std::stof(configPos.Load("CHARA_DIRECT")),
             std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z"))));
     }
     else
     {
-        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(animPath, modelPath));
+        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(ANIM_PATH, modelPath));
     }
     if (DxLib::DxLib_Init() == -1) return E_FAIL;
     m_mmd->afterInitialize();
@@ -57,72 +57,244 @@ HRESULT ManageMMD::Initialize()
     stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
     m_mmd->SetStateManager(stateManager);
 
-    /// マウスドラッグ操作
+    // 外部操作初期化
     {
-        VECTOR xVecLButton, yVecLButton;
-        mouseDrag.SetButtonFunc(VK_LBUTTON,
-            [&](LONG, LONG)
+        /// マウスドラッグ操作
         {
-            auto rayVec = m_mmd->GetRayVec();
-            xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-            yVecLButton = VNorm(VCross(xVecLButton, rayVec));
-        },
-            [&](LONG diffX, LONG diffY)
-        {
-            VECTOR newPos = m_mmd->cameraPos;
-            if (diffX != 0)
+            VECTOR xVecLButton, yVecLButton;
+            mouseDrag.SetButtonFunc(VK_LBUTTON,
+                [&](LONG, LONG)
             {
-                auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
-                newPos = VAdd(newPos, diff);
-                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+                auto rayVec = m_mmd->GetRayVec();
+                xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+                yVecLButton = VNorm(VCross(xVecLButton, rayVec));
+            },
+                [&](LONG diffX, LONG diffY)
+            {
+                VECTOR newPos = m_mmd->cameraPos;
+                if (diffX != 0)
+                {
+                    auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
+                    newPos = VAdd(newPos, diff);
+                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+                }
+
+                if (diffY != 0)
+                {
+                    auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
+                    newPos = VAdd(newPos, diff);
+                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+                }
+                m_mmd->cameraPos = newPos;
+            });
+
+            mouseDrag.SetButtonFunc(VK_MBUTTON,
+                [](LONG, LONG) {},
+                [&](LONG diffX, LONG diffY)
+            {
+                static const float CAMERA_MOVE_SPEED_A = .001f;
+                static const float CAMERA_MOVE_SPEED_B = .624f;
+
+                auto rayVec = m_mmd->GetRayVec();
+                auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+                VECTOR newPos = rayVec;
+                if (diffX != 0)
+                {
+                    float s = 1.f;
+                    if (diffX < 0)
+                        s = -1.f;
+                    newPos =
+                        VAdd(
+                            m_mmd->cameraPos,
+                            VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+                }
+
+                if (diffY != 0)
+                {
+                    auto yVec = VNorm(VCross(xVec, rayVec));
+                    float s = 1.f;
+                    if (diffY < 0)
+                        s = -1.f;
+                    newPos =
+                        VAdd(
+                            newPos,
+                            VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+                }
+
+                newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
+                m_mmd->cameraPos = newPos;
+            });
+        }
+
+        m_Window.SetCallbackMsg(WM_LBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+        {
+            mouseDrag.ButtonDown(VK_LBUTTON);
+        });
+
+        m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+        {
+            mouseDrag.ButtonDown(VK_MBUTTON);
+        });
+
+        m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
+        {
+            static const float VOLUME_DELTA = 0.05f;
+            int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
+            int nNotch = zDelta / WHEEL_DELTA;    // ノッチ数を求める
+
+            if (IsPress(VK_CONTROL))
+            {
+                auto v = m_Output->GetVolume();
+                if (nNotch > 0)
+                {
+                    // ↑に回転（チルト）した
+                    v += VOLUME_DELTA;
+                    m_Output->SetVolume(v);
+                }
+                else if (nNotch < 0)
+                {
+                    // ↓に回転（チルト）した
+                    v -= VOLUME_DELTA;
+                    m_Output->SetVolume(v);
+                }
+                cout << "volume:" << v << endl;
+                return;
             }
 
-            if (diffY != 0)
+            if (nNotch > 0)
             {
-                auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
-                newPos = VAdd(newPos, diff);
-                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+                // ↑に回転（チルト）した
+                m_mmd->SetZoom(m_mmd->GetZoom() - 5.f);
             }
-            m_mmd->cameraPos = newPos;
+            else if (nNotch < 0)
+            {
+                // ↓に回転（チルト）した
+                m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
+            }
+        });
+
+        // コンテキストメニュー操作設定
+        static std::map<UINT, function<void(UINT)>> contextCommand;
+        {
+            static auto searchContextId = [](const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& contextMenuConfig, const std::wstring& menuName)
+            {
+                auto itr = find_if(contextMenuConfig.begin(), contextMenuConfig.end(), [&menuName](auto& x) { return std::get<3>(x) == menuName; });
+                if (itr == contextMenuConfig.end()) throw "not find...";
+                return std::get<2>(*itr);
+            };
+
+            contextCommand[searchContextId(contextMenuConfig, L"Exit")] = [&](UINT)
+            {
+                m_Window.Close();
+                SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
+            };
+
+            contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&](UINT)
+            {
+                stateManager->Transrate(EState::STATE_WAIT);
+            };
+            contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = [&](UINT)
+            {
+                stateManager->Transrate(EState::STATE_RHYTHM);
+            };
+            contextCommand[searchContextId(contextMenuConfig, L"Read")] = [&](UINT)
+            {
+                stateManager->Transrate(EState::STATE_READ);
+            };
+            contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&](UINT)
+            {
+                stateManager->Transrate(EState::STATE_WAVE_HAND);
+            };
+
+            contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&](UINT)
+            {
+                auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
+                WalkStart(VGet(100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
+            };
+            contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = [&](UINT)
+            {
+                auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
+                WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
+            };
+            contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] =
+                std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
+            {
+                ((WaitState*)(stateManager->GetStateMap()[EState::STATE_WAIT].get()))->SetRandomMove(isCheck);
+            });
+
+            // ライト設定
+            {
+                auto lightMode = GetAttrVal<bool>(base->first_node("config")->first_node("light"), "mode", false);
+                m_mmd->SetEnableLight(lightMode);
+                const auto lightContextId = searchContextId(contextMenuConfig, L"Light");
+                ContextItemCheck(lightContextId, m_Window.GetContextMenu(), lightMode);
+                contextCommand[lightContextId] =
+                    std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
+                {
+                    m_mmd->SetEnableLight(isCheck);
+                });
+            }
+
+            // dance選択コマンド
+            for (size_t i = 0; i<contextNodeVec.size(); i++)
+            {
+                if (contextNodeVec[i] != "dance") continue;
+                auto contextConfig = contextMenuConfig[i];
+                static const int FIRST_DANCE_INDEX = std::get<2>(contextConfig);
+                contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
+                {
+                    ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = (id - FIRST_DANCE_INDEX);
+                    stateManager->Transrate(EState::STATE_DANCE);
+                };
+            }
+
+            // model選択コマンド
+            static std::vector<std::string> models;
+            NodeApply(base->first_node("model")->first_node(), [&](auto child)
+            {
+                models.emplace_back(GetAttribute(child, "path"));
+            });
+            for (size_t i = 0; i < contextNodeVec.size(); i++)
+            {
+                if (contextNodeVec[i] != "model") continue;
+                auto contextConfig = contextMenuConfig[i];
+                static const int FIRST_MODEL_ID = std::get<2>(contextConfig);
+                contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
+                {
+                    stateManager->Transrate(EState::STATE_WAIT);
+
+                    std::lock_guard<std::mutex> lock(modelMutex);
+                    m_mmd->Exit();
+                    m_mmd = nullptr;
+
+                    CConfigLoader configPos("config_pos.txt");
+                    if (configPos.IsOpen())
+                    {
+                        m_mmd = shared_ptr<DrawMMD>(new DrawMMD(
+                            ANIM_PATH,
+                            models[id - FIRST_MODEL_ID],
+                            std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
+                            std::stof(configPos.Load("CHARA_DIRECT")),
+                            std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z"))));
+                    }
+                    m_mmd->afterInitialize();
+                    m_mmd->SetStateManager(stateManager);
+                    InitStateModel();
+                    stateManager->Initialize(EState::STATE_WAIT);
+                };
+            }
+        }
+
+        m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
+        {
+            walkManager.Cancel();
+            auto id = (UINT)LOWORD(wParam);
+            if (!contextCommand.empty() && contextCommand.find(id) != contextCommand.end())
+            {
+                contextCommand[id](id);
+            }
         });
     }
-
-    mouseDrag.SetButtonFunc(VK_MBUTTON,
-        [](LONG, LONG) {},
-        [&](LONG diffX, LONG diffY)
-    {
-        static const float CAMERA_MOVE_SPEED_A = .001f;
-        static const float CAMERA_MOVE_SPEED_B = .624f;
-
-        auto rayVec = m_mmd->GetRayVec();
-        auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-        VECTOR newPos = rayVec;
-        if (diffX != 0)
-        {
-            float s = 1.f;
-            if (diffX < 0)
-                s = -1.f;
-            newPos =
-                VAdd(
-                    m_mmd->cameraPos,
-                    VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-        }
-
-        if (diffY != 0)
-        {
-            auto yVec = VNorm(VCross(xVec, rayVec));
-            float s = 1.f;
-            if (diffY < 0)
-                s = -1.f;
-            newPos =
-                VAdd(
-                    newPos,
-                    VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-        }
-
-        newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
-        m_mmd->cameraPos = newPos;
-    });
 
     m_Window.SetDrawFunc([&](HDC hdc)
     {
@@ -186,176 +358,6 @@ HRESULT ManageMMD::Initialize()
             mouseDrag.Update();
         }
     });
-
-    m_Window.SetCallbackMsg(WM_LBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-    {
-        mouseDrag.ButtonDown(VK_LBUTTON);
-    });
-
-    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-    {
-        mouseDrag.ButtonDown(VK_MBUTTON);
-    });
-
-    m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
-    {
-        static const float VOLUME_DELTA = 0.05f;
-        int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転量
-        int nNotch = zDelta / WHEEL_DELTA;    // ノッチ数を求める
-
-        if (IsPress(VK_CONTROL))
-        {
-            auto v = m_Output->GetVolume();
-            if (nNotch > 0)
-            {
-                // ↑に回転（チルト）した
-                v += VOLUME_DELTA;
-                m_Output->SetVolume(v);
-            }
-            else if (nNotch < 0)
-            {
-                // ↓に回転（チルト）した
-                v -= VOLUME_DELTA;
-                m_Output->SetVolume(v);
-            }
-            cout << "volume:" << v << endl;
-            return;
-        }
-
-        if (nNotch > 0)
-        {
-            // ↑に回転（チルト）した
-            m_mmd->SetZoom(m_mmd->GetZoom() - 5.f);
-        }
-        else if (nNotch < 0)
-        {
-            // ↓に回転（チルト）した
-            m_mmd->SetZoom(m_mmd->GetZoom() + 5.f);
-        }
-    });
-
-    // コンテキストメニュー操作設定
-    static std::map<UINT, function<void(UINT)>> contextCommand;
-    {
-        static auto searchContextId = [](const std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& contextMenuConfig, const std::wstring& menuName)
-        {
-            auto itr = find_if(contextMenuConfig.begin(), contextMenuConfig.end(), [&menuName](auto& x) { return std::get<3>(x) == menuName; });
-            if (itr == contextMenuConfig.end()) throw "not find...";
-            return std::get<2>(*itr);
-        };
-
-        contextCommand[searchContextId(contextMenuConfig, L"Exit")] = [&](UINT)
-        {
-            m_Window.Close();
-            SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
-        };
-
-        contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&](UINT)
-        {
-            stateManager->Transrate(EState::STATE_WAIT);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = [&](UINT)
-        {
-            stateManager->Transrate(EState::STATE_RHYTHM);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"Read")] = [&](UINT)
-        {
-            stateManager->Transrate(EState::STATE_READ);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&](UINT)
-        {
-            stateManager->Transrate(EState::STATE_WAVE_HAND);
-        };
-
-        contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&](UINT)
-        {
-            auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-            WalkStart(VGet(100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = [&](UINT)
-        {
-            auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-            WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
-        };
-        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] =
-            std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
-        {
-            ((WaitState*)(stateManager->GetStateMap()[EState::STATE_WAIT].get()))->SetRandomMove(isCheck);
-        });
-
-        // ライト設定
-        {
-            auto lightMode = GetAttrVal<bool>(base->first_node("config")->first_node("light"), "mode", false);
-            m_mmd->SetEnableLight(lightMode);
-            const auto lightContextId = searchContextId(contextMenuConfig, L"Light");
-            ContextItemCheck(lightContextId, m_Window.GetContextMenu(), lightMode);
-            contextCommand[lightContextId] =
-                std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
-            {
-                m_mmd->SetEnableLight(isCheck);
-            });
-        }
-
-        // dance選択コマンド
-        for (size_t i = 0; i<contextNodeVec.size(); i++)
-        {
-            if (contextNodeVec[i] != "dance") continue;
-            auto contextConfig = contextMenuConfig[i];
-            static const int FIRST_DANCE_INDEX = std::get<2>(contextConfig);
-            contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
-            {
-                ((DanceState*)(stateManager->GetStateMap()[EState::STATE_DANCE].get()))->DanceIndex = (id - FIRST_DANCE_INDEX);
-                stateManager->Transrate(EState::STATE_DANCE);
-            };
-        }
-
-        // model選択コマンド
-        static std::vector<std::string> models;
-        NodeApply(base->first_node("model")->first_node(), [&](auto child)
-        {
-            models.emplace_back(GetAttribute(child, "path"));
-        });
-        for (size_t i = 0; i < contextNodeVec.size(); i++)
-        {
-            if (contextNodeVec[i] != "model") continue;
-            auto contextConfig = contextMenuConfig[i];
-            static const int FIRST_MODEL_ID = std::get<2>(contextConfig);
-            contextCommand[std::get<2>(contextConfig)] = [&](UINT id)
-            {
-                stateManager->Transrate(EState::STATE_WAIT);
-
-                std::lock_guard<std::mutex> lock(modelMutex);
-                m_mmd->Exit();
-                m_mmd = nullptr;
-
-                CConfigLoader configPos("config_pos.txt");
-                if (configPos.IsOpen())
-                {
-                    m_mmd = shared_ptr<DrawMMD>(new DrawMMD(
-                        animPath,
-                        models[id - FIRST_MODEL_ID],
-                        std::stof(configPos.Load("CHARA_POS_X")), std::stof(configPos.Load("CHARA_POS_Y")), std::stof(configPos.Load("CHARA_POS_Z")),
-                        std::stof(configPos.Load("CHARA_DIRECT")),
-                        std::stof(configPos.Load("CAMERA_POS_X")), std::stof(configPos.Load("CAMERA_POS_Y")), std::stof(configPos.Load("CAMERA_POS_Z"))));
-                }
-                m_mmd->afterInitialize();
-                m_mmd->SetStateManager(stateManager);
-                InitStateModel();
-                stateManager->Initialize(EState::STATE_WAIT);
-            };
-        }
-    }
-
-    m_Window.SetCallbackCommand([&](WPARAM wParam, LPARAM lParam)
-    {
-        walkManager.Cancel();
-        auto id = (UINT)LOWORD(wParam);
-        if (!contextCommand.empty() && contextCommand.find(id) != contextCommand.end())
-        {
-            contextCommand[id](id);
-        }
-    });
-
 
     /// 録音デバイス初期化
     WAVEFORMATEX wf;
@@ -514,7 +516,6 @@ void ManageMMD::InitStateModel()
 
     shared_ptr<State> rhythm(new RhythmState());
     auto rhythmPtr = (RhythmState*)rhythm.get();
-    rhythmPtr->SetModel(m_mmd->GetModelHandle());
     rhythmPtr->SetCapture(m_Capture);
     rhythmPtr->OnceInital();
     stateManager->AddState(EState::STATE_RHYTHM, move(rhythm));
@@ -528,7 +529,6 @@ void ManageMMD::InitStateModel()
     shared_ptr<State> dance(new DanceState());
     auto dancePtr = (DanceState*)dance.get();
     dancePtr->SetOutputSound(m_Output);
-    dancePtr->SetDrawMMD(m_mmd);
     stateManager->AddState(EState::STATE_DANCE, dance);
 
     shared_ptr<State> walk(new WalkState());
