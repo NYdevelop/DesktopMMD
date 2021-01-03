@@ -82,9 +82,8 @@ void WaitState::OnceInitial()
 
 void WaitState::DoWaitAnim()
 {
-    auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
-    auto animIndexMap = mt() % m_WaitAnimMap.size();
-    auto tmpTuple = m_WaitAnimMap[animIndexMap];
+    auto tmpTuple = m_WaitAnimMap[static_cast<int>(mt() % m_WaitAnimMap.size())];
+
     auto anim = std::get<EAnimMap::ITEM_ANIM>(tmpTuple);
     anim->ResetAnimTime();
     m_mmd->canViewCamera = std::get<EAnimMap::ITEM_VIEW_CAM>(tmpTuple);
@@ -92,6 +91,7 @@ void WaitState::DoWaitAnim()
     std::cout << "wait anim : " << (int)animIndex << std::endl;
 
     auto transframe = std::get<EAnimMap::ITEM_TRANSE_FRAME>(tmpTuple);
+    auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
     animQueue->AddTransrate(-1, anim->GetAnimIndex(), transframe);
     animQueue->AddAnim(anim);
     if (std::get<EAnimMap::ITEM_RANDOM_LOOP>(tmpTuple) != 0)
@@ -115,11 +115,14 @@ void WaitState::DoWaitAnim()
 void WaitState::SetAnim(int index, bool isViewCam, bool isBlink, bool isBreath, int transFrame, int rand)
 {
     auto mapIndex = m_WaitAnimMap.size();
-    std::tuple<std::shared_ptr < PlayAnim >, int, bool, bool, bool, int, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
-    m_WaitAnimMap[mapIndex] = tmp;
-    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);
-    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->SetPlaySpeed(.5f);
-    std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->IsLoop(false);
+    std::tuple<std::shared_ptr < PlayAnim >, int, bool, bool, bool, int, int> tmp(
+        std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
+    m_WaitAnimMap[static_cast<int>(mapIndex)] = tmp;
+
+    auto anim = std::get<EAnimMap::ITEM_ANIM>(tmp);
+    anim->AttachAnime(model, (int)index);
+    anim->SetPlaySpeed(.5f);
+    anim->IsLoop(false);
 }
 
 void WaitState::LoadConfig(const std::string& configPath)

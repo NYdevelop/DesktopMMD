@@ -6,8 +6,8 @@
 #include "MMD/DrawMMD.h"
 #include "MMD/Anim/PlayAnimQueue.h"
 #include "State/StateManager.h"
-
 #include "State/WalkStateManager.h"
+#include "Util\MouseDrag.h"
 
 #include <vector>
 #include <string>
@@ -40,6 +40,8 @@ private:
     std::shared_ptr<ActionManager> animManager;
 
     WalkStateManager walkManager;
+
+    MouseDrag mouseDrag;
 
     std::mutex modelMutex;
 };

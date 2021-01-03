@@ -9,7 +9,7 @@ std::wstring StringToWString(std::string const& src, unsigned int charCode)
 {
     const size_t len = src.size() + 1;
     TCHAR* tmp = new TCHAR[len];
-    MultiByteToWideChar(charCode, 0, src.c_str(), -1, tmp, len);
+    MultiByteToWideChar(charCode, 0, src.c_str(), -1, tmp, static_cast<int>(len));
     std::wstring ret(tmp);
     delete[] tmp;
     return ret;
@@ -59,7 +59,11 @@ std::tuple<HMENU, ULONG, UINT, std::wstring> LoadContextNode(rapidxml::xml_node<
 }
 
 static std::vector<std::string> nodeVec;
-std::vector<std::string> LoadContextNode(rapidxml::xml_node<>* node, HMENU context, std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config, std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
+std::vector<std::string> LoadContextNode(
+    rapidxml::xml_node<>* node,
+    HMENU context,
+    std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>>& config,
+    std::tuple<HMENU, ULONG, UINT, std::wstring>* sub)
 {
     if (sub != nullptr)
     {
@@ -86,4 +90,14 @@ std::vector<std::string> LoadContextNode(rapidxml::xml_node<>* node, HMENU conte
         config.emplace_back(info);
     });
     return nodeVec;
+}
+
+
+
+void ContextCheckFunc(UINT id, HMENU contextMenu, const std::function<void(bool)>& callbackFunc)
+{
+    bool currentCheck = (GetMenuState(contextMenu, id, MF_BYCOMMAND) & MFS_CHECKED) > 0;
+    ContextItemCheck(id, contextMenu, !currentCheck);
+
+    callbackFunc(!currentCheck);
 }

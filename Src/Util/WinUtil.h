@@ -30,3 +30,17 @@ auto as_integer(Enumeration const value)
 {
     return static_cast<typename std::underlying_type<Enumeration>::type>(value);
 }
+
+
+// コンテキストメニューチェック関数のラッパー関数
+inline DWORD ContextItemCheck(UINT id, HMENU contextMenu, bool isCheck)
+{
+    return CheckMenuItem(contextMenu, id, MF_BYCOMMAND | isCheck ? MFS_CHECKED : MFS_UNCHECKED);
+};
+
+#include <functional>
+// コンテキストメニューチェック実装関数
+void ContextCheckFunc(
+    UINT id,
+    HMENU contextMenu,
+    const std::function<void(bool)>& callbackFunc); // チェック時のコールバック関数

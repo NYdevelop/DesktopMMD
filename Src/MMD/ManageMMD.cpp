@@ -57,9 +57,73 @@ HRESULT ManageMMD::Initialize()
     stateManager = shared_ptr< StateManager<EState> >(new StateManager<EState>());
     m_mmd->SetStateManager(stateManager);
 
-    bool isPressMButton = false, isPressLButton = false;
-    int beginMousePosX = 0, beginMousePosY = 0;
-    VECTOR xVecLButton, yVecLButton;
+    /// マウスドラッグ操作
+    {
+        VECTOR xVecLButton, yVecLButton;
+        mouseDrag.SetButtonFunc(VK_LBUTTON,
+            [&](LONG, LONG)
+        {
+            auto rayVec = m_mmd->GetRayVec();
+            xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+            yVecLButton = VNorm(VCross(xVecLButton, rayVec));
+        },
+            [&](LONG diffX, LONG diffY)
+        {
+            VECTOR newPos = m_mmd->cameraPos;
+            if (diffX != 0)
+            {
+                auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
+                newPos = VAdd(newPos, diff);
+                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+            }
+
+            if (diffY != 0)
+            {
+                auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
+                newPos = VAdd(newPos, diff);
+                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+            }
+            m_mmd->cameraPos = newPos;
+        });
+    }
+
+    mouseDrag.SetButtonFunc(VK_MBUTTON,
+        [](LONG, LONG) {},
+        [&](LONG diffX, LONG diffY)
+    {
+        static const float CAMERA_MOVE_SPEED_A = .001f;
+        static const float CAMERA_MOVE_SPEED_B = .624f;
+
+        auto rayVec = m_mmd->GetRayVec();
+        auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+        VECTOR newPos = rayVec;
+        if (diffX != 0)
+        {
+            float s = 1.f;
+            if (diffX < 0)
+                s = -1.f;
+            newPos =
+                VAdd(
+                    m_mmd->cameraPos,
+                    VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+        }
+
+        if (diffY != 0)
+        {
+            auto yVec = VNorm(VCross(xVec, rayVec));
+            float s = 1.f;
+            if (diffY < 0)
+                s = -1.f;
+            newPos =
+                VAdd(
+                    newPos,
+                    VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+        }
+
+        newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
+        m_mmd->cameraPos = newPos;
+    });
+
     m_Window.SetDrawFunc([&](HDC hdc)
     {
         if (m_Window.IsClose()) return;
@@ -119,106 +183,18 @@ HRESULT ManageMMD::Initialize()
                 WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
             }
 
-            if (!IsPress(VK_MBUTTON))
-            {
-                isPressMButton = false;
-            }
-            if (isPressMButton)
-            {
-                static const float CAMERA_MOVE_SPEED_A = .001f;
-                static const float CAMERA_MOVE_SPEED_B = .624f;
-                int mouseX, mouseY;
-                GetMousePoint(&mouseX, &mouseY);
-
-                auto rayVec = m_mmd->GetRayVec();
-                auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-                VECTOR newPos = rayVec;
-                if (mouseX - beginMousePosX != 0)
-                {
-                    float s = 1.f;
-                    if (mouseX - beginMousePosX < 0)
-                        s = -1.f;
-                    newPos =
-                        VAdd(
-                            m_mmd->cameraPos,
-                            VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-
-                    beginMousePosX = mouseX;
-                }
-
-                if (mouseY - beginMousePosY != 0)
-                {
-                    auto yVec = VNorm(VCross(xVec, rayVec));
-                    float s = 1.f;
-                    if (mouseY - beginMousePosY < 0)
-                        s = -1.f;
-                    newPos =
-                        VAdd(
-                            newPos,
-                            VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-
-                    beginMousePosY = mouseY;
-                }
-
-                newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
-                m_mmd->cameraPos = newPos;
-                return;
-            }
-
-            if (!IsPress(VK_LBUTTON))
-            {
-                isPressLButton = false;
-            }
-            if (isPressLButton)
-            {
-                int mouseX, mouseY;
-                GetMousePoint(&mouseX, &mouseY);
-
-                VECTOR newPos = m_mmd->cameraPos;
-                auto diffX = mouseX - beginMousePosX;
-                if (diffX != 0)
-                {
-                    auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
-                    newPos = VAdd( newPos, diff);
-                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
-
-                    beginMousePosX = mouseX;
-                }
-
-                auto diffY = mouseY - beginMousePosY;
-                if (diffY != 0)
-                {
-                    auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
-                    newPos = VAdd( newPos, diff);
-                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
-
-                    beginMousePosY = mouseY;
-                }
-                m_mmd->cameraPos = newPos;
-            }
+            mouseDrag.Update();
         }
-    });
-
-    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-    {
-        int mouseX, mouseY;
-        GetMousePoint(&mouseX, &mouseY);
-        beginMousePosX = mouseX;
-        beginMousePosY = mouseY;
-        isPressMButton = true;
     });
 
     m_Window.SetCallbackMsg(WM_LBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
     {
-        isPressLButton = true;
-        int mouseX, mouseY;
-        GetMousePoint(&mouseX, &mouseY);
-        beginMousePosX = mouseX;
-        beginMousePosY = mouseY;
+        mouseDrag.ButtonDown(VK_LBUTTON);
+    });
 
-        auto rayVec = m_mmd->GetRayVec();
-        xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-        yVecLButton = VNorm(VCross(xVecLButton, rayVec));
+    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
+    {
+        mouseDrag.ButtonDown(VK_MBUTTON);
     });
 
     m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
@@ -301,30 +277,24 @@ HRESULT ManageMMD::Initialize()
             auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
             WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
         };
-        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] = [&](UINT id)
+        contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] =
+            std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
         {
-            bool isCheck = (GetMenuState(m_Window.GetContextMenu(), id, MF_BYCOMMAND) & MFS_CHECKED) > 0;
-            CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | isCheck ? MFS_UNCHECKED : MFS_CHECKED);
+            ((WaitState*)(stateManager->GetStateMap()[EState::STATE_WAIT].get()))->SetRandomMove(isCheck);
+        });
 
-            auto waitState = (WaitState*)stateManager->GetStateMap()[EState::STATE_WAIT].get();
-            waitState->SetRandomMove(!isCheck);
-        };
-
-        const auto lightContextId = searchContextId(contextMenuConfig, L"Light");
-        auto lightMode = GetAttrVal<bool>(base->first_node("config")->first_node("light"), "mode", false);
-        m_mmd->SetEnableLight(lightMode);
-        if (lightMode)
+        // ライト設定
         {
-            CheckMenuItem(m_Window.GetContextMenu(), lightContextId, MF_BYCOMMAND | MFS_CHECKED);
+            auto lightMode = GetAttrVal<bool>(base->first_node("config")->first_node("light"), "mode", false);
+            m_mmd->SetEnableLight(lightMode);
+            const auto lightContextId = searchContextId(contextMenuConfig, L"Light");
+            ContextItemCheck(lightContextId, m_Window.GetContextMenu(), lightMode);
+            contextCommand[lightContextId] =
+                std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
+            {
+                m_mmd->SetEnableLight(isCheck);
+            });
         }
-        contextCommand[lightContextId] = [&](UINT id)
-        {
-            bool isCheck = (GetMenuState(m_Window.GetContextMenu(), id, MF_BYCOMMAND) & MFS_CHECKED) > 0;
-            CheckMenuItem(m_Window.GetContextMenu(), id, MF_BYCOMMAND | isCheck ? MFS_UNCHECKED : MFS_CHECKED);
-
-            m_mmd->SetEnableLight(!isCheck);
-        };
-
 
         // dance選択コマンド
         for (size_t i = 0; i<contextNodeVec.size(); i++)
