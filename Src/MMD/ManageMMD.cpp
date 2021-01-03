@@ -36,7 +36,9 @@ HRESULT ManageMMD::Initialize()
     }
 
     static const auto animPath = GetAttribute(base->first_node("config")->first_node("anim"), "path");
-    static const auto modelPath = GetAttribute(base->first_node("model")->first_node(), "path");
+    auto modelNode = base->first_node("model")->first_node();
+    //for (int i = 1; i < 13; i++) modelNode = modelNode->next_sibling();
+    static const auto modelPath = GetAttribute(modelNode, "path");
     CConfigLoader configPos("config_pos.txt");
     if (configPos.IsOpen())
     {
@@ -221,7 +223,7 @@ HRESULT ManageMMD::Initialize()
 
     m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
     {
-        static const float VOLUME_DELTA = 0.01f;
+        static const float VOLUME_DELTA = 0.05f;
         int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// âÒì]ó 
         int nNotch = zDelta / WHEEL_DELTA;    // ÉmÉbÉ`êîÇãÅÇﬂÇÈ
 

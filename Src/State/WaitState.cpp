@@ -114,7 +114,7 @@ void WaitState::DoWaitAnim()
 
 void WaitState::SetAnim(int index, bool isViewCam, bool isBlink, bool isBreath, int transFrame, int rand)
 {
-    int mapIndex = m_WaitAnimMap.size();
+    auto mapIndex = m_WaitAnimMap.size();
     std::tuple<std::shared_ptr < PlayAnim >, int, bool, bool, bool, int, int> tmp(std::shared_ptr<PlayAnim>(new PlayAnim), index, isViewCam, isBlink, isBreath, transFrame, rand);
     m_WaitAnimMap[mapIndex] = tmp;
     std::get<EAnimMap::ITEM_ANIM>(m_WaitAnimMap[mapIndex])->AttachAnime(model, (int)index);

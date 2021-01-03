@@ -18,8 +18,9 @@ void DanceState::Initialize()
 
     auto anim = std::get<DANCE_ANIM>(danceConfig[DanceIndex]);
     anim->ResetAnimTime();
-    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddTransrate(-1, anim->GetAnimIndex(), 1);
-    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->AddAnim(anim);
+    auto animQueue = animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE);
+    animQueue->AddTransrate(-1, anim->GetAnimIndex(), 1);
+    animQueue->AddAnim(anim);
     currentAnimIndex = anim->GetAnimIndex();
 
     start = chrono::system_clock::now();

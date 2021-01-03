@@ -30,9 +30,9 @@ private:
     static void CALLBACK Callback(
         HWAVEIN hwi,
         UINT uMsg,
-        DWORD dwInstance,
-        DWORD dwParam1,
-        DWORD dwParam2);
+        DWORD_PTR dwInstance,
+        DWORD_PTR dwParam1,
+        DWORD_PTR dwParam2);
 
     void InitializeBuffer(unsigned long bufSize);
 

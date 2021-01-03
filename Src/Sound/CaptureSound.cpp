@@ -10,7 +10,7 @@ using namespace std;
 HRESULT CaptureSound::OpenDevice(UINT deviceIndex, WAVEFORMATEX format, int bufferSize)
 {
     m_WaveFormat = format;
-    if (waveInOpen(&hwi, deviceIndex, &format, (DWORD)Callback, (DWORD_PTR)this, CALLBACK_FUNCTION) != MMSYSERR_NOERROR) {
+    if (waveInOpen(&hwi, deviceIndex, &format, (DWORD_PTR)&Callback, (DWORD_PTR)this, CALLBACK_FUNCTION) != MMSYSERR_NOERROR) {
         // MessageBox(NULL, TEXT("WAVEデバイスのオープンに失敗しました。"), NULL, MB_ICONERROR);
         cerr << "WAVEデバイスのオープンに失敗しました。" << endl;
         return -1;
@@ -95,7 +95,7 @@ WAVEFORMATEX CaptureSound::GetWaveFormatEx()
     return m_WaveFormat;
 }
 
-void CaptureSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+void CaptureSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
 {
     switch (uMsg)
     {

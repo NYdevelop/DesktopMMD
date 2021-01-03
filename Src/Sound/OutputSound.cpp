@@ -7,9 +7,9 @@
 HRESULT OutputSound::OpenDevice(WAVEFORMATEX* format, UINT deviceIndex)
 {
     //! 出力デバイスをオープンする.
-    TCHAR str[MAXERRORLENGTH];
-    auto mmRes = waveOutOpen(&hwo, deviceIndex, format, (DWORD)&Callback, (DWORD_PTR)this, CALLBACK_FUNCTION);
+    auto mmRes = waveOutOpen(&hwo, deviceIndex, format, (DWORD_PTR)&Callback, (DWORD_PTR)this, CALLBACK_FUNCTION);
     if (mmRes != MMSYSERR_NOERROR) {
+        TCHAR str[MAXERRORLENGTH];
         waveOutGetErrorText(mmRes, str, MAXERRORLENGTH);
         MessageBox(NULL, str, L"output soud open error", MB_ICONERROR);
         return E_FAIL;
@@ -117,7 +117,7 @@ void OutputSound::SetVolume(float val)
 }
 
 // private
-void OutputSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+void OutputSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
 {
     switch (uMsg) {
     case MM_WOM_DONE:
