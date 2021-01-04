@@ -53,9 +53,9 @@ bool WindowGravity::CheckOtherWindow(VECTOR originPos, VECTOR& updatePos)
 
     // TODO: 画面に表示されているウィンドウのみ判定
     // 現在は、Zオーダー順に最小化または最大化ウィンドウまで判定
-    //TCHAR title[255];
+
     RECT rect;
-    WINDOWINFO info;
+    WINDOWINFO info = { 0 };
     GetWindowInfo(hWnd, &info);
     while (hWnd != nullptr)
     {
@@ -67,9 +67,10 @@ bool WindowGravity::CheckOtherWindow(VECTOR originPos, VECTOR& updatePos)
                 break;
             }
 
+            TCHAR title[255];
             GetWindowRect(hWnd, &rect);
-            //GetWindowText(hWnd, title, 255);
-            //cout << WStringToString(title) << endl;;
+            GetWindowText(hWnd, title, 255);
+//            cout << WStringToString(title) << endl;;
             if ((charaScreenPos.x > rect.left && charaScreenPos.x < rect.right) &&
                  CalcPos(rect.top, originPos, updatePos) == true)
             {

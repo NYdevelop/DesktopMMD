@@ -24,16 +24,14 @@ HRESULT ManageMMD::Initialize()
     SetUserWindow(m_Window.GetHWnd());
 
     // コンテキストメニューの初期化
-    std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>> contextMenuConfig;
-    std::vector<std::string> contextNodeVec;
     rapidxml::xml_document<> doc;
     rapidxml::file<> input("config.xml");
     doc.parse<0>(input.data());
     auto base = doc.first_node("DesktopMMD");
-    {
-        contextNodeVec = LoadContextNode(base->first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
-        m_Window.InitContextMenu(contextMenuConfig);
-    }
+
+    std::vector<std::tuple<HMENU, ULONG, UINT, std::wstring>> contextMenuConfig;
+    auto contextNodeVec = LoadContextNode(base->first_node("menu")->first_node(), CreatePopupMenu(), contextMenuConfig);
+    m_Window.InitContextMenu(contextMenuConfig);
 
     static const auto ANIM_PATH = GetAttribute(base->first_node("config")->first_node("anim"), "path");
     auto modelNode = base->first_node("model")->first_node();
@@ -59,83 +57,6 @@ HRESULT ManageMMD::Initialize()
 
     // 外部操作初期化
     {
-        /// マウスドラッグ操作
-        {
-            VECTOR xVecLButton, yVecLButton;
-            mouseDrag.SetButtonFunc(VK_LBUTTON,
-                [&](LONG, LONG)
-            {
-                auto rayVec = m_mmd->GetRayVec();
-                xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-                yVecLButton = VNorm(VCross(xVecLButton, rayVec));
-            },
-                [&](LONG diffX, LONG diffY)
-            {
-                VECTOR newPos = m_mmd->cameraPos;
-                if (diffX != 0)
-                {
-                    auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
-                    newPos = VAdd(newPos, diff);
-                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
-                }
-
-                if (diffY != 0)
-                {
-                    auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
-                    newPos = VAdd(newPos, diff);
-                    m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
-                }
-                m_mmd->cameraPos = newPos;
-            });
-
-            mouseDrag.SetButtonFunc(VK_MBUTTON,
-                [](LONG, LONG) {},
-                [&](LONG diffX, LONG diffY)
-            {
-                static const float CAMERA_MOVE_SPEED_A = .001f;
-                static const float CAMERA_MOVE_SPEED_B = .624f;
-
-                auto rayVec = m_mmd->GetRayVec();
-                auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
-                VECTOR newPos = rayVec;
-                if (diffX != 0)
-                {
-                    float s = 1.f;
-                    if (diffX < 0)
-                        s = -1.f;
-                    newPos =
-                        VAdd(
-                            m_mmd->cameraPos,
-                            VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-                }
-
-                if (diffY != 0)
-                {
-                    auto yVec = VNorm(VCross(xVec, rayVec));
-                    float s = 1.f;
-                    if (diffY < 0)
-                        s = -1.f;
-                    newPos =
-                        VAdd(
-                            newPos,
-                            VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
-                }
-
-                newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
-                m_mmd->cameraPos = newPos;
-            });
-        }
-
-        m_Window.SetCallbackMsg(WM_LBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-        {
-            mouseDrag.ButtonDown(VK_LBUTTON);
-        });
-
-        m_Window.SetCallbackMsg(WM_MBUTTONDOWN, [&](WPARAM wParam, LPARAM lParam)
-        {
-            mouseDrag.ButtonDown(VK_MBUTTON);
-        });
-
         m_Window.SetCallbackMsg(WM_MOUSEWHEEL, [&](WPARAM wParam, LPARAM lParam)
         {
             static const float VOLUME_DELTA = 0.05f;
@@ -189,33 +110,28 @@ HRESULT ManageMMD::Initialize()
                 SendMessageA(m_Window.GetHWnd(), WM_CLOSE, 0, 0);
             };
 
-            contextCommand[searchContextId(contextMenuConfig, L"Wait")] = [&](UINT)
+            // モード変更
             {
-                stateManager->Transrate(EState::STATE_WAIT);
-            };
-            contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = [&](UINT)
-            {
-                stateManager->Transrate(EState::STATE_RHYTHM);
-            };
-            contextCommand[searchContextId(contextMenuConfig, L"Read")] = [&](UINT)
-            {
-                stateManager->Transrate(EState::STATE_READ);
-            };
-            contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = [&](UINT)
-            {
-                stateManager->Transrate(EState::STATE_WAVE_HAND);
-            };
+                auto modeChangeFunc = [&](UINT, EState mode)
+                {
+                    stateManager->Transrate(mode);
+                };
+                contextCommand[searchContextId(contextMenuConfig, L"Wait")] = std::bind(modeChangeFunc, std::placeholders::_1, EState::STATE_WAIT);
+                contextCommand[searchContextId(contextMenuConfig, L"Rhythm")] = std::bind(modeChangeFunc, std::placeholders::_1, EState::STATE_RHYTHM);
+                contextCommand[searchContextId(contextMenuConfig, L"Read")] = std::bind(modeChangeFunc, std::placeholders::_1, EState::STATE_READ);
+                contextCommand[searchContextId(contextMenuConfig, L"手を振る")] = std::bind(modeChangeFunc, std::placeholders::_1, EState::STATE_WAVE_HAND);
+            }
 
-            contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = [&](UINT)
+            // 移動指示
             {
-                auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-                WalkStart(VGet(100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
-            };
-            contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = [&](UINT)
-            {
-                auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
-                WalkStart(VGet(1920.f - 100.f, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
-            };
+                auto moveFunc = [&](UINT, float pos)
+                {
+                    auto CharaScreenPos = ConvWorldPosToScreenPos(m_mmd->GetCharactorPos());
+                    WalkStart(VGet(pos, CharaScreenPos.y, -1), m_mmd.get(), &walkManager);
+                };
+                contextCommand[searchContextId(contextMenuConfig, L"左端へ移動")] = std::bind(moveFunc, std::placeholders::_1, 100.f);
+                contextCommand[searchContextId(contextMenuConfig, L"右端へ移動")] = std::bind(moveFunc, std::placeholders::_1, 1920.f - 100.f);
+            }
             contextCommand[searchContextId(contextMenuConfig, L"ランダム移動")] =
                 std::bind(ContextCheckFunc, std::placeholders::_1, m_Window.GetContextMenu(), [&](bool isCheck)
             {
@@ -294,6 +210,8 @@ HRESULT ManageMMD::Initialize()
                 contextCommand[id](id);
             }
         });
+
+        InitMouseDrag();
     }
 
     m_Window.SetDrawFunc([&](HDC hdc)
@@ -311,68 +229,25 @@ HRESULT ManageMMD::Initialize()
         }
 
         /// キー入力判定
-        {
-            if (IsPress(VK_CONTROL) == true)
-            {
-                if (IsPress(VK_RIGHT))
-                {
-                    m_mmd->RotateY -= .1f;
-                }
-
-                if (IsPress(VK_LEFT))
-                {
-                    m_mmd->RotateY += .1f;
-                }
-
-                if (IsPress(VK_UP))
-                {
-                    m_mmd->SetZoom(m_mmd->GetZoom() + .1f);
-                }
-
-                if (IsPress(VK_DOWN))
-                {
-                    m_mmd->SetZoom(m_mmd->GetZoom() - .1f);
-                }
-                return;
-            }
-
-            auto pos = m_mmd->GetCharactorPos();
-            if (IsPress(VK_UP))
-            {
-                pos.y += .1f;
-            }
-
-            if (IsPress(VK_DOWN))
-            {
-                pos.y -= .1f;
-            }
-            m_mmd->SetCharactorPos(pos);
-
-            if (IsPress(VK_HOME))
-            {
-                int MouseX = 0, MouseY = 0;
-                GetMousePoint(&MouseX, &MouseY);
-                WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
-            }
-
-            mouseDrag.Update();
-        }
+        InputKey();
     });
 
     /// 録音デバイス初期化
-    WAVEFORMATEX wf;
-    wf.wFormatTag = WAVE_FORMAT_PCM;       // PCM形式
-    wf.nChannels = 1;                      // ステレオかモノラルか
-    wf.nSamplesPerSec = 22050;             // サンプリングレート 22050KHz
-    wf.wBitsPerSample = 16;                // 量子化レベル
-    wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;      // バイトあたりのビット数[PCMの仕様]
-    wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;    // 1 秒あたりのバイト数
-                                                                // モノラル*サンプル22050*量子化16bit=1byteなので 一秒間に44100byteのデータが発生する
-                                                                // サンプル * nBlockAlign = 一秒間のデータ量なので nBlockAlignは2
+    {
+        WAVEFORMATEX wf;
+        wf.wFormatTag = WAVE_FORMAT_PCM;       // PCM形式
+        wf.nChannels = 1;                      // ステレオかモノラルか
+        wf.nSamplesPerSec = 22050;             // サンプリングレート 22050KHz
+        wf.wBitsPerSample = 16;                // 量子化レベル
+        wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;      // バイトあたりのビット数[PCMの仕様]
+        wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;    // 1 秒あたりのバイト数
+                                                                    // モノラル*サンプル22050*量子化16bit=1byteなので 一秒間に44100byteのデータが発生する
+                                                                    // サンプル * nBlockAlign = 一秒間のデータ量なので nBlockAlignは2
 
-    m_Capture = shared_ptr<CaptureSound>(new CaptureSound());
-    auto isCapture = GetAttrVal(base->first_node("config")->first_node("capture"), "mode", false);
-    if (isCapture) m_Capture->OpenDevice(0, wf, 4410 * 4);
+        m_Capture = shared_ptr<CaptureSound>(new CaptureSound());
+        auto isCapture = GetAttrVal(base->first_node("config")->first_node("capture"), "mode", false);
+        if (isCapture) m_Capture->OpenDevice(0, wf, (wf.nSamplesPerSec / 5) * 4);
+    }
 
     /// 音声出力初期化
     m_Output = shared_ptr<OutputSound>(new OutputSound());
@@ -547,4 +422,133 @@ void ManageMMD::InitStateModel()
     walkManager.SetNextState(EState::STATE_WAIT);
 
     waitPtr->OnceInitial();
+}
+
+void ManageMMD::InitMouseDrag()
+{
+    /// マウス左ドラッグ操作
+    {
+        VECTOR xVecLButton, yVecLButton;
+        mouseDrag.SetButtonFunc(VK_LBUTTON,
+            [&](LONG, LONG)
+        {
+            auto rayVec = m_mmd->GetRayVec();
+            xVecLButton = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+            yVecLButton = VNorm(VCross(xVecLButton, rayVec));
+        },
+            [&](LONG diffX, LONG diffY)
+        {
+            VECTOR newPos = m_mmd->cameraPos;
+            if (diffX != 0)
+            {
+                auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
+                newPos = VAdd(newPos, diff);
+                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+            }
+
+            if (diffY != 0)
+            {
+                auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
+                newPos = VAdd(newPos, diff);
+                m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
+            }
+            m_mmd->cameraPos = newPos;
+        });
+    }
+
+    /// マウス中ドラッグ操作
+    {
+        mouseDrag.SetButtonFunc(VK_MBUTTON,
+            [](LONG, LONG) {},
+            [&](LONG diffX, LONG diffY)
+        {
+            static const float CAMERA_MOVE_SPEED_A = .001f;
+            static const float CAMERA_MOVE_SPEED_B = .624f;
+
+            auto rayVec = m_mmd->GetRayVec();
+            auto xVec = VNorm(VCross(rayVec, VGet(0, 1, 0)));
+            VECTOR newPos = rayVec;
+            if (diffX != 0)
+            {
+                float s = 1.f;
+                if (diffX < 0)
+                    s = -1.f;
+                newPos =
+                    VAdd(
+                        m_mmd->cameraPos,
+                        VScale(xVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+            }
+
+            if (diffY != 0)
+            {
+                auto yVec = VNorm(VCross(xVec, rayVec));
+                float s = 1.f;
+                if (diffY < 0)
+                    s = -1.f;
+                newPos =
+                    VAdd(
+                        newPos,
+                        VScale(yVec, (CAMERA_MOVE_SPEED_A * pow(m_mmd->GetZoom(), 1.8f) + CAMERA_MOVE_SPEED_B) * s));
+            }
+
+            newPos = VScale(VNorm(newPos), m_mmd->GetZoom());
+            m_mmd->cameraPos = newPos;
+        });
+    }
+
+    /// ドラッグ開始登録
+    auto mouseClickFunc = [&](WPARAM, LPARAM, unsigned char button)
+    {
+        mouseDrag.ButtonDown(button);
+    };
+    m_Window.SetCallbackMsg(WM_LBUTTONDOWN, std::bind(mouseClickFunc, std::placeholders::_1, std::placeholders::_2, VK_LBUTTON));
+    m_Window.SetCallbackMsg(WM_MBUTTONDOWN, std::bind(mouseClickFunc, std::placeholders::_1, std::placeholders::_2, VK_MBUTTON));
+}
+
+void ManageMMD::InputKey()
+{
+    if (IsPress(VK_CONTROL) == true)
+    {
+        if (IsPress(VK_RIGHT))
+        {
+            m_mmd->RotateY -= .1f;
+        }
+
+        if (IsPress(VK_LEFT))
+        {
+            m_mmd->RotateY += .1f;
+        }
+
+        if (IsPress(VK_UP))
+        {
+            m_mmd->SetZoom(m_mmd->GetZoom() + .1f);
+        }
+
+        if (IsPress(VK_DOWN))
+        {
+            m_mmd->SetZoom(m_mmd->GetZoom() - .1f);
+        }
+        return;
+    }
+
+    auto pos = m_mmd->GetCharactorPos();
+    if (IsPress(VK_UP))
+    {
+        pos.y += .1f;
+    }
+
+    if (IsPress(VK_DOWN))
+    {
+        pos.y -= .1f;
+    }
+    m_mmd->SetCharactorPos(pos);
+
+    if (IsPress(VK_HOME))
+    {
+        int MouseX = 0, MouseY = 0;
+        GetMousePoint(&MouseX, &MouseY);
+        WalkStart(VGet((float)MouseX, (float)MouseY, -1), m_mmd.get(), &walkManager);
+    }
+
+    mouseDrag.Update();
 }

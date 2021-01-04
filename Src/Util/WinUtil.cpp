@@ -1,8 +1,5 @@
 #include "WinUtil.h"
 
-#include <vector>
-#include <system_error>
-
 using namespace std;
 
 std::wstring StringToWString(std::string const& src, unsigned int charCode)
@@ -68,10 +65,9 @@ std::vector<std::string> LoadContextNode(
     if (sub != nullptr)
     {
         std::get<1>(*sub) = MF_POPUP;
-        auto subMenu = CreatePopupMenu();
-        std::get<2>(*sub) = (UINT)subMenu;
+        context = CreatePopupMenu();
+        std::get<2>(*sub) = (UINT)(UINT_PTR)context;
         config.emplace_back(*sub);
-        context = subMenu;
     }
 
     NodeApply(node, [&](auto child)

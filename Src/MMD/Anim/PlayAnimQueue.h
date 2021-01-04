@@ -35,7 +35,7 @@ public:
 
     void Pause();
 
-    void Restart();
+    void Resume();
 
 private:
     /// アニメインタフェースとTransrateフラグを格納

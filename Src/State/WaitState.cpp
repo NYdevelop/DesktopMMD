@@ -23,8 +23,8 @@ void WaitState::Doing()
 {
     if (!animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty()) return;
     m_mmd->canViewCamera = true;
-    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->Restart();
-    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->Restart();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->Resume();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->Resume();
 
     if (m_RandomMove == false)
     {
@@ -54,6 +54,8 @@ void WaitState::Doing()
 void WaitState::End()
 {
     m_mmd->canViewCamera = false;
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BLINK)->Resume();
+    animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_BREATH)->Resume();
 
     if (!animManager->GetAnimQueue(ActionManager::EAnimQueue::QUEUE_USE)->Empty())
     {

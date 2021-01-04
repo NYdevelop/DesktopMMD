@@ -35,7 +35,7 @@ auto as_integer(Enumeration const value)
 // コンテキストメニューチェック関数のラッパー関数
 inline DWORD ContextItemCheck(UINT id, HMENU contextMenu, bool isCheck)
 {
-    return CheckMenuItem(contextMenu, id, MF_BYCOMMAND | isCheck ? MFS_CHECKED : MFS_UNCHECKED);
+    return CheckMenuItem(contextMenu, id, MF_BYCOMMAND | (isCheck ? MFS_CHECKED : MFS_UNCHECKED));
 };
 
 #include <functional>

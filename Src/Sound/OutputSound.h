@@ -40,6 +40,8 @@ private:
 
     HWAVEOUT hwo;
 
+    static const int READ_HZ = 2;
+
     static const int BUFFER_NUM = 2;
     WAVEHDR OutHdr[BUFFER_NUM];               //!< サウンド入力のデータブロック構造体
     char* m_DataBuffer[BUFFER_NUM];

@@ -36,14 +36,14 @@ void OutputSound::Start(const std::wstring & wavFileName, UINT deviceIndex)
 
     OpenDevice(&m_FileWaveFormat, deviceIndex);
     auto header = m_FileReader.GetHeader();
-    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec;
+    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
     InitializeBuffer(size);
 
     ReadNext();
     InputData();
 
     ReadNext();
-    Sleep(400);
+    Sleep(1000 / READ_HZ - 200);
     InputData();
 }
 
@@ -58,7 +58,7 @@ void OutputSound::Stop()
 HRESULT OutputSound::CloseDevice()
 {
     if (hwo == nullptr) S_OK;
-    Sleep(1100);
+    Sleep(1000 / READ_HZ + 100);
     for (int i = 0; i < BUFFER_NUM; i++)
     {
         //! 出力デバイスに登録したデータブロックを解放する.
@@ -91,7 +91,7 @@ void OutputSound::InputData()
 
 void OutputSound::ReadNext()
 {
-    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / 2;
+    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
     size = m_FileReader.ReadWaveFile(OutHdr[m_CurrentBuffer].lpData, size);
     OutHdr[m_CurrentBuffer].dwBufferLength = size;
     if (size == 0)

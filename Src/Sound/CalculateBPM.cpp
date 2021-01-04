@@ -73,16 +73,16 @@ void find_peak3(const double* a, size_t size, int *max_idx)
             {
                 max_idx[2] = max_idx[1];
                 max_idx[1] = max_idx[0];
-                max_idx[0] = i - 1;
+                max_idx[0] = static_cast<int>(i - 1);
             }
             else if (max_idx[1] < 0 || a[i - 1] > a[max_idx[1]])
             {
                 max_idx[2] = max_idx[1];
-                max_idx[1] = i - 1;
+                max_idx[1] = static_cast<int>(i - 1);
             }
             else if (max_idx[2] < 0 || a[i - 1] > a[max_idx[2]])
             {
-                max_idx[2] = i - 1;
+                max_idx[2] = static_cast<int>(i - 1);
             }
         }
     }
@@ -102,13 +102,13 @@ inline double power(const double re, const double im)
 
 std::vector<int> CalculateBPM::CalcBPM(std::vector<double> vol, WAVEFORMATEX wf)
 {
-    const int N = vol.size();
+    const auto N = vol.size();
     if (N == 0) return vector<int>();
     // 音量差分(増加のみ)
     double *diff = new double[N]; // 音量差分
 
     diff[0] = vol[0];
-    for (int i = 1; i < N; i++)
+    for (size_t i = 1; i < N; i++)
     {
         if (vol[i] - vol[i - 1] > 0)
         {
@@ -149,7 +149,7 @@ std::vector<int> CalculateBPM::CalcBPM(std::vector<double> vol, WAVEFORMATEX wf)
         double f = double(bpm) / 60;
         for (int n = 0; n < N; n++)
         {
-            double win = Humming(n, N);
+            double win = Humming(n, static_cast<unsigned long>(N));
             a_sum += diff[n] * cos(2.0 * M_PI * f * n / s) * win;
             b_sum += diff[n] * sin(2.0 * M_PI * f * n / s) * win;
             // 注意：窓関数を使用しないと端の影響で誤差が出る

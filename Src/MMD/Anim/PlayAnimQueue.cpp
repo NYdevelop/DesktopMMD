@@ -88,7 +88,7 @@ void PlayAnimQueue::Pause()
     isPause = true;
 }
 
-void PlayAnimQueue::Restart()
+void PlayAnimQueue::Resume()
 {
     if (isPause == false) return;
     auto index = m_Queue.front().first->GetAnimIndex();

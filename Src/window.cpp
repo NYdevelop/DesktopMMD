@@ -77,7 +77,9 @@ LRESULT CALLBACK CWindow::WindProc(
     LPARAM lParam) {
 
     CWindow* win = (CWindow*)::GetProp(hwnd, TEXT("THIS_INSTANCE"));
-    if (win != NULL && win->m_CallbackMap.find(uMsg) != win->m_CallbackMap.end())
+    if (win == NULL) return DefWindowProc(hwnd, uMsg, wParam, lParam);
+
+    if (win->m_CallbackMap.find(uMsg) != win->m_CallbackMap.end())
     {
         win->m_CallbackMap[uMsg](wParam, lParam);
         return 0;

@@ -71,15 +71,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -184,6 +188,7 @@
     <ClInclude Include="Src\State\WalkStateManager.h" />
     <ClInclude Include="Src\State\WaveHandState.h" />
     <ClInclude Include="Src\Util\ConfigLoader.h" />
+    <ClInclude Include="Src\Util\MouseDrag.h" />
     <ClInclude Include="Src\Util\Util.h" />
     <ClInclude Include="Src\Util\UtilMMD.h" />
     <ClInclude Include="Src\Util\UtilXml.h" />
@@ -217,6 +222,7 @@
     <ClCompile Include="Src\State\WalkStateManager.cpp" />
     <ClCompile Include="Src\State\WaveHandState.cpp" />
     <ClCompile Include="Src\Util\ConfigLoader.cpp" />
+    <ClCompile Include="Src\Util\MouseDrag.cpp" />
     <ClCompile Include="Src\Util\UtilMMD.cpp" />
     <ClCompile Include="Src\Util\UtilXml.cpp" />
   </ItemGroup>

@@ -31,6 +31,10 @@ public:
 private:
     void InitStateModel();
 
+    void InitMouseDrag();
+
+    void InputKey();
+
     CWindow m_Window;
     std::shared_ptr<CaptureSound> m_Capture;
     std::shared_ptr<OutputSound> m_Output;
