@@ -21,13 +21,11 @@ DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath,
     dispHeight = rc.bottom - rc.top;
 
 
-    RotateY = charaDirect;//DX_PI_F;
-    float posX = charaX;//0.f;
-    float posY = charaY;//0.f;
-    m_Zoom = cameraZ * -1.f;//35.f;
+    RotateY = charaDirect;
+    m_Zoom = cameraZ * -1.f;
 
-    charaPos = VGet(charaX, charaY, charaZ);//VGet(posX, posY, 1.0f);
-    cameraPos = VGet(cameraX, cameraY, m_Zoom * -1.f);;// VGet(0.f, 0.f, m_Zoom * -1.f);
+    charaPos = VGet(charaX, charaY, charaZ);
+    cameraPos = VGet(cameraX, cameraY, m_Zoom * -1.f);
 }
 
 void DrawMMD::afterInitialize()

@@ -1,7 +1,5 @@
 #include "UtilMMD.h"
 
-
-
 void WalkStart(VECTOR screenPos, DrawMMD * mmd, WalkStateManager * walker)
 {
     auto tmpScreenPos = screenPos;
@@ -30,9 +28,8 @@ void WalkStart(VECTOR screenPos, DrawMMD * mmd, WalkStateManager * walker)
 
             // éwíËâÊñ ç¿ïWÇä‹Çﬁñ åWêîéZèo
             auto norm = VCross(rayVec, VGet(0.f, 1.f, 0.f));
-            auto d = -VDot(norm, Start3DPos);
 
-            auto t = d + VDot(norm, pos);
+            auto t = VDot(norm, VSub(pos, Start3DPos));
             newPos = VAdd(pos, VScale(ScreenSlideVec, t));
         }
         else
