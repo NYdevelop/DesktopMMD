@@ -441,14 +441,14 @@ void ManageMMD::InitMouseDrag()
             VECTOR newPos = m_mmd->cameraPos;
             if (diffX != 0)
             {
-                auto diff = VScale(xVecLButton, diffX / m_mmd->GetZoom());
+                auto diff = VScale(xVecLButton, diffX / sqrt(m_mmd->GetZoom()) / 2.f);
                 newPos = VAdd(newPos, diff);
                 m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
             }
 
             if (diffY != 0)
             {
-                auto diff = VScale(yVecLButton, -diffY / m_mmd->GetZoom());
+                auto diff = VScale(yVecLButton, -diffY / sqrt(m_mmd->GetZoom()) / 2.f);
                 newPos = VAdd(newPos, diff);
                 m_mmd->SetCharactorPos(VAdd(m_mmd->GetCharactorPos(), diff));
             }
