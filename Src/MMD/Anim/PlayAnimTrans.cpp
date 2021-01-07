@@ -5,7 +5,6 @@
 int PlayAnimTrans::AttachAnime(int modHandle, int animIndex)
 {
     modelHandle = modHandle;
-    srcAnimIndex = srcAnimIndex;
     transrateAnimIndex = animIndex;
     return 0;
 }

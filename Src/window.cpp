@@ -22,8 +22,8 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
     sWndClassEx.cbClsExtra = 0;
     sWndClassEx.cbWndExtra = 0;
     sWndClassEx.hInstance = GetModuleHandle(NULL);
-    sWndClassEx.hIcon = NULL;// LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
-    sWndClassEx.hIconSm = NULL;// LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
+    sWndClassEx.hIcon = NULL;   // LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
+    sWndClassEx.hIconSm = NULL; // LoadIcon(sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
     sWndClassEx.hCursor = LoadCursor(NULL, IDC_ARROW);
     sWndClassEx.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH),//(HBRUSH)(COLOR_WINDOW + 1);
         sWndClassEx.lpszMenuName = NULL;// (LPCSTR)IDC_TESTSHARESURFACE;
@@ -61,9 +61,6 @@ HRESULT CWindow::InitWindow(HWND* hWnd) {
     if (!hTmpWnd)
         return E_FAIL;
 
-    ShowWindow(
-        hTmpWnd,           // window handle
-        SW_SHOWDEFAULT);   // 
     UpdateWindow(hTmpWnd);
 
     return S_OK;

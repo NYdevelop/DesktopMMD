@@ -43,7 +43,8 @@ void DrawMMD::afterInitialize()
     SetCameraNearFar(1.f, 1000.0f);
     SetCameraPositionAndTarget_UpVecY(cameraPos, cameraViewPos);
 
-    //gHandle = MakeGraph(1920, 1040);
+    SetFullSceneAntiAliasingMode(4, 4);
+    // gHandle = MakeGraph(1920, 1040);
 }
 
 //ÉÅÉCÉìÇ∆Ç»ÇÈèàóù
@@ -129,7 +130,7 @@ void DrawMMD::LoadModel()
     isDraw = false;
 
     MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_REALTIME);
-    //MV1SetLoadModelPhysicsWorldGravity(-10.f);
+    // MV1SetLoadModelPhysicsWorldGravity(-10.f);
     MV1InitModel();
 
     TCHAR buf[255];

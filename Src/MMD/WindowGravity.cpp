@@ -22,8 +22,7 @@ float WindowGravity::PosUpdate(VECTOR pos)
 bool WindowGravity::CalcPos(int screenY, VECTOR originPos, VECTOR& updatePos, bool isDesktop)
 {
     auto plane = GetPlane(static_cast<float>(screenY));
-    auto t =
-        VDot(plane.second, originPos) - VDot(plane.second, plane.first);
+    auto t = VDot(plane.second, VSub(originPos, plane.first));
 
     // ”÷’²®‚ª•K—v‚©”»’è
     if ((isDesktop && t > 0) || // ã•ûŒü‚Ö‚Ì•â³
