@@ -51,6 +51,7 @@ void OutputSound::Stop()
 {
     if (hwo == nullptr) return;
     m_IsStop = true;
+    waveOutPause(hwo);
     m_FileReader.CloseWaveFile();
     m_CurrentBuffer = 0;
 }
