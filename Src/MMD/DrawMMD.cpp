@@ -26,6 +26,8 @@ DrawMMD::DrawMMD(const std::string & animPath, const std::string & modelPath,
 
     charaPos = VGet(charaX, charaY, charaZ);
     cameraPos = VGet(cameraX, cameraY, m_Zoom * -1.f);
+
+    SetUseDirect3DVersion(DX_DIRECT3D_9EX);
 }
 
 void DrawMMD::afterInitialize()
@@ -45,6 +47,45 @@ void DrawMMD::afterInitialize()
 
     SetFullSceneAntiAliasingMode(4, 4);
     // gHandle = MakeGraph(1920, 1040);
+
+    //ChangeLightTypePoint(
+    //    VGet(0.0f, 0.0f, 0.0f),
+    //    1000.f,
+    //    1.f,
+    //    0.f,
+    //    0.f);
+
+    // プログラマブルシェーダーモデル２．０が使用できない場合はエラーを表示して終了
+    if (GetValidShaderVersion() < 300)
+    {
+        // エラー表示
+        std::cout << "プログラマブルシェーダー２．０が使用できない環境のようです" << std::endl;
+
+        // キー入力待ち
+        WaitKey();
+
+        // ＤＸライブラリの後始末
+        DxLib_End();
+
+        // ソフト終了
+        return;
+    }
+
+    // 頂点シェーダーを読み込む
+    VertexShaderHandle = LoadVertexShader(L"Src/Shader/SkinMesh4_DirLight_ToonVS.vso");
+    std::cout << "VShader handle: " << VertexShaderHandle << std::endl;
+
+    // ピクセルシェーダーを読み込む
+    PixelShaderHandle = LoadPixelShader(L"Src/Shader/SkinMesh4_DirLight_ToonPS.pso");
+    std::cout << "PShader handle: " << PixelShaderHandle << std::endl;
+
+    // 使用する頂点シェーダーをセット
+    SetUseVertexShader(VertexShaderHandle);
+
+    // 使用するピクセルシェーダーをセット
+    SetUsePixelShader(PixelShaderHandle);
+
+    MV1SetUseOrigShader(TRUE);
 }
 
 //メインとなる処理
@@ -112,6 +153,12 @@ void DrawMMD::Exit()
 {
     isDraw = false;
     MV1DeleteModel(model);
+
+    // 読み込んだ頂点シェーダーの削除
+    DeleteShader(VertexShaderHandle);
+
+    // 読み込んだピクセルシェーダーの削除
+    DeleteShader(PixelShaderHandle);
 
     std::ofstream ofs("config_pos.txt");
     Write(ofs, "CHARA_POS_X", to_string(charaPos.x));

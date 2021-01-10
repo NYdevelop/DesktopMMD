@@ -89,4 +89,7 @@ private:
 
     std::string m_AnimPath;
     std::string m_ModelPath;
+
+    int VertexShaderHandle;
+    int PixelShaderHandle;
 };
