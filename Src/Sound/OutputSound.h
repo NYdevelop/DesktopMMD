@@ -18,7 +18,7 @@ public:
 
     void InputData();
 
-    void ReadNext();
+    int ReadNext();
 
     inline float GetVolume() { return m_Volume; }
 

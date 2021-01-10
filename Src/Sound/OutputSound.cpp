@@ -51,7 +51,7 @@ void OutputSound::Stop()
 {
     if (hwo == nullptr) return;
     m_IsStop = true;
-    waveOutPause(hwo);
+    waveOutReset(hwo);
     m_FileReader.CloseWaveFile();
     m_CurrentBuffer = 0;
 }
@@ -90,18 +90,17 @@ void OutputSound::InputData()
     }
 }
 
-void OutputSound::ReadNext()
+int OutputSound::ReadNext()
 {
     unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
     size = m_FileReader.ReadWaveFile(OutHdr[m_CurrentBuffer].lpData, size);
     OutHdr[m_CurrentBuffer].dwBufferLength = size;
     if (size == 0)
     {
-        Stop();
-        CloseDevice();
-        return;
+        return S_FALSE;
     }
     DoVolume(OutHdr[m_CurrentBuffer].lpData, size, &m_FileWaveFormat);
+    return S_OK;
 }
 
 void OutputSound::SetVolume(float val)
@@ -129,7 +128,7 @@ void OutputSound::Callback(HWAVEIN hwi, UINT uMsg, DWORD_PTR dwInstance, DWORD_P
             return;
         }
 
-        outputSound->ReadNext();
+        if (outputSound->ReadNext() == S_FALSE) break;
         outputSound->InputData();
         break;
     }
