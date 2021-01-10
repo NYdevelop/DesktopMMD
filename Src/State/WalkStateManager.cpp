@@ -65,6 +65,8 @@ void WalkStateManager::Update()
 
 void WalkStateManager::Cancel()
 {
+    if (m_IsMove == false) return;
+
     m_IsMove = false;
     m_StateManager->Transrate(nextState);
 }
