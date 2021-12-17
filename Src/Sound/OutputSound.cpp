@@ -4,6 +4,10 @@
 
 #include <iostream>
 
+#include "ReadMp3.h"
+#include "ReadWavFile.h"
+#include "ReadWssFile.h"
+
 HRESULT OutputSound::OpenDevice(WAVEFORMATEX* format, UINT deviceIndex)
 {
     //! 出力デバイスをオープンする.
@@ -17,27 +21,51 @@ HRESULT OutputSound::OpenDevice(WAVEFORMATEX* format, UINT deviceIndex)
     return S_OK;
 }
 
-void OutputSound::Start(const std::wstring & wavFileName, UINT deviceIndex)
+void OutputSound::Start(const std::wstring& fileName, UINT deviceIndex)
+{
+    auto dotPos = fileName.find_last_of(L".");
+    if (dotPos == std::string::npos)
+    {
+        std::cerr << "file name error" << std::endl;
+        throw "file name error";
+    }
+    auto ext = fileName.substr(dotPos+1);
+    if (ext == L"wav")
+    {
+        m_FileReader = std::unique_ptr<IReadFile>(new ReadWavFile());
+    }
+    else if (ext == L"mp3")
+    {
+        m_FileReader = std::unique_ptr<IReadFile>(new ReadMp3());
+    }
+    else if (ext == L"wss")
+    {
+        m_FileReader = std::unique_ptr<IReadFile>(new ReadWssFile());
+    }
+
+    StartWavFile(fileName, deviceIndex);
+}
+
+void OutputSound::StartWavFile(const std::wstring & fileName, UINT deviceIndex)
 {
     m_IsStop = false;
-    if (m_FileReader.ReadOpenWaveFile(wavFileName.c_str()) == FALSE)
+
+    if (m_FileReader->Open(fileName) == FALSE)
     {
-        MessageBox(NULL, TEXT("wav open error"), NULL, MB_ICONERROR);
+        MessageBox(NULL, TEXT("file open error"), NULL, MB_ICONERROR);
         return;
     }
 
-    auto format = m_FileReader.GetFormat();
-    m_FileWaveFormat.wFormatTag = WAVE_FORMAT_PCM;
-    m_FileWaveFormat.nChannels = format.Channels;
-    m_FileWaveFormat.nSamplesPerSec = format.SamplesPerSec;
-    m_FileWaveFormat.wBitsPerSample = format.BitsPerSample;
-    m_FileWaveFormat.nBlockAlign = m_FileWaveFormat.wBitsPerSample * m_FileWaveFormat.nChannels / 8;
-    m_FileWaveFormat.nAvgBytesPerSec = m_FileWaveFormat.nSamplesPerSec * m_FileWaveFormat.nBlockAlign;
+    m_FileWaveFormat = m_FileReader->m_WaveFormat;
 
+    StartWav(deviceIndex);
+}
+
+void OutputSound::StartWav(UINT deviceIndex)
+{
     OpenDevice(&m_FileWaveFormat, deviceIndex);
-    auto header = m_FileReader.GetHeader();
-    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
-    InitializeBuffer(size);
+    m_ReadSize = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
+    InitializeBuffer(m_ReadSize);
 
     ReadNext();
     InputData();
@@ -52,7 +80,7 @@ void OutputSound::Stop()
     if (hwo == nullptr) return;
     m_IsStop = true;
     waveOutReset(hwo);
-    m_FileReader.CloseWaveFile();
+    m_FileReader->Dispose();
     m_CurrentBuffer = 0;
 }
 
@@ -92,8 +120,7 @@ void OutputSound::InputData()
 
 int OutputSound::ReadNext()
 {
-    unsigned long size = m_FileWaveFormat.nAvgBytesPerSec / READ_HZ;
-    size = m_FileReader.ReadWaveFile(OutHdr[m_CurrentBuffer].lpData, size);
+    unsigned long size = m_FileReader->GetData((unsigned char*)OutHdr[m_CurrentBuffer].lpData, m_ReadSize);
     OutHdr[m_CurrentBuffer].dwBufferLength = size;
     if (size == 0)
     {
@@ -114,6 +141,11 @@ void OutputSound::SetVolume(float val)
         val = 0.f;
     }
     m_Volume = val;
+}
+
+double OutputSound::GetDuration()
+{
+    return m_FileReader->m_Size / (double)m_FileWaveFormat.nAvgBytesPerSec;
 }
 
 // private

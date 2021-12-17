@@ -1,22 +1,14 @@
 #pragma once
 
-#include <Windows.h>
+#include "ReadFile.h"
 #include <vector>
 #include "WaveFile.h"
 
-class ReadWavFile
+class ReadWavFile : public IReadFile
 {
 public:
-    /*!
-    *	@brief	ファイルを読み込みモードでオープンする.
-    *
-    *	@param	[in]	file_name	ファイル名のポインタ.
-    *
-    *	@retval	TRUE = OK. / FALSE = NG.
-    */
-    BOOL ReadOpenWaveFile(LPCTSTR file_name);
-
-    void CloseWaveFile(void);
+    bool Open(const std::wstring & fileName);
+    void Dispose();
 
     /*!
     *	@brief	ファイルからWAVEデータを読み込む.
@@ -26,7 +18,7 @@ public:
     *
     *	@retval	ファイルから読み込んだバイト数.
     */
-    DWORD	ReadWaveFile(void* data, DWORD size);
+    unsigned long GetData(unsigned char* data, unsigned long size);
     RIFFHEADER GetHeader();
     RIFFFORMATCHUNK GetFormat();
 

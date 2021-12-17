@@ -5,9 +5,10 @@
 
 #define	RIFFCC( _x )	(((_x >> 24) & 0xFF) + ((_x >> 8) & 0xFF00) + ((_x << 8) & 0xFF0000) + ((_x << 24) & 0xFF000000))
 
-BOOL ReadWavFile::ReadOpenWaveFile(LPCTSTR file_name)
+bool ReadWavFile::Open(const std::wstring & fileName)
 {
     DWORD offset = 0;
+    auto file_name = const_cast<WCHAR*>((fileName).c_str());
 
     //! 既にファイル・オープン中の場合、エラーにする.
     if (hFile) {
@@ -30,7 +31,7 @@ BOOL ReadWavFile::ReadOpenWaveFile(LPCTSTR file_name)
         const int CHECK_LENGTH = 256;
         //! ファイルの先頭からストリームを読み込む.
         BYTE	buf[CHECK_LENGTH];
-        auto len = ReadWaveFile(buf, CHECK_LENGTH);
+        auto len = GetData(buf, CHECK_LENGTH);
         if (len == 0) break;
 
         //! ファイルヘッダを取り出す.
@@ -91,16 +92,24 @@ BOOL ReadWavFile::ReadOpenWaveFile(LPCTSTR file_name)
         pos1.QuadPart = offset;
         SetFilePointerEx(hFile, pos1, &pos2, FILE_BEGIN);
 
+        auto format = GetFormat();
+        m_WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
+        m_WaveFormat.nChannels = format.Channels;
+        m_WaveFormat.nSamplesPerSec = format.SamplesPerSec;
+        m_WaveFormat.wBitsPerSample = format.BitsPerSample;
+        m_WaveFormat.nBlockAlign = m_WaveFormat.wBitsPerSample * m_WaveFormat.nChannels / 8;
+        m_WaveFormat.nAvgBytesPerSec = m_WaveFormat.nSamplesPerSec * m_WaveFormat.nBlockAlign;
+
         return TRUE;
 
     } while (FALSE);
 
     //! エラーの場合、ファイルをクローズして終了する.
-    CloseWaveFile();
+    Dispose();
     return FALSE;
 }
 
-void ReadWavFile::CloseWaveFile(void)
+void ReadWavFile::Dispose()
 {
     if (hFile) {
         //! オープン中のファイルがある場合、ファイルをクローズする.
@@ -109,7 +118,8 @@ void ReadWavFile::CloseWaveFile(void)
     hFile = NULL;
 }
 
-DWORD ReadWavFile::ReadWaveFile(void * data, DWORD size)
+unsigned long ReadWavFile::GetData(unsigned char* data, unsigned long size)
+//DWORD ReadWavFile::ReadWaveFile(void * data, DWORD size)
 {
     DWORD len = 0;
 

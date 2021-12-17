@@ -1,16 +1,19 @@
 #pragma once
 
-#include <Windows.h>
+#include "ReadFile.h"
 #include <string>
-
-#include "ReadWavFile.h"
+#include <memory>
 
 class OutputSound
 {
 public:
     HRESULT OpenDevice(WAVEFORMATEX* format, UINT deviceIndex = WAVE_MAPPER);
 
-    void Start(const std::wstring& wavFileName, UINT deviceIndex = WAVE_MAPPER);
+    void Start(const std::wstring & fileName, UINT deviceIndex = WAVE_MAPPER);
+
+    void StartWavFile(const std::wstring& wavFileName, UINT deviceIndex = WAVE_MAPPER);
+
+    void StartWav(UINT deviceIndex);
 
     void Stop();
 
@@ -25,6 +28,8 @@ public:
     void SetVolume(float val);
 
     inline bool IsPlay() { return !m_IsStop; }
+
+    double GetDuration();
 
 private:
     static void CALLBACK Callback(
@@ -46,8 +51,9 @@ private:
     WAVEHDR OutHdr[BUFFER_NUM];               //!< サウンド入力のデータブロック構造体
     char* m_DataBuffer[BUFFER_NUM];
     int m_CurrentBuffer = 0;
+    unsigned long m_ReadSize;
 
-    ReadWavFile m_FileReader;
+    std::unique_ptr<IReadFile> m_FileReader;
     WAVEFORMATEX m_FileWaveFormat;
 
     float m_Volume = 0.0625;
